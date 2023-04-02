@@ -2,7 +2,6 @@ package com.risonna.schedulewebapp.controllers;
 
 import com.risonna.schedulewebapp.beans.Lesson;
 import com.risonna.schedulewebapp.excelparsing.ExcelSearch;
-import jakarta.enterprise.context.ApplicationScoped;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import org.apache.commons.io.IOUtils;
@@ -14,7 +13,7 @@ import java.util.Arrays;
 import java.util.List;
 
 @Named
-@ApplicationScoped
+@SessionScoped
 public class uploadedFileController implements Serializable {
 
     private UploadedFile uploadedFile;
