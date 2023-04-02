@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: rison
+  Date: 28.03.2023
+  Time: 15:52
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+    <title>Title</title>
+
+</h:head>
+
+<h:body>
+    <ui:composition>
+
+    <div class="header">
+        <h:graphicImage library="images" name="university_design.jpg" />
+        <h:form>
+            <div class="header-buttons">
+                <h:commandButton value="#{msg.login}" action="#{loginController.login}" styleClass="login-button" />
+                <h:commandButton value="#{msg.register}" action="#{loginController.register}" styleClass="register-button" />
+            </div>
+        </h:form>
+    </div>
+
+    </ui:composition>
+
+</h:body>
+
+</html>

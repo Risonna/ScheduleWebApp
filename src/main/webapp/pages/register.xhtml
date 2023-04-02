@@ -1,0 +1,63 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: rison
+  Date: 29.03.2023
+  Time: 18:04
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:ui="http://xmlns.jcp.org/jsf/composite"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+>
+
+<h:head>
+    <title>Title</title>
+</h:head>
+
+<h:body>
+
+    <h:form enctype="multipart/form-data">
+        <p:fileUpload value="#{uploadedFileController.uploadedFile}" mode="simple"/>
+
+
+        <h:commandButton value="Upload" action="#{uploadedFileController.upload}" />
+    </h:form>
+    <h:form>
+        <h:commandButton value="Parse" action="#{uploadedFileController.parse(uploadedFileController.filePath)}"/>
+    </h:form>
+
+
+    <h:button id="sex1" value="register"/>
+
+    <h:dataTable value="#{uploadedFileController.dayTimeGroup(uploadedFileController.listOfLessons, 'понедельник', 'пми-221')}" var="lessonsList" rendered="#{uploadedFileController.isUploaded}">
+
+
+        <h:column>
+            <h:outputText value="Subject's name is #{lessonsList.subjectName} "/>
+            <h:outputText value="Teacher's name is #{lessonsList.teacherName} "/>
+            <h:outputText value="Group's name is #{lessonsList.groupName} "/>
+            <h:outputText value="Cabinet № #{lessonsList.cabinetName} "/>
+            <h:outputText value="The time is #{lessonsList.lessonTime}"/>
+        </h:column>
+
+
+
+
+    </h:dataTable>
+
+
+
+
+
+
+
+
+</h:body>
+
+</html>
