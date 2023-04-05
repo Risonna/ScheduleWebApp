@@ -20,9 +20,15 @@ import java.util.logging.Logger;
 @ApplicationScoped
 public class scheduleController implements Serializable {
     private List<String> teacherNames =  Arrays.asList("доц. Карабцев С.Н.", "доц. Завозкин С.Ю.", "доц. Фомина Л.Н.", "доц. Бурмин Л.Н.", "доц. Гордиенок Н.И.", "доц. Савельева И.В.", "асс. Илькевич В.В.", "проф. Медведев А.В.", "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.");
-
+    private List<String> subjects = Arrays.asList("Дифференциальные уравнения", "Дискретная математика", "Программирование", "Физика", "Математический анализ", "Базы данных", "Алгебра", "Введение в специальность", "Иностранный язык", "Циклические виды спорта", "Информатика", "История");
     public List<String> getTeacherNames() {
         return teacherNames;
+    }
+    public List<String> getSubjects(){
+        return subjects;
+    }
+    public void setSubjects(List<String> subjects){
+        this.subjects = subjects;
     }
 
     public void setTeacherNames(List<String> teacherNames) {
@@ -104,6 +110,45 @@ public class scheduleController implements Serializable {
 
         }
     }
+    public void fillSubjects(List<String> subjectNames){
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try {
+            conn = ScheduleDatabase.getConnection();
+            prepStmt = conn.prepareStatement("INSERT INTO subjects (id, name) VALUES (?, ?)");
+            int i = 1;
+
+            for (String subject: subjectNames) {
+                prepStmt.setInt(1, i);
+                prepStmt.setString(2, subject);
+                prepStmt.addBatch();
+                i++;
+
+            }
+            prepStmt.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (prepStmt != null) {
+                    prepStmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+
+
 
 
 //    public String updateLessons(ArrayList<Lesson> listWithLessons){
