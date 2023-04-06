@@ -1,7 +1,7 @@
 package com.risonna.schedulewebapp.excelparsing;
 
 
-import com.risonna.schedulewebapp.beans.Lesson;
+import com.risonna.schedulewebapp.beans.*;
 import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -17,89 +17,114 @@ import java.util.Objects;
 public class ExcelSearch {
     private Workbook workbook;
     private FileInputStream inputStreamFile;
-    private List<String> teacherNames;
-    private List<String> subjects;
+    private List<Teacher> teacherNames;
+    private List<Subject> subjects;
+    private List<Cabinet> cabinetList;
+    private List<Group> groupList;
 
     private ArrayList<Lesson> lessonArrayList = new ArrayList<>();
 
-    public ExcelSearch(String pathString, List<String> namesOfTeachers, List<String> subjectList) throws IOException {
+    public ExcelSearch(String pathString, List<Teacher> namesOfTeachers, List<Subject> subjectList, List<Cabinet> cabinetList, List<Group> groupList) throws IOException {
 
         inputStreamFile = new FileInputStream(pathString);
         workbook = new HSSFWorkbook(inputStreamFile);
         teacherNames = namesOfTeachers;
         subjects = subjectList;
+        this.cabinetList = cabinetList;
+        this.groupList = groupList;
     }
 
 
     public void parseStuff() throws IOException {
-        Sheet sheet = this.workbook.getSheetAt(0);
-        for (Row row : sheet) {
-            for (Cell cell : row) {
-                if (cell.getCellType() == CellType.STRING) {
-                    String cellValue = cell.getRichStringCellValue().getString().trim();
-                    for (String term : teacherNames) {
-                        if (cellValue.toLowerCase().contains(term.toLowerCase())) {
-                            // Print the position of the cell
-                           Lesson lesson = new Lesson();
-                           lesson.setTeacherName(term);
-                            boolean isSubjectThere = false;
-                            for(String subj : subjects){
-                                if(cellValue.toLowerCase().contains(subj.toLowerCase())){
-                                    isSubjectThere = true;
-                                    int teacherIndex = cellValue.indexOf(term);
-                                    int subjectIndex = cellValue.indexOf(subj);
-                                    String betweenText = cellValue.substring(subjectIndex, teacherIndex).trim();
-                                    lesson.setSubjectName(betweenText);
+        for (Sheet sheet: workbook) {
+            for (Row row : sheet) {
+                for (Cell cell : row) {
+                    if (cell.getCellType() == CellType.STRING) {
+                        String cellValue = cell.getRichStringCellValue().getString().trim();
+                        for (Teacher teacher : teacherNames) {
+                            if (cellValue.toLowerCase().contains(teacher.getTeacherName().toLowerCase())) {
+                                // Print the position of the cell
+                                Lesson lesson = new Lesson();
+                                lesson.setTeacherId(teacher.getId());
+                                lesson.setTeacherName(teacher.getTeacherName());
+                                boolean isSubjectThere = false;
+                                for (Subject subj : subjects) {
+                                    if (cellValue.toLowerCase().contains(subj.getSubjectName().toLowerCase())) {
+                                        isSubjectThere = true;
+                                        int teacherIndex = cellValue.indexOf(teacher.getTeacherName());
+                                        int subjectIndex = cellValue.indexOf(subj.getSubjectName());
+                                        String betweenText = cellValue.substring(subjectIndex, teacherIndex).trim();
+                                        lesson.setSubjectName(betweenText);
+                                        lesson.setSubjectId(subj.getId());
+                                    }
                                 }
+                                if (!isSubjectThere) {
+                                    lesson.setSubjectName("Subject isn't specified or not found");
+                                }
+                                if (cellValue.toLowerCase().contains("ауд")) {
+                                    int index = cellValue.indexOf("ауд") + 4; // add 4 to skip "ауд."
+                                    String cabNumber = cellValue.substring(index).trim();
+                                    lesson.setCabinetName(cabNumber);
+                                    lesson.setCabinetId(0);
+                                    for (Cabinet cabinet : cabinetList) {
+                                        if(cabNumber.equals(cabinet.getCabinetName())){
+                                            lesson.setCabinetId(cabinet.getId());
+                                            break;
+                                        }
+
+                                    }
+                                } else {
+                                    lesson.setCabinetName("Cabinet not found or not specified");
+                                    lesson.setCabinetId(0);
+                                }
+                                String cellTime;
+
+
+                                cellTime = this.getTImeOfLesson(sheet, cell.getRowIndex());
+
+                                //Print the time of thr cell
+                                lesson.setLessonTime(cellTime);
+
+
+                                String cellDay; //Variable for lesson's day
+
+                                cellDay = this.getDayOfLesson(sheet, row, cell);
+
+                                //Print lesson's day
+                                lesson.setLessonDay(cellDay);
+
+
+                                String[] groupNames; // Array for 2 group names above but from the method return
+
+                                //returns array of 2 and moves it to our groupNames array
+                                groupNames = this.getGroupNameAndFullName(sheet, cell);
+
+                                // Print full and short names of a group
+                                lesson.setGroupName(groupNames[0]);
+                                lesson.setGroupNameFull(groupNames[1]);
+
+
+                                String instituteName; // Variable for institute name
+
+                                instituteName = this.getInstituteNames(sheet, cell);
+
+                                // Print institute name
+                                lesson.setInstituteName(instituteName);
+                                lesson.setGroupId(0);
+                                int sis = 0;
+                                for (Group group : groupList) {
+                                    if (sis==3){
+                                        lesson.setGroupId(group.getId());
+                                    }
+                                    sis++;
+
+                                }
+
+
+                                lessonArrayList.add(lesson);
+
+
                             }
-                            if (!isSubjectThere){
-                                lesson.setSubjectName("I/O ERROR");
-                            }
-                            if(cellValue.toLowerCase().contains("ауд")){
-                                int index = cellValue.indexOf("ауд") + 4; // add 4 to skip "ауд."
-                                String cabNumber = cellValue.substring(index).trim();
-                                lesson.setCabinetName(cabNumber);
-                            }
-                            else{
-                                lesson.setCabinetName("I/O ERROR");
-                            }
-                            String cellTime;
-
-
-                            cellTime = this.getTImeOfLesson(sheet, cell.getRowIndex());
-
-                            //Print the time of thr cell
-                            lesson.setLessonTime(cellTime);
-
-
-                            String cellDay; //Variable for lesson's day
-
-                            cellDay = this.getDayOfLesson(sheet, row, cell);
-
-                            //Print lesson's day
-                            lesson.setLessonDay(cellDay);
-
-
-                            String[] groupNames; // Array for 2 group names above but from the method return
-
-                            //returns array of 2 and moves it to our groupNames array
-                            groupNames = this.getGroupNameAndFullName(sheet, cell);
-
-                            // Print full and short names of a group
-                            lesson.setGroupName(groupNames[0]);
-                            lesson.setGroupNameFull(groupNames[1]);
-
-
-                            String instituteName; // Variable for institute name
-
-                            instituteName = this.getInstituteNames(sheet, cell);
-
-                            // Print institute name
-                            lesson.setInstituteName(instituteName);
-
-                            lessonArrayList.add(lesson);
-
-
                         }
                     }
                 }

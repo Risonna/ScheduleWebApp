@@ -1,6 +1,6 @@
 package com.risonna.schedulewebapp.controllers;
 
-import com.risonna.schedulewebapp.beans.Lesson;
+import com.risonna.schedulewebapp.beans.*;
 import com.risonna.schedulewebapp.excelparsing.ExcelSearch;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
@@ -47,40 +47,28 @@ public class uploadedFileController implements Serializable {
         return this.filePath;
     }
 
-    public ArrayList<Lesson> dayTimeGroup(ArrayList<Lesson> allLessonList, String day, String group){
-        var dayTimeGroupList = new ArrayList<Lesson>();
-
-        for (Lesson lesson: allLessonList) {
-            if(lesson.getLessonDay().toLowerCase().equals(day) && lesson.getGroupName().toLowerCase().equals(group)){
-                dayTimeGroupList.add(lesson);
-            }
-
-        }
-        if(dayTimeGroupList.size() == 0){
-            var lessonLesson = new Lesson();
-            lessonLesson.setSubjectName("nothing was added");
-            dayTimeGroupList.add(lessonLesson);
-        }
-        return dayTimeGroupList;
-    }
 
     public void parse(String filePath) throws IOException {
-        List<String> subjects = Arrays.asList("Дифференциальные уравнения", "Дискретная математика", "Программирование", "Физика", "Математический анализ", "Базы данных", "Алгебра", "Введение в специальность", "Иностранный язык", "Циклические виды спорта", "Информатика", "История");
-        List<String> teacherNames =  Arrays.asList("доц. Карабцев С.Н.", "доц. Завозкин С.Ю.", "доц. Фомина Л.Н.", "доц. Бурмин Л.Н.", "доц. Гордиенок Н.И.", "доц. Савельева И.В.", "асс. Илькевич В.В.", "проф. Медведев А.В.", "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.");
+        scheduleController getLessonInfoFromSQL = new scheduleController();
+        List<Teacher> teachers = getLessonInfoFromSQL.getTeacherList();
+        List<Subject> subjects = getLessonInfoFromSQL.getSubjectList();
+        List<Cabinet> cabinets = getLessonInfoFromSQL.getCabinetList();
+        List<Group> groups = getLessonInfoFromSQL.getGroupList();
 
-        setExcelSearch(new ExcelSearch(filePath, teacherNames, subjects));
+        setExcelSearch(new ExcelSearch(filePath, teachers, subjects, cabinets, groups));
         excelSearch.parseStuff();
         listOfLessons = excelSearch.getLessonList();
         for (Lesson sex: listOfLessons) {
 
             System.out.println("the teacher is " + sex.getTeacherName());
+            System.out.println("the teacher's id is " + sex.getTeacherId());
             System.out.println("the subject is " + sex.getSubjectName());
             System.out.println("the time is " + sex.getLessonTime());
             System.out.println("the day is  " + sex.getLessonDay());
             System.out.println("the cabinet is " + sex.getCabinetName());
+            System.out.println("the cabinet's id is " + sex.getCabinetId());
             System.out.println("the group is " + sex.getGroupName());
-            System.out.println("the group's full name is " + sex.getGroupNameFull());
-            System.out.println("the institute is " + sex.getInstituteName());
+            System.out.println("the group's id is " + sex.getGroupId());
 
         }
         System.out.println(listOfLessons);

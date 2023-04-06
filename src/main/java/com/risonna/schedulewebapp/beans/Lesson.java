@@ -19,6 +19,12 @@ public class Lesson implements Serializable {
     private String groupName;
     private String groupNameFull;
     private String instituteName;
+    private String lessonWeek;
+    private int teacherId;
+    private int subjectId;
+    private int cabinetId;
+    private int groupId;
+
 
     public Lesson(){
 
@@ -51,6 +57,17 @@ public class Lesson implements Serializable {
         this.instituteName = instituteName;
     }
 
+    public void setCabinetId(int cabinetId) { this.cabinetId = cabinetId; }
+
+    public void setGroupId(int groupId) { this.groupId = groupId; }
+
+    public void setSubjectId(int subjectId) { this.subjectId = subjectId; }
+
+    public void setTeacherId(int teacherId) { this.teacherId = teacherId; }
+
+    public void setLessonWeek(String lessonWeek) {
+        this.lessonWeek = lessonWeek;
+    }
 
     //getters
     public String getTeacherName() {
@@ -77,11 +94,21 @@ public class Lesson implements Serializable {
         return groupName;
     }
 
-    public String getGroupNameFull() {
-        return groupNameFull;
-    }
+    public String getGroupNameFull() { return groupNameFull; }
 
     public String getInstituteName() {
         return instituteName;
+    }
+
+    public int getCabinetId() { return cabinetId; }
+
+    public int getGroupId() { return groupId; }
+
+    public int getSubjectId() { return subjectId; }
+
+    public int getTeacherId() { return teacherId; }
+
+    public String getLessonWeek() {
+        return lessonWeek;
     }
 }

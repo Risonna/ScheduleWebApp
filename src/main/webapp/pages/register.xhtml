@@ -37,7 +37,7 @@
 
     <h:button id="sex1" value="register"/>
 
-    <h:dataTable value="#{uploadedFileController.dayTimeGroup(uploadedFileController.listOfLessons, 'понедельник', 'пми-221')}" var="lessonsList" rendered="#{uploadedFileController.isUploaded}">
+    <h:dataTable value="#{uploadedFileController.listOfLessons}" var="lessonsList" rendered="#{uploadedFileController.isUploaded}">
 
 
         <h:column>
