@@ -30,9 +30,16 @@
     </h:form>
     <h:form>
         <h:commandButton value="Parse" action="#{uploadedFileController.parse(uploadedFileController.filePath)}"/>
+        <h:commandButton value="CheckCabinetUsage" action="#{scheduleController.checkCabinetUsage(uploadedFileController.listOfLessons)}"/>
         <h:commandButton value="Fill Teachers" action="#{scheduleController.fillTeachers(scheduleController.teacherNames)}"/>
         <h:commandButton value="Fill Subjects" action="#{scheduleController.fillSubjects(scheduleController.subjects)}"/>
     </h:form>
+
+    <h:dataTable value="#{scheduleController.listOfRepeatedCabinets}" var="cabinetCheckedList" rendered="#{scheduleController.cabinetChecked}">
+        <h:column>
+            <h:outputText value="#{cabinetCheckedList}"/>
+        </h:column>
+    </h:dataTable>
 
 
     <h:button id="sex1" value="register"/>
@@ -41,11 +48,17 @@
 
 
         <h:column>
+            <h:outputText value="Is lessonCell #{lessonsList.lessonCell} "/>
+            <h:outputText value="Potoch #{lessonsList.potochLesson} "/>
+            <h:outputText value="groupsForLesson #{lessonsList.groupsForLesson} "/>
             <h:outputText value="Subject's name is #{lessonsList.subjectName} "/>
+            <h:outputText value="Cell is #{lessonsList.cellId}"/>
             <h:outputText value="Teacher's name is #{lessonsList.teacherName} "/>
+            <h:outputText value="The day is #{lessonsList.lessonDay} "/>
+            <h:outputText value="The week is #{lessonsList.lessonWeek} "/>
             <h:outputText value="Group's name is #{lessonsList.groupName} "/>
             <h:outputText value="Cabinet № #{lessonsList.cabinetName} "/>
-            <h:outputText value="The time is #{lessonsList.lessonTime}"/>
+            <h:outputText value="The time is #{lessonsList.lessonTime} "/>
         </h:column>
 
 

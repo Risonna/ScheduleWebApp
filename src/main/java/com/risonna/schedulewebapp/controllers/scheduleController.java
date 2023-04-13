@@ -7,17 +7,50 @@ import jakarta.inject.Named;
 
 import java.io.Serializable;
 import java.sql.*;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
 @Named
 @ApplicationScoped
 public class scheduleController implements Serializable {
-    private List<String> teacherNames =  Arrays.asList("доц. Карабцев С.Н.", "доц. Завозкин С.Ю.", "доц. Фомина Л.Н.", "доц. Бурмин Л.Н.", "доц. Гордиенок Н.И.", "доц. Савельева И.В.", "асс. Илькевич В.В.", "проф. Медведев А.В.", "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.", "доц. Новосельцева М.А.");
-    private List<String> subjects = Arrays.asList("Дифференциальные уравнения", "Дискретная математика", "Программирование", "Физика", "Математический анализ", "Базы данных", "Алгебра", "Введение в специальность", "Иностранный язык", "Циклические виды спорта", "Информатика", "История");
+    private List<String> teacherNames =  Arrays.asList("доц. Карабцев С.Н.", "доц. Завозкин С.Ю.", "доц. Фомина Л.Н.",
+            "доц. Бурмин Л.Н.", "доц. Гордиенок Н.И.", "доц. Савельева И.В.", "асс. Илькевич В.В.", "проф. Медведев А.В.",
+            "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.", "доц. Новосельцева М.А.", "проф. Степанов Ю.А.", "доц. Исламов Р.С.",
+            "доц. Стуколов С.В.", "доц. Гринвальд О.Н.", "доц. Чернова Е.С.", "доц. Власова Н.В.", "проф. Альтшулер О.Г.", "доц. Сергеева О.А.",
+            "проф. Рабенко Т.Г.", "доц. Жалнина А.А.", "доц. Буданова Е.А.", "проф. Смоленцев Н.К.", "доц. Чуешев А.В.", "ст.пр. Зимин А.И.",
+            "доц. Перевалова А.А.", "доц. Саблинский А.И.");
+    private List<String> subjects = Arrays.asList("Дифференциальные уравнения", "Дискретная математика",
+            "Программирование", "Физика", "Математический анализ", "Базы данных", "Алгебра", "Введение в специальность",
+            "Иностранный язык", "Циклические виды спорта", "Информатика", "История", "Высшая математика", "Культура речи и деловое общение",
+            "Физическая культура", "Языки программирования", "Теория вероятностей и математическая статистика", "Разработка мобильных приложений",
+            "Спортивные игры", "Компьютерные сети", "Введение в финансовую математику", "Технологии параллельного программирования",
+            "Социальные коммуникации", "Операционные системы", "Высокоуровневые методы информатики и программирования",
+            "Геоинформационные системы", "Разработка web-приложений", "Фитнес", "Проектирование, разработка и оптимизация web-приложений",
+            "Численные методы", "Маркетинг", "Особенности программирования в системах реального времени", "Методы оптимизации",
+            "Разработка компьютерных игр", "Исследование операций и математическое программирование", "Программирование на JAVA",
+            "Математические основы технической кибернетики", "Высокоуровневые методы информатики и программирования",
+            "Математическое и имитационное моделирование экономических процессов", "Математические методы обработки экспертной информации",
+            "Математические методы оценки инвестиционных проектов", "Программная инженерия");
+    private boolean isCabinetChecked = false;
+    private List<String> listOfRepeatedCabinets = new ArrayList<>();
+
+    public List<String> getListOfRepeatedCabinets() {
+        return listOfRepeatedCabinets;
+    }
+
+    public void setListOfRepeatedCabinets(List<String> listOfRepeatedCabinets) {
+        this.listOfRepeatedCabinets = listOfRepeatedCabinets;
+    }
+
+    public boolean isCabinetChecked() {
+        return isCabinetChecked;
+    }
+
+    public void setCabinetChecked(boolean cabinetChecked) {
+        isCabinetChecked = cabinetChecked;
+    }
+
     public List<String> getTeacherNames() {
         return teacherNames;
     }
@@ -362,6 +395,37 @@ public class scheduleController implements Serializable {
 
         return exists;
     }
+
+    public List<String> checkCabinetUsage(List<Lesson> allLessons) {
+        List<String> repeatedCabinetUse = new ArrayList<>();
+        Set<String> seenCabinetUses = new HashSet<>(); // Keep track of identified cabinet usage combinations
+        for (int i = 0; i < allLessons.size(); i++) {
+            Lesson lesson = allLessons.get(i);
+            String cabinetToCheck = lesson.getCabinetName();
+            String cabinetTime = lesson.getLessonTime();
+            String cabinetDay = lesson.getLessonDay();
+            for (int j = i + 1; j < allLessons.size(); j++) { // Only check the remaining lessons in the list
+                Lesson lessonj = allLessons.get(j);
+                if (lesson.getLessonWeek().equals(lessonj.getLessonWeek()) &&
+                        cabinetToCheck.equals(lessonj.getCabinetName()) &&
+                        cabinetTime.equals(lessonj.getLessonTime()) &&
+                        cabinetDay.equals(lessonj.getLessonDay())) {
+                    String cabinetUse = "Cabinet " + cabinetToCheck + " is in use on " +
+                            cabinetTime + cabinetDay + " by groups " + lessonj.getGroupName() +
+                            " and " + lesson.getGroupName();
+                    if (!seenCabinetUses.contains(cabinetUse)) {
+                        repeatedCabinetUse.add(cabinetUse);
+                        seenCabinetUses.add(cabinetUse);
+                    }
+                }
+            }
+        }
+        setCabinetChecked(true);
+        listOfRepeatedCabinets = repeatedCabinetUse;
+        return repeatedCabinetUse;
+    }
+
+
 
 
 

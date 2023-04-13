@@ -8,6 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.primefaces.model.file.UploadedFile;
 
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;

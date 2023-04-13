@@ -20,10 +20,14 @@ public class Lesson implements Serializable {
     private String groupNameFull;
     private String instituteName;
     private String lessonWeek;
+    private String cellId;
     private int teacherId;
     private int subjectId;
     private int cabinetId;
     private int groupId;
+    private boolean potochLesson;
+    private boolean lessonCell;
+    private int groupsForLesson;
 
 
     public Lesson(){
@@ -32,6 +36,36 @@ public class Lesson implements Serializable {
 
 
     //setters
+
+
+    public int getGroupsForLesson() {
+        return groupsForLesson;
+    }
+
+    public void setGroupsForLesson(int groupsForLesson) {
+        this.groupsForLesson = groupsForLesson;
+    }
+
+    public boolean isLessonCell() {
+        return lessonCell;
+    }
+
+    public void setLessonCell(boolean lessonCell) {
+        this.lessonCell = lessonCell;
+    }
+
+    public void setCellId(String cellId) {
+        this.cellId = cellId;
+    }
+
+    public boolean isPotochLesson() {
+        return potochLesson;
+    }
+
+    public void setPotochLesson(boolean potochLesson) {
+        this.potochLesson = potochLesson;
+    }
+
     public void setTeacherName(String teacherName){
         this.teacherName = teacherName;
     }
@@ -72,6 +106,10 @@ public class Lesson implements Serializable {
     //getters
     public String getTeacherName() {
         return teacherName;
+    }
+
+    public String getCellId() {
+        return cellId;
     }
 
     public String getSubjectName() {
