@@ -40,10 +40,10 @@ public class ExcelSearch {
             Map<String, CellRangeAddress> groupMergedCells = new HashMap<>();
             for (int colIndex = 2; colIndex < sheet.getRow(2).getLastCellNum(); colIndex += 1) {
                 Cell cell = sheet.getRow(2).getCell(colIndex);
-                if(!cell.getStringCellValue().trim().equals("")){
+                if (!cell.getStringCellValue().trim().equals("")) {
                     String groupName = cell.getStringCellValue().trim();
                     CellRangeAddress mergedCell = getMergedCellRanges(sheet, cell.getRowIndex(), colIndex);
-                    if(mergedCell != null){
+                    if (mergedCell != null) {
                         groupMergedCells.put(groupName, mergedCell);
                     }
                 }
@@ -53,213 +53,173 @@ public class ExcelSearch {
                     if (cell.getCellType() == CellType.STRING) {
                         String cellValue = cell.getRichStringCellValue().getString().trim();
                         if (!cellValue.equals("")) {
-                            for (Teacher teacher : teacherNames) {
-                                if (cellValue.toLowerCase().contains(teacher.getTeacherName().toLowerCase())) {
-                                    // Print the position of the cell
-                                    Lesson lesson = new Lesson();
-                                    lesson.setTeacherId(teacher.getId());
-                                    lesson.setTeacherName(teacher.getTeacherName());
-                                    boolean isSubjectThere = false;
-                                    for (Subject subj : subjects) {
-                                        if (cellValue.toLowerCase().contains(subj.getSubjectName().toLowerCase())) {
-                                            isSubjectThere = true;
-                                            int teacherIndex = cellValue.indexOf(teacher.getTeacherName());
-                                            int subjectIndex = cellValue.indexOf(subj.getSubjectName());
-                                            if (subjectIndex >= 0) { // add this check
-                                                String betweenText = cellValue.substring(subjectIndex, teacherIndex).trim();
-                                                lesson.setSubjectName(betweenText);
-                                            } else {
-                                                lesson.setSubjectName("Error in cellValue.substring() in ExcelSearch.parseStuff()");
-                                            }
-                                            lesson.setSubjectId(subj.getId());
-                                        }
+                            if (!cellValue.toLowerCase().contains("по выбору".toLowerCase()) && !cellValue.contains(" нед. ")) {
+                                actualParsing(cellValue, sheet, cell, row, groupMergedCells);
+                            }
+                            else{
+                                if(!cellValue.toLowerCase().contains("нед")) {
+                                    int byChoiceAmount = 0;
+                                    int index = cellValue.toLowerCase().indexOf("по выбору".toLowerCase());
+                                    while (index != -1) {
+                                        byChoiceAmount++;
+                                        index = cellValue.toLowerCase().indexOf("по выбору".toLowerCase(), index + 1);
                                     }
-                                    if (!isSubjectThere) {
-                                        lesson.setSubjectName("Subject isn't specified or not found");
-                                    }
-
-
-                                    Pattern pattern = Pattern.compile("(?i)" + lesson.getTeacherName() + "\\s*[.,]+\\s*");
-                                    Matcher matcher = pattern.matcher(cellValue);
-
-                                    String teacherNameMatched;
-                                    if (matcher.find()) {
-                                        teacherNameMatched = matcher.group();
-                                        // Do something with the teacher name
+                                    if (byChoiceAmount < 2) {
+                                        actualParsing(cellValue, sheet, cell, row, groupMergedCells);
                                     } else {
-                                        // No teacher name found
-                                        teacherNameMatched = "";
-                                    }
-
-                                    String cabNumber = "unknown";
-                                    if (!teacherNameMatched.isEmpty()) {
-                                        if (cellValue.contains("ауд")) {
-                                            int index = cellValue.indexOf("ауд") + 4;
-                                            cabNumber = cellValue.substring(index);
-                                        } else {
-                                            int startIndex = cellValue.indexOf(teacherNameMatched) + teacherNameMatched.length();
-                                            if (startIndex < cellValue.length()) {
-                                                cabNumber = cellValue.substring(startIndex).trim();
+                                        if (cell.getStringCellValue().contains("ауд")) {
+                                            int audAmount = 0;
+                                            int indexAud = cellValue.toLowerCase().indexOf("ауд".toLowerCase());
+                                            while (indexAud != -1) {
+                                                audAmount++;
+                                                indexAud = cellValue.toLowerCase().indexOf("ауд".toLowerCase(), indexAud + 1);
                                             }
-                                        }
-                                    }
+                                            if (audAmount == byChoiceAmount) {
+                                                Pattern pattern = Pattern.compile("\\d+[а-я]?");
+                                                Matcher matcher = pattern.matcher(cellValue);
 
 
-                                    lesson.setCabinetName(cabNumber);
-                                    lesson.setCabinetId(0);
-                                    for (Cabinet cabinet : cabinetList) {
-                                        if (cabNumber.equals(cabinet.getCabinetName())) {
-                                            lesson.setCabinetId(cabinet.getId());
-                                            break;
-                                        }
-                                    }
-
-
-                                    String weekDay;
-                                    weekDay = checkWeek(cell);
-                                    lesson.setLessonWeek(weekDay);
-
-                                    String cellTime;
-
-
-                                    cellTime = this.getTImeOfLesson(sheet, cell.getRowIndex());
-
-                                    //Print the time of thr cell
-                                    lesson.setLessonTime(cellTime);
-
-
-                                    String cellDay; //Variable for lesson's day
-
-                                    cellDay = this.getDayOfLesson(sheet, row, cell);
-
-                                    //Print lesson's day
-                                    lesson.setLessonDay(cellDay);
-
-
-                                    // Print full and short names of a group
-                                    lesson.setGroupName(getGroupName(sheet, cell));
-
-
-                                    String instituteName; // Variable for institute name
-
-                                    instituteName = this.getInstituteNames(sheet, cell);
-
-                                    // Print institute name
-                                    lesson.setInstituteName(instituteName);
-
-                                    lesson.setGroupId(0);
-                                    for (Group group : groupList) {
-                                        if (lesson.getGroupName().equalsIgnoreCase(group.getGroupName())) {
-                                            lesson.setGroupId(group.getId());
-                                        }
-
-                                    }
-                                    lesson.setCellId(cell.getAddress().toString());
-
-
-                                    List<CellRangeAddress> groupRegions = new ArrayList<>();
-                                    CellRangeAddress lessonCell = null;
-                                    for (CellRangeAddress mergedRegion : sheet.getMergedRegions()) {
-                                        // Check if merged region intersects with the row of the groups
-                                        if (mergedRegion.containsRow(2) && (mergedRegion.getFirstColumn() >= 2)) {
-                                            groupRegions.add(mergedRegion);
-                                        }
-
-                                        // Check if merged region intersects with the column of the lesson
-                                        if (mergedRegion.containsColumn(cell.getColumnIndex()) && mergedRegion.isInRange(cell.getRowIndex(), cell.getColumnIndex())) {
-                                            lessonCell = mergedRegion;
-                                        }
-                                    }
-
-
-
-                                    boolean potochLesson = false;
-                                    int groupsForLesson = 0;
-
-                                    //if lessonCell isn't null we treat it as a merged cell
-                                    if (lessonCell != null) {
-                                        lesson.setLessonCell(true);
-                                        int lessonFirstColumn = lessonCell.getFirstColumn();
-                                        int lessonLastColumn = lessonCell.getLastColumn();
-                                        if (!groupRegions.isEmpty()) {
-                                            for (CellRangeAddress groupRegion : groupRegions) {
-                                                int groupFirstColumn = groupRegion.getFirstColumn();
-                                                int groupLastColumn = groupRegion.getLastColumn();
-                                                if (lessonFirstColumn <= groupLastColumn && lessonLastColumn >= groupFirstColumn) {
-                                                    groupsForLesson++;
-                                                }
-                                            }
-
-                                        }
-                                        else{
-                                            List<Cell> groupCells = new ArrayList<>();
-                                            for (int i = 2; i < sheet.getRow(2).getLastCellNum(); i++) {
-                                                Cell groupCell = sheet.getRow(2).getCell(i);
-                                                if (groupCell != null) {
-                                                    groupCells.add(groupCell);
-                                                }
-                                            }
-                                            for (Cell groupCell : groupCells) {
-                                                int groupColumnIndex = groupCell.getColumnIndex();
-                                                if (lessonFirstColumn <= groupColumnIndex && lessonLastColumn >= groupColumnIndex) {
-                                                    groupsForLesson++;
-                                                }
-                                            }
-                                        }
-                                    }
-                                    //otherwise just treat as normal cell
-                                    else {
-                                        lesson.setLessonCell(false);
-                                        groupsForLesson = 1;
-                                    }
-                                    if (groupsForLesson >= 2) potochLesson = true;
-                                    lesson.setGroupsForLesson(groupsForLesson);
-                                    lesson.setPotochLesson(potochLesson);
-
-
-                                    if (potochLesson) {
-                                        for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
-                                            String groupName = entry.getKey();
-                                            CellRangeAddress mergedCell = entry.getValue();
-                                            if (!groupName.equalsIgnoreCase(lesson.getGroupName()) && lessonCell != null) {
-                                                int firstRow = mergedCell.getFirstRow();
-                                                int lastRow = mergedCell.getLastRow();
-                                                int firstCol = mergedCell.getFirstColumn();
-                                                int lastCol = mergedCell.getLastColumn();
-                                                if (lessonCell.getFirstColumn() <= lastCol && lessonCell.getLastColumn() >= firstCol) {
-                                                    Lesson lessonPotoch = new Lesson();
-                                                    lessonPotoch.setLessonTime(cellTime);
-                                                    lessonPotoch.setLessonDay(cellDay);
-                                                    lessonPotoch.setLessonWeek(weekDay);
-                                                    lessonPotoch.setSubjectName(lesson.getSubjectName());
-                                                    lessonPotoch.setSubjectId(lesson.getSubjectId());
-                                                    lessonPotoch.setTeacherName(teacher.getTeacherName());
-                                                    lessonPotoch.setTeacherId(teacher.getId());
-                                                    lessonPotoch.setInstituteName(instituteName);
-                                                    lessonPotoch.setCabinetName(lesson.getCabinetName());
-                                                    lessonPotoch.setGroupName(groupName);
-                                                    lessonPotoch.setGroupsForLesson(groupsForLesson);
-                                                    lessonPotoch.setLessonCell(true);
-                                                    lessonPotoch.setPotochLesson(potochLesson);
-                                                    boolean found = false;
-                                                    for (Group group : groupList) {
-                                                        if (lessonPotoch.getGroupName().equalsIgnoreCase(group.getGroupName())) {
-                                                            lessonPotoch.setGroupId(group.getId());
-                                                            found = true;
+                                                int start = 0;
+                                                int end;
+                                                while (matcher.find(start)) {
+                                                    String match = matcher.group();
+                                                    end = cellValue.indexOf(match, start) + match.length();
+                                                    String lesson = cellValue.substring(start, end);
+                                                    System.out.println("Matched substring: " + lesson + '\n' + "The pattern " + match);
+                                                    Lesson lesson1 = new Lesson();
+                                                    String teacherName = "";
+                                                    for (Teacher teacher : teacherNames) {
+                                                        if (lesson.toLowerCase().contains(teacher.getTeacherName().toLowerCase())) {
+                                                            lesson1.setTeacherName(teacher.getTeacherName());
+                                                            lesson1.setTeacherId(teacher.getId());
+                                                            teacherName = teacher.getTeacherName();
                                                         }
 
                                                     }
-                                                    if (!found) {
-                                                        lessonPotoch.setGroupId(0);
+                                                    if (teacherName.equals("")) {
+                                                        lesson1.setTeacherId(0);
+                                                        lesson1.setTeacherName("unknown");
                                                     }
-                                                    lessonArrayList.add(lessonPotoch);
+                                                    teacherName = null;
+                                                    String subjectName = "";
+                                                    for (Subject subject : subjects) {
+                                                        if (lesson.trim().toLowerCase().contains(subject.getSubjectName().trim().toLowerCase())) {
+                                                            lesson1.setSubjectName(subject.getSubjectName());
+                                                            lesson1.setSubjectId(subject.getId());
+                                                            subjectName = subject.getSubjectName();
+                                                        }
+                                                    }
+                                                    if (subjectName.equals("")) {
+                                                        lesson1.setSubjectId(0);
+                                                        lesson1.setSubjectName("unknown");
+                                                    }
+                                                    subjectName = null;
+
+                                                    String cabNumber;
+                                                    cabNumber = getCabinetName(lesson1.getTeacherName(), lesson);
+                                                    lesson1.setCabinetId(0);
+                                                    lesson1.setCabinetName(cabNumber);
+                                                    for (Cabinet cabinet : cabinetList) {
+                                                        if (cabNumber.trim().equalsIgnoreCase(cabinet.getCabinetName().trim())) {
+                                                            lesson1.setCabinetId(cabinet.getId());
+                                                            break;
+                                                        }
+                                                    }
+
+                                                    String week;
+                                                    week = checkWeek(lesson);
+                                                    lesson1.setLessonWeek(week);
+
+                                                    lesson1.setLessonDay(getDayOfLesson(sheet, cell));
+                                                    lesson1.setLessonTime(getTImeOfLesson(sheet, row.getRowNum()));
+                                                    lesson1.setInstituteName(getInstituteNames(sheet, cell));
+                                                    lesson1.setGroupName(getGroupName(sheet, cell));
+                                                    lessonArrayList.add(lesson1);
 
 
+                                                    start = end;
+                                                }
+                                            } else {//"ауд" numb doesn't equal byChoiceAmount
+                                                for (int i = 0; i < byChoiceAmount; i++) {
+
+
+                                                    Lesson lesson = new Lesson();
+//                                            lesson.setCellId("666");
+//                                            lesson.setLessonCell(true);
+//                                            lesson.setPotochLesson(false);
+                                                    lesson.setLessonWeek(checkWeek(cellValue));
+                                                    lesson.setLessonTime(getTImeOfLesson(sheet, cell.getRowIndex()));
+                                                    lesson.setLessonDay(getDayOfLesson(sheet, cell));
+//                                            lesson.setGroupsForLesson(1);
+                                                    lesson.setGroupId(0);
+                                                    lesson.setCabinetName("unknown");
+                                                    lesson.setGroupName(getGroupName(sheet, cell));
+                                                    //lesson.setInstituteName("gavno");
+                                                    lesson.setTeacherName("unknown");
+                                                    lesson.setTeacherId(0);
+                                                    lesson.setSubjectName("unknown");
+                                                    lesson.setGroupName(getGroupName(sheet, cell));
+                                                    for (Group group : groupList) {
+                                                        if (lesson.getGroupName().trim().toLowerCase().equals(group.getGroupName().trim().toLowerCase())) {
+                                                            lesson.setGroupId(group.getId());
+                                                            break;
+                                                        }
+                                                    }
+                                                    lesson.setSubjectId(0);
+                                                    lesson.setCabinetId(0);
+                                                    lessonArrayList.add(lesson);
                                                 }
                                             }
-                                        }
+                                        } else {//doesn't contain "ауд"
+//                                            for (int i = 0; i < byChoiceAmount; i++) {
+//
+//
+                                                Lesson lesson = new Lesson();
+//                                            lesson.setCellId("666");
+//                                            lesson.setLessonCell(true);
+//                                            lesson.setPotochLesson(false);
+                                                lesson.setLessonWeek(checkWeek(cellValue));
+                                                lesson.setLessonTime(getTImeOfLesson(sheet, cell.getRowIndex()));
+                                                lesson.setLessonDay(getDayOfLesson(sheet, cell));
+//                                            lesson.setGroupsForLesson(1);
+                                                lesson.setGroupId(0);
+                                                lesson.setCabinetName("unknown");
+                                                //lesson.setGroupName("sex15");
+                                                //lesson.setInstituteName("gavno");
+                                                lesson.setTeacherName("unknown");
+                                                lesson.setTeacherId(0);
+                                                lesson.setSubjectName("unknown");
+                                                lesson.setGroupName(getGroupName(sheet, cell));
+                                                for (Group group : groupList) {
+                                                    if (lesson.getGroupName().trim().toLowerCase().equals(group.getGroupName().trim().toLowerCase())) {
+                                                        lesson.setGroupId(group.getId());
+                                                        break;
+                                                    }
+                                                }
+                                                lesson.setSubjectId(0);
+                                                lesson.setCabinetId(0);
+                                                lessonArrayList.add(lesson);
+                                            }
+
                                     }
-                                    lessonArrayList.add(lesson);
+                                }
+                                else{//does contain ned
+                                    Pattern pattern = Pattern.compile("\\s*(?:чет\\.|неч\\.)?\\s*с(?:о?\\s*\\d+(?:-\\d+)?|\\d+-\\d+)\\s*нед\\.?");
+
+
+                                    Matcher matcher = pattern.matcher(cellValue);
+
+
+                                    int start = 0;
+                                    int end;
+                                    while (matcher.find(start)) {
+                                        String match = matcher.group();
+                                        end = cellValue.indexOf(match, start) + match.length();
+                                        String lesson = cellValue.substring(start, end);
+                                        System.out.println("The cell: " + cellValue +"\nMatched substring: " + lesson + '\n' + "The pattern " + match);
+                                        start = end;
+                                    }
+
 
 
                                 }
@@ -307,16 +267,13 @@ public class ExcelSearch {
         }
         return cellTime;
     }
-
-
-
-    private String getDayOfLesson(Sheet sheet, Row row, Cell cell){
+    private String getDayOfLesson(Sheet sheet, Cell cell){
         String cellday1 = null;
         int index = sheet.getNumMergedRegions();
 
         for(int i = 0; i < index; i++) {
             CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
-            if (mergedRegion.isInRange(cell.getRowIndex(), row.getFirstCellNum())) {
+            if (mergedRegion.isInRange(cell.getRowIndex(), cell.getRow().getFirstCellNum())) {
                 for (int j = mergedRegion.getFirstRow(); j <= mergedRegion.getLastRow(); j++) {
                     Row regionRow = sheet.getRow(j);
                     for (int k = mergedRegion.getFirstColumn(); k <= mergedRegion.getLastColumn(); k++) {
@@ -331,7 +288,6 @@ public class ExcelSearch {
         }
         return cellday1;
     }
-
     private String getInstituteNames(Sheet sheet, Cell cell){
         String instituteName = null;
 
@@ -395,23 +351,52 @@ public class ExcelSearch {
 
         return groupName;
     }
-
-    private String checkWeek(Cell cell){
+    private String checkWeek(String lessonNameString){
 
         String week;
-        String lessonText = cell.getRichStringCellValue().getString().trim().toLowerCase();
-        if (lessonText.startsWith("неч")) {
+        if (lessonNameString.startsWith("неч")) {
             week = "неч";
-        } else if (lessonText.startsWith("чет")) {
+        } else if (lessonNameString.startsWith("чет")) {
             week = "чет";
 
         } else {
             // If nothing is specified, assume the lesson is on every week
-            week = "любая";
+            week = "";
         }
         return week;
     }
+    private String getCabinetName(String teacherName, String lessonString){
+        Pattern pattern = Pattern.compile("(?i)" + teacherName + "\\s*[.,]+\\s*");
+        Matcher matcher = pattern.matcher(lessonString);
 
+        String teacherNameMatched;
+        if (matcher.find()) {
+            teacherNameMatched = matcher.group();
+            // Do something with the teacher name
+        } else {
+            // No teacher name found
+            teacherNameMatched = "";
+        }
+
+        String cabNumber = "unknown";
+        if (!teacherNameMatched.isEmpty()) {
+            if (lessonString.contains("ауд")) {
+                int index = lessonString.indexOf("ауд") + 4;
+                cabNumber = lessonString.substring(index);
+            } else {
+                int startIndex = lessonString.indexOf(teacherNameMatched) + teacherNameMatched.length();
+                if (startIndex < lessonString.length()) {
+                    cabNumber = lessonString.substring(startIndex).trim();
+                }
+            }
+        }
+
+        if (cabNumber.toLowerCase().contains(" c ")) {
+            cabNumber = cabNumber.substring(1);
+        }
+
+        return cabNumber;
+    }
     private CellRangeAddress getMergedCellRanges(Sheet sheet, int row, int colIndex) {
         CellRangeAddress mergedCellRanges;
         for (int i = 0; i < sheet.getNumMergedRegions(); i++) {
@@ -422,6 +407,191 @@ public class ExcelSearch {
         }
         return null;
     }
+
+    private void actualParsing(String cellValue, Sheet sheet, Cell cell, Row row, Map<String, CellRangeAddress> groupMergedCells){
+        for (Teacher teacher : teacherNames) {
+            if (cellValue.toLowerCase().contains(teacher.getTeacherName().toLowerCase())) {
+                // Print the position of the cell
+                Lesson lesson = new Lesson();
+                lesson.setTeacherId(teacher.getId());
+                lesson.setTeacherName(teacher.getTeacherName());
+                boolean isSubjectThere = false;
+                for (Subject subj : subjects) {
+                    if (cellValue.toLowerCase().contains(subj.getSubjectName().toLowerCase())) {
+                        isSubjectThere = true;
+                        int teacherIndex = cellValue.indexOf(teacher.getTeacherName());
+                        int subjectIndex = cellValue.indexOf(subj.getSubjectName());
+                        if (subjectIndex >= 0) { // add this check
+                            String betweenText = cellValue.substring(subjectIndex, teacherIndex).trim();
+                            lesson.setSubjectName(betweenText);
+                        } else {
+                            lesson.setSubjectName("Error in cellValue.substring() in ExcelSearch.parseStuff()");
+                        }
+                        lesson.setSubjectId(subj.getId());
+                    }
+                }
+                if (!isSubjectThere) {
+                    lesson.setSubjectName("Subject isn't specified or not found");
+                }
+
+                String cabNumber;
+                cabNumber = getCabinetName(lesson.getTeacherName(), cellValue);
+
+                lesson.setCabinetName(cabNumber);
+                lesson.setCabinetId(0);
+                for (Cabinet cabinet : cabinetList) {
+                    if (cabNumber.equals(cabinet.getCabinetName())) {
+                        lesson.setCabinetId(cabinet.getId());
+                        break;
+                    }
+                }
+
+
+                String weekDay;
+                weekDay = checkWeek(cell.getRichStringCellValue().getString().trim().toLowerCase());
+                lesson.setLessonWeek(weekDay);
+
+
+                String cellTime;
+                cellTime = this.getTImeOfLesson(sheet, cell.getRowIndex());
+                //Print the time of thr cell
+                lesson.setLessonTime(cellTime);
+
+
+                String cellDay; //Variable for lesson's day
+                cellDay = this.getDayOfLesson(sheet, cell);
+                //Print lesson's day
+                lesson.setLessonDay(cellDay);
+
+
+                // Print full and short names of a group
+                lesson.setGroupName(getGroupName(sheet, cell));
+
+
+                String instituteName; // Variable for institute name
+                instituteName = this.getInstituteNames(sheet, cell);
+                // Print institute name
+                lesson.setInstituteName(instituteName);
+
+                lesson.setGroupId(0);
+                for (Group group : groupList) {
+                    if (lesson.getGroupName().equalsIgnoreCase(group.getGroupName())) {
+                        lesson.setGroupId(group.getId());
+                    }
+                }
+                lesson.setCellId(cell.getAddress().toString());
+
+
+                List<CellRangeAddress> groupRegions = new ArrayList<>();
+                CellRangeAddress lessonCell = null;
+                for (CellRangeAddress mergedRegion : sheet.getMergedRegions()) {
+                    // Check if merged region intersects with the row of the groups
+                    if (mergedRegion.containsRow(2) && (mergedRegion.getFirstColumn() >= 2)) {
+                        groupRegions.add(mergedRegion);
+                    }
+
+                    // Check if merged region intersects with the column of the lesson
+                    if (mergedRegion.containsColumn(cell.getColumnIndex()) && mergedRegion.isInRange(cell.getRowIndex(), cell.getColumnIndex())) {
+                        lessonCell = mergedRegion;
+                    }
+                }
+
+
+
+                boolean potochLesson = false;
+                int groupsForLesson = 0;
+
+                //if lessonCell isn't null we treat it as a merged cell
+                if (lessonCell != null) {
+                    lesson.setLessonCell(true);
+                    int lessonFirstColumn = lessonCell.getFirstColumn();
+                    int lessonLastColumn = lessonCell.getLastColumn();
+                    if (!groupRegions.isEmpty()) {
+                        for (CellRangeAddress groupRegion : groupRegions) {
+                            int groupFirstColumn = groupRegion.getFirstColumn();
+                            int groupLastColumn = groupRegion.getLastColumn();
+                            if (lessonFirstColumn <= groupLastColumn && lessonLastColumn >= groupFirstColumn) {
+                                groupsForLesson++;
+                            }
+                        }
+
+                    }
+                    else{
+                        List<Cell> groupCells = new ArrayList<>();
+                        for (int i = 2; i < sheet.getRow(2).getLastCellNum(); i++) {
+                            Cell groupCell = sheet.getRow(2).getCell(i);
+                            if (groupCell != null) {
+                                groupCells.add(groupCell);
+                            }
+                        }
+                        for (Cell groupCell : groupCells) {
+                            int groupColumnIndex = groupCell.getColumnIndex();
+                            if (lessonFirstColumn <= groupColumnIndex && lessonLastColumn >= groupColumnIndex) {
+                                groupsForLesson++;
+                            }
+                        }
+                    }
+                }
+                //otherwise just treat as normal cell
+                else {
+                    lesson.setLessonCell(false);
+                    groupsForLesson = 1;
+                }
+                if (groupsForLesson >= 2) potochLesson = true;
+                lesson.setGroupsForLesson(groupsForLesson);
+                lesson.setPotochLesson(potochLesson);
+
+
+                if (potochLesson) {
+                    for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
+                        String groupName = entry.getKey();
+                        CellRangeAddress mergedCell = entry.getValue();
+                        if (!groupName.equalsIgnoreCase(lesson.getGroupName()) && lessonCell != null) {
+                            int firstRow = mergedCell.getFirstRow();
+                            int lastRow = mergedCell.getLastRow();
+                            int firstCol = mergedCell.getFirstColumn();
+                            int lastCol = mergedCell.getLastColumn();
+                            if (lessonCell.getFirstColumn() <= lastCol && lessonCell.getLastColumn() >= firstCol) {
+                                Lesson lessonPotoch = new Lesson();
+                                lessonPotoch.setLessonTime(cellTime);
+                                lessonPotoch.setLessonDay(cellDay);
+                                lessonPotoch.setLessonWeek(weekDay);
+                                lessonPotoch.setSubjectName(lesson.getSubjectName());
+                                lessonPotoch.setSubjectId(lesson.getSubjectId());
+                                lessonPotoch.setTeacherName(teacher.getTeacherName());
+                                lessonPotoch.setTeacherId(teacher.getId());
+                                lessonPotoch.setInstituteName(instituteName);
+                                lessonPotoch.setCabinetName(lesson.getCabinetName());
+                                lessonPotoch.setGroupName(groupName);
+                                lessonPotoch.setGroupsForLesson(groupsForLesson);
+                                lessonPotoch.setLessonCell(true);
+                                lessonPotoch.setPotochLesson(potochLesson);
+                                boolean found = false;
+                                for (Group group : groupList) {
+                                    if (lessonPotoch.getGroupName().equalsIgnoreCase(group.getGroupName())) {
+                                        lessonPotoch.setGroupId(group.getId());
+                                        found = true;
+                                    }
+
+                                }
+                                if (!found) {
+                                    lessonPotoch.setGroupId(0);
+                                }
+                                lessonArrayList.add(lessonPotoch);
+
+
+                            }
+                        }
+                    }
+                }
+                lessonArrayList.add(lesson);
+
+
+            }
+        }
+    }
+
+
 
 
 

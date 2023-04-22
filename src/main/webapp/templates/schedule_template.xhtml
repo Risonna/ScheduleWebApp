@@ -15,28 +15,26 @@
 
 <h:head>
     <title>Title</title>
+    <ui:insert name="page-specific-css"/>
     <h:outputStylesheet library="css" name="styles.css"/>
     <h:outputStylesheet library="css" name="stylelogin.css"/>
+
 </h:head>
 
 <h:body>
 
     <div class="wrapper">
-
         <ui:insert name="header">
             <ui:include src="/templates/header.xhtml"/>
         </ui:insert>
-
         <div class="content">
             <ui:insert name="content">
                 <ui:include src="/templates/content.xhtml"/>
             </ui:insert>
         </div>
-
         <ui:insert name="footer">
             <ui:include src="/templates/footer.xhtml"/>
         </ui:insert>
-
     </div>
 
 </h:body>

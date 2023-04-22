@@ -1,0 +1,115 @@
+body{
+    font-family: "Open Sans", sans-serif;
+    color: #333;
+}
+table.lesson-table {
+    border-collapse: collapse;
+    margin: 10px auto;
+    text-align: center;
+}
+
+.lesson-table td, .lesson-table th {
+    border: 1px solid #ddd;
+    padding: 8px;
+}
+
+.lesson-table th {
+    background-color: #f2f2f2;
+    color: #333;
+    font-weight: bold;
+}
+
+.lesson-table th:first-child, .lesson-table td:first-child {
+    border-left: none;
+}
+
+.lesson-table th:last-child, .lesson-table td:last-child {
+    border-right: none;
+}
+
+.lesson-table td:first-child {
+    border-left: none;
+}
+
+.lesson-table td:last-child {
+    border-right: none;
+}
+
+.lesson-table td > div {
+    border-top: 1px solid #ddd;
+    padding: 5px;
+}
+
+.lesson-table td > div:last-child {
+    border-bottom: none;
+}
+
+h:form {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    flex-wrap: wrap;
+    width: 100%;
+}
+
+.selection-menu-wrapper {
+    text-align: center;
+}
+
+h:selectOneMenu {
+    margin: 0 10px;
+}
+
+.lesson-table {
+    margin: 20px auto;
+}
+
+select {
+    font-size: 16px;
+    padding: 10px;
+    border: none;
+    border-radius: 5px;
+    background-color: #f2f2f2;
+    color: #333;
+    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+    width: 200px;
+}
+
+select:hover {
+    cursor: pointer;
+}
+
+select+select {
+    margin-left: 50px;
+}
+
+h1 {
+    text-align: center;
+    font-family: Arial, sans-serif;
+    color: #007bff;
+}
+
+.lesson-table td:nth-child(2) {
+    text-align: center;
+}
+
+.lesson-table td > div {
+    border-top: 1px solid #ddd;
+    padding: 5px;
+    text-align: center;
+}
+
+.lesson-table td > div:last-child {
+    border-bottom: none;
+}
+.lesson-table {
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+}
+
+.lesson-table td > div > div {
+    display: inline-block;
+    color: #555;
+}
+.lesson-table tr:hover {
+    background-color: #f5f5f5;
+}

@@ -38,6 +38,7 @@ public class Lesson implements Serializable {
     //setters
 
 
+
     public int getGroupsForLesson() {
         return groupsForLesson;
     }

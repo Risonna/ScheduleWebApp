@@ -4,6 +4,22 @@
       xmlns:h="http://xmlns.jcp.org/jsf/html"
       xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
 <head>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const inputs = document.querySelectorAll("input[type='text'], input[type='password']");
+            inputs.forEach(input => {
+                input.dataset.placeholder = input.getAttribute("placeholder");
+                input.addEventListener("focus", function() {
+                    this.removeAttribute("placeholder");
+                });
+                input.addEventListener("blur", function() {
+                    this.setAttribute("placeholder", this.dataset.placeholder);
+                });
+            });
+        });
+    </script>
+
+
 </head>
 
 <body>
@@ -14,12 +30,12 @@
         <h:form id="loginForm" class="login-form">
             <h:panelGroup id="messages" layout="block" />
             <h:panelGroup>
-                <h:outputLabel for="username" value="Username: " />
-                <h:inputText id="username" value="#{User.username}" />
+                <h:outputLabel for="username" value="Username: " style="align-self: center; font-size: large" />
+                <h:inputText id="username" value="#{User.username}" class="form-control" />
             </h:panelGroup>
             <h:panelGroup>
-                <h:outputLabel for="password" value="Password: " />
-                <h:inputSecret id="password" value="#{User.password}" />
+                <h:outputLabel for="password" value="Password: " style="align-self: center; font-size: large" />
+                <h:inputSecret id="password" value="#{User.password}" class="form-control" />
             </h:panelGroup>
             <h:panelGroup class="button-row">
                 <h:commandButton id="loginButton" value="Login" action="#{loginController.login}" styleClass="logbib-button"/>

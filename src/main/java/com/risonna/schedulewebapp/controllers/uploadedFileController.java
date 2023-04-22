@@ -21,10 +21,20 @@ public class uploadedFileController implements Serializable {
     private String filePath;
 
     private ArrayList<Lesson> listOfLessons;
+    public static ArrayList<Lesson> lessonsStatic;
+    private ArrayList<Lesson> listOfLessonsForGroup;
 
     private Boolean isUploaded;
 
     private ExcelSearch excelSearch;
+
+    public ArrayList<Lesson> getListOfLessonsForGroup() {
+        return listOfLessonsForGroup;
+    }
+
+    public void setListOfLessonsForGroup(ArrayList<Lesson> listOfLessonsForGroup) {
+        this.listOfLessonsForGroup = listOfLessonsForGroup;
+    }
 
     public UploadedFile getUploadedFile() {
         return uploadedFile;
@@ -59,20 +69,9 @@ public class uploadedFileController implements Serializable {
         setExcelSearch(new ExcelSearch(filePath, teachers, subjects, cabinets, groups));
         excelSearch.parseStuff();
         listOfLessons = excelSearch.getLessonList();
-        for (Lesson sex: listOfLessons) {
+        listOfLessonsForGroup = getLessonInfoFromSQL.getLessonsByGroup(listOfLessons, "МОА-195");
+        lessonsStatic = listOfLessons;
 
-            System.out.println("the teacher is " + sex.getTeacherName());
-            System.out.println("the teacher's id is " + sex.getTeacherId());
-            System.out.println("the subject is " + sex.getSubjectName());
-            System.out.println("the time is " + sex.getLessonTime());
-            System.out.println("the day is  " + sex.getLessonDay());
-            System.out.println("the cabinet is " + sex.getCabinetName());
-            System.out.println("the cabinet's id is " + sex.getCabinetId());
-            System.out.println("the group is " + sex.getGroupName());
-            System.out.println("the group's id is " + sex.getGroupId());
-
-        }
-        System.out.println(listOfLessons);
         isUploaded = true;
 
     }
