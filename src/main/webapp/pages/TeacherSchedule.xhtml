@@ -10,15 +10,64 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:ui="http://java.sun.com/jsf/facelets">
 
 <h:head>
     <title>Title</title>
+    <h:outputStylesheet library="css" name="style_groups.css"/>
 </h:head>
 
 <h:body>
+    <ui:composition template="/templates/schedule_template.xhtml">
+        <ui:define name="page-specific-css">
+            <h:outputStylesheet library="css" name="style_groups.css" rendered="#{true}"/>
+        </ui:define>
 
-    <h:button value="TeacherSchedule"/>
+        <ui:define name="content">
+
+            <h1>Расписание преподавателей</h1>
+            <h:form>
+                <div class="selection-menu-wrapper">
+                    <h:selectOneMenu value="#{scheduleController.selectedTeacher}">
+                        <f:selectItems value="#{scheduleController.teacherNameList}" />
+                        <f:ajax execute="@this" render="@form" />
+                    </h:selectOneMenu>
+                    <h:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
+                        <f:selectItems value="#{scheduleController.daysOfWeek}" />
+                        <f:ajax execute="@this" render="@form" />
+                    </h:selectOneMenu>
+                </div>
+                <table class="lesson-table" id="lessonTable">
+                    <tr>
+                        <th>Время</th>
+                        <th>#{scheduleController.selectedDayOfWeek}</th>
+                    </tr>
+                    <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod">
+                        <tr>
+                            <td>
+                                <h:outputText value="#{timePeriod}" />
+                            </td>
+                            <td>
+                                <div style="text-align: center">
+                                    <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, scheduleController.selectedDayOfWeek)}" var="filteredLessonsByDayAndTeacher"
+                                                 style="display: inline-block">
+                                        <h:column>
+                                            <div>
+                                                <h:outputText value="#{filteredLessonsByDayAndTeacher.lessonWeek} #{filteredLessonsByDayAndTeacher.subjectName} #{filteredLessonsByDayAndTeacher.teacherName} ауд. #{filteredLessonsByDayAndTeacher.cabinetName}" />
+                                            </div>
+                                        </h:column>
+                                    </h:dataTable>
+                                </div>
+                            </td>
+                        </tr>
+                    </ui:repeat>
+                </table>
+            </h:form>
+
+        </ui:define>
+
+    </ui:composition>
 
 </h:body>
 

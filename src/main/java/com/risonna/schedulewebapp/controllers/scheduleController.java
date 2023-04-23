@@ -47,10 +47,30 @@ public class scheduleController implements Serializable {
 
     private String selectedDayOfWeek;
     private String selectedGroup;
+    private String selectedTeacher;
+    private List<String> teacherNameList;
     private List<String> daysOfWeek;
     private List<String> groupNames;
     private List<Lesson> filteredLessonsByDayAndGroup;
     private List<Lesson> lessonsByTimePeriodAndGroupAndDay;
+    private List<Lesson> lessonsByTimePeriodAndTeacherAndDay;
+
+    public String getSelectedTeacher() {
+        return selectedTeacher;
+    }
+    public void setSelectedTeacher(String selectedTeacher){
+        this.selectedTeacher = selectedTeacher;
+    }
+    public List<String> getTeacherNameList() {
+        List<String> names = new ArrayList<>();
+        for (Lesson lesson : uploadedFileController.lessonsStatic) {
+            String teacherName = lesson.getTeacherName();
+            if (!names.contains(teacherName)) {
+                names.add(teacherName);
+            }
+        }
+        return names;
+    }
 
     public String getSelectedDayOfWeek() {
         return selectedDayOfWeek;
@@ -61,7 +81,6 @@ public class scheduleController implements Serializable {
     public List<String> getDaysOfWeek() {
         return Arrays.asList("ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА");
     }
-
     public String getSelectedGroup() {
         return selectedGroup;
     }
@@ -80,6 +99,45 @@ public class scheduleController implements Serializable {
         return names;
     }
 
+    public List<Lesson> getFilteredLessonsByDayAndTeacher(String day) {
+        List<Lesson> filteredLessons = new ArrayList<>();
+        String selectedTeacher = getSelectedTeacher();
+        if (selectedTeacher != null) {
+            for (Lesson lesson : uploadedFileController.lessonsStatic) {
+                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getTeacherName().equalsIgnoreCase(selectedTeacher)) {
+                    filteredLessons.add(lesson);
+                    System.out.println("getFilteredLessonsByTeacherAndDay " + lesson.getTeacherName());
+                }
+            }
+        }
+        return filteredLessons;
+    }
+    public List<Lesson> getLessonsByTimePeriodAndTeacherAndDay(String timePeriod, String day) {
+        List<Lesson> lessonsByDayAndTeacher = getFilteredLessonsByDayAndTeacher(day);
+        List<Lesson> lessonsByTimePeriod = new ArrayList<>();
+        for (Lesson lesson : lessonsByDayAndTeacher) {
+            if (lesson.getLessonTime().contains(timePeriod)) {
+                boolean hasLessonWithDayTime = false;
+                if(!lessonsByTimePeriod.isEmpty()) {
+                    for (Lesson lessonByTime : lessonsByTimePeriod) {
+                        if (lessonByTime.getLessonTime().equalsIgnoreCase(lesson.getLessonTime()) &&
+                                lessonByTime.getLessonDay().equalsIgnoreCase(lesson.getLessonDay()) &&
+                                lessonByTime.getLessonWeek().equalsIgnoreCase(lesson.getLessonWeek())) {
+                            hasLessonWithDayTime = true;
+                            break;
+                        }
+                    }
+                }
+                if(!hasLessonWithDayTime){
+                    lessonsByTimePeriod.add(lesson);
+                }
+                System.out.println("getLessonsByTimePeriodAndTeacherAndDay: " + lesson.getSubjectName() + lesson.getGroupName() + lesson.getLessonDay() + lesson.getLessonTime());
+            }
+        }
+        System.out.println("Lessons by time period getLessonsByTimePeriodAndTeacherAndDay: " + lessonsByTimePeriod);
+
+        return lessonsByTimePeriod;
+    }
 
     public List<Lesson> getFilteredLessonsByDayAndGroup(String day) {
         List<Lesson> filteredLessons = new ArrayList<>();
@@ -100,11 +158,8 @@ public class scheduleController implements Serializable {
         for (Lesson lesson : lessonsByDayAndGroup) {
             if (lesson.getLessonTime().contains(timePeriod)) {
                 lessonsByTimePeriod.add(lesson);
-                System.out.println("Filtered lesson: " + lesson.getSubjectName() + lesson.getGroupName() + lesson.getLessonDay() + lesson.getLessonTime());
             }
         }
-        System.out.println("Lessons by time period: " + lessonsByTimePeriod);
-
         return lessonsByTimePeriod;
     }
 
