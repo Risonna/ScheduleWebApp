@@ -8,8 +8,6 @@ import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 @Named
 @ApplicationScoped
@@ -54,6 +52,7 @@ public class scheduleController implements Serializable {
     private List<Lesson> filteredLessonsByDayAndGroup;
     private List<Lesson> lessonsByTimePeriodAndGroupAndDay;
     private List<Lesson> lessonsByTimePeriodAndTeacherAndDay;
+
 
     public String getSelectedTeacher() {
         return selectedTeacher;

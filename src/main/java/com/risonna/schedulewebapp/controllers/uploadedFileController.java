@@ -28,6 +28,7 @@ public class uploadedFileController implements Serializable {
 
     private ExcelSearch excelSearch;
 
+
     public ArrayList<Lesson> getListOfLessonsForGroup() {
         return listOfLessonsForGroup;
     }
@@ -71,6 +72,7 @@ public class uploadedFileController implements Serializable {
         listOfLessons = excelSearch.getLessonList();
         listOfLessonsForGroup = getLessonInfoFromSQL.getLessonsByGroup(listOfLessons, "МОА-195");
         lessonsStatic = listOfLessons;
+
 
         isUploaded = true;
 
