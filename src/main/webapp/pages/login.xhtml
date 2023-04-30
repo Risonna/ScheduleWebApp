@@ -31,14 +31,14 @@
             <h:panelGroup id="messages" layout="block" />
             <h:panelGroup>
                 <h:outputLabel for="username" value="Username: " style="align-self: center; font-size: large" />
-                <h:inputText id="username" value="#{User.username}" class="form-control" />
+                <h:inputText id="username" value="#{user.username}" class="form-control" required="true" requiredMessage="#Username is required" />
             </h:panelGroup>
             <h:panelGroup>
                 <h:outputLabel for="password" value="Password: " style="align-self: center; font-size: large" />
-                <h:inputSecret id="password" value="#{User.password}" class="form-control" />
+                <h:inputSecret id="password" value="#{user.password}" class="form-control" required="true" redisplay="true" requiredMessage="Password is required"/>
             </h:panelGroup>
             <h:panelGroup class="button-row">
-                <h:commandButton id="loginButton" value="Login" action="#{loginController.login}" styleClass="logbib-button"/>
+                <h:commandButton id="loginButton" value="Login" action="#{user.login()}" styleClass="logbib-button"/>
             </h:panelGroup>
         </h:form>
     </ui:define>

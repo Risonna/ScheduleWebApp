@@ -11,11 +11,20 @@ import java.io.Serializable;
 public class Teacher implements Serializable {
 
     private int id;
+    private String title;
     private String teacherName;
     private String department;
 
     public Teacher(){
 
+    }
+
+    public String getTitle() {
+        return title;
+    }
+
+    public void setTitle(String title) {
+        this.title = title;
     }
 
     public int getId(){

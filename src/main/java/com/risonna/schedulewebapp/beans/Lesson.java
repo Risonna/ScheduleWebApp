@@ -21,6 +21,7 @@ public class Lesson implements Serializable {
     private String instituteName;
     private String lessonWeek;
     private String cellId;
+    private int rowNum;
     private int teacherId;
     private int subjectId;
     private int cabinetId;
@@ -38,6 +39,13 @@ public class Lesson implements Serializable {
     //setters
 
 
+    public int getRowNum() {
+        return rowNum;
+    }
+
+    public void setRowNum(int rowNum) {
+        this.rowNum = rowNum;
+    }
 
     public int getGroupsForLesson() {
         return groupsForLesson;

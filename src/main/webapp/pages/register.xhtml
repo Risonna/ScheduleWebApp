@@ -1,74 +1,57 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<!--
-  Created by IntelliJ IDEA.
-  User: rison
-  Date: 29.03.2023
-  Time: 18:04
--->
-<!DOCTYPE html
-        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
-        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
-
+<?xml version='1.0' encoding='UTF-8' ?>
+<!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:p="http://primefaces.org/ui"
-      xmlns:ui="http://xmlns.jcp.org/jsf/composite"
       xmlns:h="http://xmlns.jcp.org/jsf/html"
->
-
-<h:head>
-    <title>Title</title>
-</h:head>
-
-<h:body>
-
-    <h:form enctype="multipart/form-data">
-        <p:fileUpload value="#{uploadedFileController.uploadedFile}" mode="simple"/>
-
-
-        <h:commandButton value="Upload" action="#{uploadedFileController.upload}" />
-    </h:form>
-    <h:form>
-        <h:commandButton value="Parse" action="#{uploadedFileController.parse(uploadedFileController.filePath)}"/>
-        <h:commandButton value="CheckCabinetUsage" action="#{scheduleController.checkCabinetUsage(uploadedFileController.listOfLessons)}"/>
-        <h:commandButton value="Fill Teachers" action="#{scheduleController.fillTeachers(scheduleController.teacherNames)}"/>
-        <h:commandButton value="Fill Subjects" action="#{scheduleController.fillSubjects(scheduleController.subjects)}"/>
-    </h:form>
-
-    <h:dataTable value="#{scheduleController.listOfRepeatedCabinets}" var="cabinetCheckedList" rendered="#{scheduleController.cabinetChecked}">
-        <h:column>
-            <h:outputText value="#{cabinetCheckedList}"/>
-        </h:column>
-    </h:dataTable>
+      xmlns:ui="http://xmlns.jcp.org/jsf/facelets">
+<head>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            const inputs = document.querySelectorAll("input[type='text'], input[type='password']");
+            inputs.forEach(input => {
+                input.dataset.placeholder = input.getAttribute("placeholder");
+                input.addEventListener("focus", function() {
+                    this.removeAttribute("placeholder");
+                });
+                input.addEventListener("blur", function() {
+                    this.setAttribute("placeholder", this.dataset.placeholder);
+                });
+            });
+        });
+    </script>
+    <title>Registration</title>
 
 
-    <h:button id="sex1" value="register"/>
+</head>
 
-    <h:dataTable value="#{uploadedFileController.listOfLessons}" var="lessonsList" rendered="#{uploadedFileController.isUploaded}">
+<body>
 
+<ui:composition template="/templates/schedule_template.xhtml">
 
-        <h:column>
-            <h:outputText value="Is lessonCell #{lessonsList.lessonCell} "/>
-            <h:outputText value="Potoch #{lessonsList.potochLesson} "/>
-            <h:outputText value="groupsForLesson #{lessonsList.groupsForLesson} "/>
-            <h:outputText value="Subject's name is #{lessonsList.subjectName} "/>
-            <h:outputText value="Cell is #{lessonsList.cellId}"/>
-            <h:outputText value="Teacher's name is #{lessonsList.teacherName} "/>
-            <h:outputText value="The day is #{lessonsList.lessonDay} "/>
-            <h:outputText value="The week is #{lessonsList.lessonWeek} "/>
-            <h:outputText value="Group's name is #{lessonsList.groupName} "/>
-            <h:outputText value="Cabinet № #{lessonsList.cabinetName} "/>
-            <h:outputText value="The time is #{lessonsList.lessonTime} "/>
-        </h:column>
-    </h:dataTable>
+    <ui:define name="content">
+        <h:form id="loginForm" class="login-form">
+            <h:panelGroup id="messages" layout="block" />
+            <h:panelGroup>
+                <h:outputLabel for="username" value="Username: " style="align-self: center; font-size: large" />
+                <h:inputText id="username" value="#{register.username}" class="form-control" />
+            </h:panelGroup>
+            <h:panelGroup>
+                <h:outputLabel for="password" value="Password: " style="align-self: center; font-size: large" />
+                <h:inputSecret id="password" value="#{register.password}" class="form-control" />
+            </h:panelGroup>
+            <h:panelGroup>
+                <h:outputLabel for="password" value="Confirm your password: " style="align-self: center; font-size: large" />
+                <h:inputSecret id="passwordConfirm" value="#{register.password}" class="form-control" />
+            </h:panelGroup>
+            <h:panelGroup>
+                <h:outputLabel for="Email" value="Enter your email: " style="align-self: center; font-size: large" />
+                <h:inputText id="Email" value="#{register.email}" class="form-control" />
+            </h:panelGroup>
+            <h:panelGroup class="button-row">
+                <h:commandButton id="RegisterButton" value="Register" action="#{register.registerUser()}" styleClass="logbib-button"/>
+            </h:panelGroup>
+        </h:form>
+    </ui:define>
 
-
-
-
-
-
-
-
-</h:body>
-
+</ui:composition>
+</body>
 </html>

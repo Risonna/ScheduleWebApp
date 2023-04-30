@@ -12,13 +12,16 @@ import java.util.*;
 @Named
 @ApplicationScoped
 public class scheduleController implements Serializable {
-    private List<String> teacherNames =  Arrays.asList("unknown", "доц. Карабцев С.Н.", "доц. Завозкин С.Ю.", "доц. Фомина Л.Н.",
-            "доц. Бурмин Л.Н.", "доц. Гордиенок Н.И.", "доц. Савельева И.В.", "асс. Илькевич В.В.", "проф. Медведев А.В.",
-            "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.", "доц. Новосельцева М.А.", "проф. Степанов Ю.А.", "доц. Исламов Р.С.",
-            "доц. Стуколов С.В.", "доц. Чернова Е.С.", "доц. Власова Н.В.", "проф. Альтшулер О.Г.", "доц. Сергеева О.А.",
-            "проф. Рабенко Т.Г.", "доц. Жалнина А.А.", "доц. Буданова Е.А.", "проф. Смоленцев Н.К.", "доц. Чуешев А.В.", "ст.пр. Зимин А.И.",
-            "доц. Перевалова А.А.", "доц. Саблинский А.И.", "доц. Зимин А.И.", "доц. Гаврилов О.Ф.", "доц. Мешечкин В.В.", "асс. Степанов И.Ю.",
-            "асс. Торгулькин В.В.", "проф. Зиняков Н.М.", "доц. Рейн Т.С.", "работодатель Грибанов А.В.", "доц. Иванов К.С.");
+    private List<Teacher> teacherList = specifyTheTeachers();
+
+    public void setTeacherList(List<Teacher> teacherList) {
+        this.teacherList = teacherList;
+    }
+
+    public List<Teacher> getTeacherList() {
+        return teacherList;
+    }
+
     private List<String> subjects = Arrays.asList("unknown", "Дифференциальные уравнения", "Дискретная математика",
             "Программирование", "Физика", "Математический анализ", "Базы данных", "Алгебра", "Введение в специальность",
             "Иностранный язык", "Циклические виды спорта", "Информатика", "История", "Высшая математика", "Культура речи и деловое общение",
@@ -46,13 +49,16 @@ public class scheduleController implements Serializable {
     private String selectedDayOfWeek;
     private String selectedGroup;
     private String selectedTeacher;
-    private List<String> teacherNameList;
     private List<String> daysOfWeek;
     private List<String> groupNames;
     private List<Lesson> filteredLessonsByDayAndGroup;
     private List<Lesson> lessonsByTimePeriodAndGroupAndDay;
     private List<Lesson> lessonsByTimePeriodAndTeacherAndDay;
+    private List<Lesson> listOfStuff;
 
+    public void setListOfStuff(List<Lesson> listOfStuff) {
+        this.listOfStuff = listOfStuff;
+    }
 
     public String getSelectedTeacher() {
         return selectedTeacher;
@@ -70,6 +76,7 @@ public class scheduleController implements Serializable {
         }
         return names;
     }
+
 
     public String getSelectedDayOfWeek() {
         return selectedDayOfWeek;
@@ -159,8 +166,36 @@ public class scheduleController implements Serializable {
                 lessonsByTimePeriod.add(lesson);
             }
         }
+
         return lessonsByTimePeriod;
     }
+
+    public List<List<Lesson>> getListsStuff(List<Lesson> listHuh) {
+        List<Integer> rowPositions = new ArrayList<>();
+        int rowAmount = 0;
+        for (Lesson lesson : listHuh) {
+            if (!rowPositions.contains(lesson.getRowNum())) {
+                rowPositions.add(lesson.getRowNum());
+                rowAmount++;
+            }
+        }
+
+        List<List<Lesson>> listOfListsOfLessons = new ArrayList<>();
+        for (int j = 0; j < rowAmount; j++) {
+            List<Lesson> listOfLessons = new ArrayList<>();
+            int rownum = rowPositions.get(j);
+            for (Lesson lesson : listHuh) {
+                if (lesson.getRowNum() == rownum) {
+                    listOfLessons.add(lesson);
+                }
+            }
+            System.out.println("new teach is: " + listOfLessons.get(0).getTeacherName());
+            listOfListsOfLessons.add(listOfLessons);
+        }
+        return listOfListsOfLessons;
+    }
+
+
 
 
     private List<Lesson> getLessonsFromSQL(){
@@ -230,9 +265,6 @@ public class scheduleController implements Serializable {
         isCabinetChecked = cabinetChecked;
     }
 
-    public List<String> getTeacherNames() {
-        return teacherNames;
-    }
     public List<String> getSubjects(){
         return subjects;
     }
@@ -240,13 +272,55 @@ public class scheduleController implements Serializable {
         this.subjects = subjects;
     }
 
-    public void setTeacherNames(List<String> teacherNames) {
-        this.teacherNames = teacherNames;
-    }
+    public scheduleController() {
 
-    public scheduleController(){
 
     }
+
+    private List<Teacher> specifyTheTeachers(){
+        List<Teacher> teacherlist = new ArrayList<>();
+        List<String> teachers = Arrays.asList("unknown", "доц. Карабцев С.Н.", "доц. Завозкин С.Ю.", "доц. Фомина Л.Н.",
+                "доц. Бурмин Л.Н.", "доц. Гордиенок Н.И.", "доц. Савельева И.В.", "асс. Илькевич В.В.", "проф. Медведев А.В.",
+                "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.", "доц. Новосельцева М.А.", "проф. Степанов Ю.А.", "доц. Исламов Р.С.",
+                "доц. Стуколов С.В.", "доц. Чернова Е.С.", "доц. Власова Н.В.", "проф. Альтшулер О.Г.", "доц. Сергеева О.А.",
+                "проф. Рабенко Т.Г.", "доц. Жалнина А.А.", "доц. Буданова Е.А.", "проф. Смоленцев Н.К.", "доц. Чуешев А.В.", "ст.пр. Зимин А.И.",
+                "доц. Перевалова А.А.", "доц. Саблинский А.И.", "доц. Зимин А.И.", "доц. Гаврилов О.Ф.", "доц. Мешечкин В.В.", "асс. Степанов И.Ю.",
+                "асс. Торгулькин В.В.", "проф. Зиняков Н.М.", "доц. Рейн Т.С.", "работодатель Грибанов А.В.", "доц. Иванов К.С.");
+
+        List<String> teacherNames = Arrays.asList("unknown", "Карабцев С.Н.", "Завозкин С.Ю.", "Фомина Л.Н.",
+                "Бурмин Л.Н.", "Гордиенок Н.И.", "Савельева И.В.", "Илькевич В.В.", "Медведев А.В.",
+                "Тюкалова С.А.", "Гринвальд О.Н.", "Карпинец А.Ю.", "Новосельцева М.А.", "Степанов Ю.А.", "Исламов Р.С.",
+                "Стуколов С.В.", "Чернова Е.С.", "Власова Н.В.", "Альтшулер О.Г.", "Сергеева О.А.",
+                "Рабенко Т.Г.", "Жалнина А.А.", "Буданова Е.А.", "Смоленцев Н.К.", "Чуешев А.В.", "Зимин А.И.",
+                "Перевалова А.А.", "Саблинский А.И.", "Зимин А.И.", "Гаврилов О.Ф.", "Мешечкин В.В.", "Степанов И.Ю.",
+                "Торгулькин В.В.", "Зиняков Н.М.", "Рейн Т.С.", "Грибанов А.В.", "Иванов К.С.", "Корчагина И.В.", "Пастухова Е.Я.", "Часовников С.Н.",
+                "Фролова Т.В.", "Кранзеева Е.А.", "Каган Е.С.", "Инденко О.Н.", "Турта А.В.", "Борисов В.Г.", "Гудов А.М.", "Дорн Е.В.",
+                "Рыкова Н.Ф.", "Степанов В.Б.", "Кононова С.А.", "Напреенко Г.В.", "Григорик Н.Н.", "Нятина Н.В.", "Гутова С.Г.",
+                "Чеботарев А.Л.", "Кучер Н.А.", "Колбаса О.А.", "Дмитриева Н.В.", "Тимофеева Н.А.", "Шаров А.А.", "Борисова М.В.",
+                "Скотникова Л.Н.", "Солопова А.Н.", "Крутиков В.Н.", "Вылегжанина А.В.");
+
+        List<String> teacherTitles = Arrays.asList("unknown", "доц", "доц", "доц",
+                "доц", "доц", "доц", "асс", "проф",
+                "ст. пр.", "доц", "доц", "доц", "проф", "доц",
+                "доц", "доц", "доц", "проф", "доц",
+                "проф", "доц", "доц", "проф", "доц", "ст.пр.",
+                "доц", "доц", "доц", "доц", "доц", "асс",
+                "асс", "проф", "доц", "работодатель", "доц", "доц", "доц", "доц", "доц", "доц", "доц",
+                "доц", "работодатель", "доц", "проф", "почас", "ст. пр.", "работодатель", "доц", "доц", "ст. пр.", "доц",
+                "доц", "доц", "проф", "асс", "доц", "асс", "асс", "ст. пр.", "ст. пр.", "доц", "проф", "доц");
+
+        for (int i = 0; i<teacherNames.size(); i++){
+            Teacher teacher = new Teacher();
+            teacher.setId(i);
+            teacher.setTeacherName(teacherNames.get(i));
+            teacher.setDepartment("unknown");
+            teacher.setTitle(teacherTitles.get(i));
+            teacherlist.add(teacher);
+        }
+
+        return teacherlist;
+    }
+
     public ArrayList<Lesson> dayGroup(ArrayList<Lesson> allLessonList, String day, String group){
         var dayTimeGroupList = new ArrayList<Lesson>();
 
@@ -298,21 +372,20 @@ public class scheduleController implements Serializable {
         return dayTimeGroupList;
     }
 
-    public void fillTeachers(List<String> teacherNames){
+    public void fillTeachers(List<Teacher> teacherNames){
         PreparedStatement prepStmt = null;
         ResultSet rs = null;
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
-            prepStmt = conn.prepareStatement("INSERT INTO teachers (id, name, department) VALUES (?, ?, ?)");
-            int i = 1;
+            prepStmt = conn.prepareStatement("INSERT INTO teachers (id, name, department, title) VALUES (?, ?, ?, ?)");
 
-            for (String teacher: teacherNames) {
-                prepStmt.setInt(1, i);
-                prepStmt.setString(2, teacher);
+            for (Teacher teacher: teacherNames) {
+                prepStmt.setInt(1, teacher.getId());
+                prepStmt.setString(2, teacher.getTeacherName());
                 prepStmt.setString(3, "don't have that info");
+                prepStmt.setString(4, teacher.getTitle());
                 prepStmt.addBatch();
-                i++;
 
             }
             prepStmt.executeBatch();
@@ -413,7 +486,7 @@ public class scheduleController implements Serializable {
         }
     }
 
-    public List<Teacher> getTeacherList() {
+    public List<Teacher> getTeacherListFromSQL() {
         Statement stmt = null;
         ResultSet rs = null;
         Connection conn = null;
@@ -426,10 +499,12 @@ public class scheduleController implements Serializable {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
                 String department = rs.getString("department");
+                String title = rs.getString("title");
                 Teacher teacher = new Teacher();
                 teacher.setId(id);
                 teacher.setTeacherName(name);
                 teacher.setDepartment(department);
+                teacher.setTitle(title);
                 teachers.add(teacher);
             }
         } catch (SQLException e) {

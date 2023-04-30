@@ -22,12 +22,18 @@
     <ui:composition>
 
     <div class="header">
-        <h:graphicImage library="images" name="university_design.jpg" />
-        <h:form>
+            <h:link outcome="homePage">
+                <h:graphicImage library="images" name="university_design.jpg" />
+            </h:link>
+
+
+        <h:form >
             <div class="header-buttons">
-                <h:commandButton value="#{msg.login}" action="#{loginController.login}" styleClass="login-button" />
-                <h:commandButton value="#{msg.register}" action="#{loginController.register}" styleClass="register-button" />
+                <h:commandButton value="#{msg.login}" action="#{loginController.login}" styleClass="login-button" rendered="#{!user.logged}"/>
+                <h:commandButton value="#{msg.register}" action="#{loginController.register}" styleClass="register-button" rendered="#{!user.logged}"/>
             </div>
+            <h:outputText value="Hello, #{user.username} \n" rendered="#{user.logged}" />
+            <h:commandLink value="Log out" action="#{user.logout()}" rendered="#{user.logged}"/>
         </h:form>
     </div>
 

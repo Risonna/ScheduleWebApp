@@ -113,3 +113,13 @@ h1 {
 .lesson-table tr:hover {
     background-color: #f5f5f5;
 }
+.inner-table td {
+    display: inline-block;
+}
+div.lesson-item {
+    margin-bottom: 10px;
+    border: 5px solid #ddd;
+    padding: 5px;
+    margin: 10px auto;
+}
+

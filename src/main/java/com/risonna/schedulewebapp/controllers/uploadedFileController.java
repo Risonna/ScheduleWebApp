@@ -62,15 +62,21 @@ public class uploadedFileController implements Serializable {
 
     public void parse(String filePath) throws IOException {
         scheduleController getLessonInfoFromSQL = new scheduleController();
-        List<Teacher> teachers = getLessonInfoFromSQL.getTeacherList();
+        List<Teacher> teachers = getLessonInfoFromSQL.getTeacherListFromSQL();
         List<Subject> subjects = getLessonInfoFromSQL.getSubjectList();
         List<Cabinet> cabinets = getLessonInfoFromSQL.getCabinetList();
         List<Group> groups = getLessonInfoFromSQL.getGroupList();
 
         setExcelSearch(new ExcelSearch(filePath, teachers, subjects, cabinets, groups));
+
+
         excelSearch.parseStuff();
+
+
         listOfLessons = excelSearch.getLessonList();
         listOfLessonsForGroup = getLessonInfoFromSQL.getLessonsByGroup(listOfLessons, "МОА-195");
+
+
         lessonsStatic = listOfLessons;
 
 
