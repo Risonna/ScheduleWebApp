@@ -13,10 +13,28 @@ public class Teacher implements Serializable {
     private int id;
     private String title;
     private String teacherName;
+    private String teacherSurname;
+    private String teacherPatronymic;
     private String department;
 
     public Teacher(){
 
+    }
+
+    public String getTeacherPatronymic() {
+        return teacherPatronymic;
+    }
+
+    public String getTeacherSurname() {
+        return teacherSurname;
+    }
+
+    public void setTeacherPatronymic(String teacherPatronymic) {
+        this.teacherPatronymic = teacherPatronymic;
+    }
+
+    public void setTeacherSurname(String teacherSurname) {
+        this.teacherSurname = teacherSurname;
     }
 
     public String getTitle() {

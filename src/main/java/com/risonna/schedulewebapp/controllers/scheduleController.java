@@ -38,6 +38,80 @@ public class scheduleController implements Serializable {
             "Системы хранения и обработки больших данных", "Разработка нативных мобильных приложений", "Администрирование ERP кластеров",
             "Компьютерное моделирование в современных задачах медицины и промышленн", "Информационная безопасность",
             "Коррупция: причины, проявления, продиводействие", "Разработка мобильных приложений");
+    private List<String> cabinets = Arrays.asList("1бл", "2бл", "2130а", "2130б", "2130в", "2131в", "2134", "2139",
+            "2141", "2143", "2204", "2210", "2218", "2219", "2220", "2221", "2226бл", "2226", "2229", "5104", "5106", "5109",
+            "5113", "5120", "5121", "5320", "5404", "1517", "1313", "1326", "1333", "1335", "4бл", "5бл", "лыжная база 1 корпус");
+
+    private List<Group> groupsFromSQL = getGroupListFromSQL();
+
+    public List<Group> getGroupsFromSQL() {
+        return groupsFromSQL;
+    }
+
+    public void setGroupsFromSQL(List<Group> groupsFromSQL) {
+        this.groupsFromSQL = groupsFromSQL;
+    }
+
+    private List<Subject> subjectsFromSQL = getSubjectListFromSQL();
+
+    public List<Subject> getSubjectsFromSQL() {
+        return subjectsFromSQL;
+    }
+
+    public void setSubjectsFromSQL(List<Subject> subjectsFromSQL) {
+        this.subjectsFromSQL = subjectsFromSQL;
+    }
+
+    private List<Cabinet> cabinetsFromSQL = getCabinetListFromSQL();
+
+    public List<Cabinet> getCabinetsFromSQL() {
+        return cabinetsFromSQL;
+    }
+
+    public void setCabinetsFromSQL(List<Cabinet> cabinetsFromSQL) {
+        this.cabinetsFromSQL = cabinetsFromSQL;
+    }
+
+    private List<Teacher> teachersFromSQL = getTeacherListFromSQL();
+
+    public List<Teacher> getTeachersFromSQL() {
+        return teachersFromSQL;
+    }
+
+    public void setTeachersFromSQL(List<Teacher> teachersFromSQL) {
+        this.teachersFromSQL = teachersFromSQL;
+    }
+
+    private List<Lesson> lessonsFromSQL = getLessonsListFromSQL();
+
+    public void setLessonsFromSQL(List<Lesson> lessonsFromSQL) {
+        this.lessonsFromSQL = lessonsFromSQL;
+    }
+
+    public List<Lesson> getLessonsFromSQL() {
+        return lessonsFromSQL;
+    }
+    private List<Lesson> lessonsOk;
+
+    public List<Lesson> getLessonsOk() {
+        lessonsOk = lessonsFromSQL;
+        for (Lesson lesson: lessonsOk){
+            getSubjectTeacherCabinetGroupById(lesson);
+        }
+        return lessonsOk;
+    }
+
+    public void setLessonsOk(List<Lesson> lessonsOk) {
+        this.lessonsOk = lessonsOk;
+    }
+
+    public void setCabinets(List<String> cabinets) {
+        this.cabinets = cabinets;
+    }
+
+    public List<String> getCabinets() {
+        return cabinets;
+    }
 
     private boolean isCabinetChecked = false;
     private final String[] TIME_PERIODS = {"8.00-9.35", "9.45-11.20", "11.45-13.20", "13.30-15.05", "15.30-17.05", "17.15-18.50"};
@@ -68,9 +142,16 @@ public class scheduleController implements Serializable {
     }
     public List<String> getTeacherNameList() {
         List<String> names = new ArrayList<>();
-        for (Lesson lesson : uploadedFileController.lessonsStatic) {
-            String teacherName = lesson.getTeacherName();
+        for (Teacher teacher : teachersFromSQL) {
+            String teacherName;
+            if(!teacher.getTeacherSurname().equalsIgnoreCase("unknown")){
+                teacherName = teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0) + ".";
+            }
+            else{
+                teacherName = teacher.getTeacherName();
+            }
             if (!names.contains(teacherName)) {
+
                 names.add(teacherName);
             }
         }
@@ -96,10 +177,32 @@ public class scheduleController implements Serializable {
     }
     public List<String> getGroupNames() {
         List<String> names = new ArrayList<>();
-        for (Lesson lesson : uploadedFileController.lessonsStatic) {
-            String groupName = lesson.getGroupName();
-            if (!names.contains(groupName)) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+        ResultSet rs = null;
+        try {
+            conn = ScheduleDatabase.getConnection();
+            stmt = conn.prepareStatement("SELECT studentgroups.name FROM `studentgroups`");
+            rs = stmt.executeQuery();
+            while (rs.next()) {
+                String groupName = rs.getString("name");
                 names.add(groupName);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (rs != null) {
+                    rs.close();
+                }
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
             }
         }
         return names;
@@ -109,7 +212,7 @@ public class scheduleController implements Serializable {
         List<Lesson> filteredLessons = new ArrayList<>();
         String selectedTeacher = getSelectedTeacher();
         if (selectedTeacher != null) {
-            for (Lesson lesson : uploadedFileController.lessonsStatic) {
+            for (Lesson lesson : getLessonsOk()) {
                 if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getTeacherName().equalsIgnoreCase(selectedTeacher)) {
                     filteredLessons.add(lesson);
                     System.out.println("getFilteredLessonsByTeacherAndDay " + lesson.getTeacherName());
@@ -149,8 +252,9 @@ public class scheduleController implements Serializable {
         List<Lesson> filteredLessons = new ArrayList<>();
         String selectedGroup = getSelectedGroup();
         if (selectedGroup != null) {
-            for (Lesson lesson : uploadedFileController.lessonsStatic) {
-                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getGroupName().equalsIgnoreCase(selectedGroup)) {
+            for (Lesson lesson : getLessonsOk()) {
+                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getGroupName().trim().equalsIgnoreCase(selectedGroup.trim())) {
+
                     filteredLessons.add(lesson);
                 }
             }
@@ -192,13 +296,21 @@ public class scheduleController implements Serializable {
             System.out.println("new teach is: " + listOfLessons.get(0).getTeacherName());
             listOfListsOfLessons.add(listOfLessons);
         }
+
+        for (List<Lesson> lessonList:listOfListsOfLessons) {
+            for (Lesson lesson:lessonList) {
+
+
+            }
+
+        }
         return listOfListsOfLessons;
     }
 
 
 
 
-    private List<Lesson> getLessonsFromSQL(){
+    private List<Lesson> getLessonsListFromSQL(){
 
         Statement stmt = null;
         ResultSet rs = null;
@@ -209,21 +321,23 @@ public class scheduleController implements Serializable {
             stmt = conn.createStatement();
             rs = stmt.executeQuery("SELECT * FROM lessons");
             while (rs.next()) {
-                int id = rs.getInt("teacherid");
+                int teacherid = rs.getInt("teacherid");
                 int subjectid = rs.getInt("subjectid");
                 String time = rs.getString("time");
                 String day = rs.getString("day");
                 int groupId = rs.getInt("groupid");
                 int cabinetid = rs.getInt("cabinetid");
                 String week = rs.getString("week");
+                int rowNum = rs.getInt("rownum");
                 Lesson lesson = new Lesson();
-                lesson.setTeacherId(id);
+                lesson.setTeacherId(teacherid);
                 lesson.setSubjectId(subjectid);
                 lesson.setLessonTime(time);
                 lesson.setLessonDay(day);
                 lesson.setGroupId(groupId);
                 lesson.setCabinetId(cabinetid);
                 lesson.setLessonWeek(week);
+                lesson.setRowNum(rowNum);
                 lessonsList.add(lesson);
             }
         } catch (SQLException e) {
@@ -279,98 +393,48 @@ public class scheduleController implements Serializable {
 
     private List<Teacher> specifyTheTeachers(){
         List<Teacher> teacherlist = new ArrayList<>();
-        List<String> teachers = Arrays.asList("unknown", "доц. Карабцев С.Н.", "доц. Завозкин С.Ю.", "доц. Фомина Л.Н.",
-                "доц. Бурмин Л.Н.", "доц. Гордиенок Н.И.", "доц. Савельева И.В.", "асс. Илькевич В.В.", "проф. Медведев А.В.",
-                "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.", "доц. Новосельцева М.А.", "проф. Степанов Ю.А.", "доц. Исламов Р.С.",
-                "доц. Стуколов С.В.", "доц. Чернова Е.С.", "доц. Власова Н.В.", "проф. Альтшулер О.Г.", "доц. Сергеева О.А.",
-                "проф. Рабенко Т.Г.", "доц. Жалнина А.А.", "доц. Буданова Е.А.", "проф. Смоленцев Н.К.", "доц. Чуешев А.В.", "ст.пр. Зимин А.И.",
-                "доц. Перевалова А.А.", "доц. Саблинский А.И.", "доц. Зимин А.И.", "доц. Гаврилов О.Ф.", "доц. Мешечкин В.В.", "асс. Степанов И.Ю.",
-                "асс. Торгулькин В.В.", "проф. Зиняков Н.М.", "доц. Рейн Т.С.", "работодатель Грибанов А.В.", "доц. Иванов К.С.");
+        List<String> teachers = Arrays.asList("unknown",
+                "доц. Гордиенок Н.И.", "доц. Савельева И.В.",
+                "ст. пр. Тюкалова С.А.", "доц. Гринвальд О.Н.", "доц. Карпинец А.Ю.", "доц. Новосельцева М.А.", "доц. Исламов Р.С.",
+                "доц. Чернова Е.С.", "доц. Власова Н.В.", "проф. Альтшулер О.Г.", "доц. Сергеева О.А.",
+                "проф. Рабенко Т.Г.", "доц. Жалнина А.А.", "доц. Буданова Е.А.", "проф. Смоленцев Н.К.", "доц. Чуешев А.В.",
+                "доц. Гаврилов О.Ф.",
+                "асс. Торгулькин В.В.", "проф. Зиняков Н.М.", "доц. Рейн Т.С.", "работодатель Грибанов А.В.");
 
-        List<String> teacherNames = Arrays.asList("unknown", "Карабцев С.Н.", "Завозкин С.Ю.", "Фомина Л.Н.",
-                "Бурмин Л.Н.", "Гордиенок Н.И.", "Савельева И.В.", "Илькевич В.В.", "Медведев А.В.",
-                "Тюкалова С.А.", "Гринвальд О.Н.", "Карпинец А.Ю.", "Новосельцева М.А.", "Степанов Ю.А.", "Исламов Р.С.",
-                "Стуколов С.В.", "Чернова Е.С.", "Власова Н.В.", "Альтшулер О.Г.", "Сергеева О.А.",
-                "Рабенко Т.Г.", "Жалнина А.А.", "Буданова Е.А.", "Смоленцев Н.К.", "Чуешев А.В.", "Зимин А.И.",
-                "Перевалова А.А.", "Саблинский А.И.", "Зимин А.И.", "Гаврилов О.Ф.", "Мешечкин В.В.", "Степанов И.Ю.",
-                "Торгулькин В.В.", "Зиняков Н.М.", "Рейн Т.С.", "Грибанов А.В.", "Иванов К.С.", "Корчагина И.В.", "Пастухова Е.Я.", "Часовников С.Н.",
-                "Фролова Т.В.", "Кранзеева Е.А.", "Каган Е.С.", "Инденко О.Н.", "Турта А.В.", "Борисов В.Г.", "Гудов А.М.", "Дорн Е.В.",
-                "Рыкова Н.Ф.", "Степанов В.Б.", "Кононова С.А.", "Напреенко Г.В.", "Григорик Н.Н.", "Нятина Н.В.", "Гутова С.Г.",
-                "Чеботарев А.Л.", "Кучер Н.А.", "Колбаса О.А.", "Дмитриева Н.В.", "Тимофеева Н.А.", "Шаров А.А.", "Борисова М.В.",
-                "Скотникова Л.Н.", "Солопова А.Н.", "Крутиков В.Н.", "Вылегжанина А.В.");
+        List<String> teacherNames = Arrays.asList("unknown",
+                "Гордиенок Н.И.", "Савельева И.В.",
+                "Тюкалова С.А.", "Гринвальд О.Н.", "Карпинец А.Ю.", "Новосельцева М.А.", "Исламов Р.С.",
+                "Чернова Е.С.", "Власова Н.В.", "Альтшулер О.Г.", "Сергеева О.А.",
+                "Рабенко Т.Г.", "Жалнина А.А.", "Буданова Е.А.", "Смоленцев Н.К.", "Чуешев А.В.", "Гаврилов О.Ф.",
+                "Торгулькин В.В.", "Зиняков Н.М.", "Рейн Т.С.",
+                "Фролова Т.В.", "Каган Е.С.", "Инденко О.Н.", "Борисов В.Г.",
+                "Рыкова Н.Ф.", "Напреенко Г.В.", "Григорик Н.Н.", "Нятина Н.В.", "Гутова С.Г.",
+                "Кучер Н.А.", "Дмитриева Н.В.", "Тимофеева Н.А.", "Шаров А.А.", "Борисова М.В.",
+                "Скотникова Л.Н.");
 
-        List<String> teacherTitles = Arrays.asList("unknown", "доц", "доц", "доц",
-                "доц", "доц", "доц", "асс", "проф",
+        List<String> teacherTitles = Arrays.asList("unknown",
+                "доц", "доц",
                 "ст. пр.", "доц", "доц", "доц", "проф", "доц",
-                "доц", "доц", "доц", "проф", "доц",
-                "проф", "доц", "доц", "проф", "доц", "ст.пр.",
-                "доц", "доц", "доц", "доц", "доц", "асс",
-                "асс", "проф", "доц", "работодатель", "доц", "доц", "доц", "доц", "доц", "доц", "доц",
-                "доц", "работодатель", "доц", "проф", "почас", "ст. пр.", "работодатель", "доц", "доц", "ст. пр.", "доц",
-                "доц", "доц", "проф", "асс", "доц", "асс", "асс", "ст. пр.", "ст. пр.", "доц", "проф", "доц");
+                "доц", "доц",
+                "проф", "доц", "доц", "проф", "доц",
+                "доц", "доц", "доц", "асс",
+                "проф", "доц",
+                "работодатель", "доц", "ст. пр.", "работодатель", "доц", "ст. пр.", "доц",
+                "доц", "доц", "доц", "асс", "асс", "ст. пр.", "ст. пр.");
 
         for (int i = 0; i<teacherNames.size(); i++){
             Teacher teacher = new Teacher();
-            teacher.setId(i);
             teacher.setTeacherName(teacherNames.get(i));
             teacher.setDepartment("unknown");
             teacher.setTitle(teacherTitles.get(i));
+            teacher.setTeacherSurname("unknown");
+            teacher.setTeacherPatronymic("unknown");
             teacherlist.add(teacher);
         }
 
         return teacherlist;
     }
 
-    public ArrayList<Lesson> dayGroup(ArrayList<Lesson> allLessonList, String day, String group){
-        var dayTimeGroupList = new ArrayList<Lesson>();
-
-        for (Lesson lesson: allLessonList) {
-            if(lesson.getLessonDay().toLowerCase().equals(day) && lesson.getGroupName().toLowerCase().equals(group)){
-                dayTimeGroupList.add(lesson);
-            }
-
-        }
-        if(dayTimeGroupList.size() == 0){
-            var lessonLesson = new Lesson();
-            lessonLesson.setSubjectName("nothing was added");
-            dayTimeGroupList.add(lessonLesson);
-        }
-        return dayTimeGroupList;
-    }
-    public ArrayList<Lesson> getLessonsByGroup(ArrayList<Lesson> allLessonList, String group){
-        var dayTimeGroupList = new ArrayList<Lesson>();
-
-        for (Lesson lesson: allLessonList) {
-            if(lesson.getGroupName().equalsIgnoreCase(group)){
-                dayTimeGroupList.add(lesson);
-            }
-
-        }
-        if(dayTimeGroupList.size() == 0){
-            var lessonLesson = new Lesson();
-            lessonLesson.setSubjectName("nothing was added");
-            lessonLesson.setLessonTime("8.00-9.35");
-            dayTimeGroupList.add(lessonLesson);
-        }
-        return dayTimeGroupList;
-    }
-
-    public ArrayList<Lesson> dayTeacher(ArrayList<Lesson> allLessonList, String day, String teacher){
-        var dayTimeGroupList = new ArrayList<Lesson>();
-
-        for (Lesson lesson: allLessonList) {
-            if(lesson.getLessonDay().toLowerCase().equals(day) && lesson.getGroupName().toLowerCase().equals(teacher)){
-                dayTimeGroupList.add(lesson);
-            }
-
-        }
-        if(dayTimeGroupList.size() == 0){
-            var lessonLesson = new Lesson();
-            lessonLesson.setSubjectName("nothing was added");
-            dayTimeGroupList.add(lessonLesson);
-        }
-        return dayTimeGroupList;
-    }
 
     public void fillTeachers(List<Teacher> teacherNames){
         PreparedStatement prepStmt = null;
@@ -378,14 +442,22 @@ public class scheduleController implements Serializable {
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
-            prepStmt = conn.prepareStatement("INSERT INTO teachers (id, name, department, title) VALUES (?, ?, ?, ?)");
-
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * from teachers");
+            int i = 1;
+            while (rs.next()){
+                i = rs.getInt("id") + 1;
+            }
+            prepStmt = conn.prepareStatement("INSERT INTO teachers (id, name, department, title, surname, patronymic) VALUES (?, ?, ?, ?, ?, ?)");
             for (Teacher teacher: teacherNames) {
-                prepStmt.setInt(1, teacher.getId());
+                prepStmt.setInt(1, i);
                 prepStmt.setString(2, teacher.getTeacherName());
-                prepStmt.setString(3, "don't have that info");
+                prepStmt.setString(3, teacher.getDepartment());
                 prepStmt.setString(4, teacher.getTitle());
+                prepStmt.setString(5, teacher.getTeacherSurname());
+                prepStmt.setString(6, teacher.getTeacherPatronymic());
                 prepStmt.addBatch();
+                i++;
 
             }
             prepStmt.executeBatch();
@@ -453,8 +525,12 @@ public class scheduleController implements Serializable {
         try {
             conn = ScheduleDatabase.getConnection();
             prepStmt = conn.prepareStatement("INSERT INTO cabinets (id, cabinetname, type, seats) VALUES (?, ?, ?, ?)");
+            prepStmt.setInt(1, 0);
+            prepStmt.setString(2, "unknown");
+            prepStmt.setString(3, "unknown");
+            prepStmt.setString(4, "unknown");
+            prepStmt.addBatch();
             int i = 1;
-
             for (String cabinetName: Cabinets) {
                 prepStmt.setInt(1, i);
                 prepStmt.setString(2, cabinetName);
@@ -462,7 +538,92 @@ public class scheduleController implements Serializable {
                 prepStmt.setString(4, "unknown");
                 prepStmt.addBatch();
                 i++;
+            }
+            prepStmt.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (prepStmt != null) {
+                    prepStmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
 
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+    public void fillLessons(List<Lesson> lessons){
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try {
+            conn = ScheduleDatabase.getConnection();
+            prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, rownum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            int i = 1;
+            for (Lesson lesson: lessons) {
+                prepStmt.setInt(1, i);
+                prepStmt.setInt(2, lesson.getTeacherId());
+                prepStmt.setInt(3, lesson.getSubjectId());
+                prepStmt.setString(4, lesson.getLessonTime());
+                prepStmt.setString(5, lesson.getLessonDay());
+                prepStmt.setInt(6, lesson.getGroupId());
+                prepStmt.setInt(7, lesson.getCabinetId());
+                prepStmt.setString(8, lesson.getLessonWeek());
+                prepStmt.setInt(9, lesson.getRowNum());
+                prepStmt.addBatch();
+                i++;
+
+            }
+            System.out.println(lessons.size());
+            prepStmt.executeBatch();
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (prepStmt != null) {
+                    prepStmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+    }
+    public void fillGroups(List<String> groups){
+        PreparedStatement prepStmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try {
+            conn = ScheduleDatabase.getConnection();
+            prepStmt = conn.prepareStatement("INSERT INTO studentgroups (id, name, fullname, institute) VALUES (?, ?, ?, ?)");
+            prepStmt.setInt(1, 0);
+            prepStmt.setString(2, "unknown");
+            prepStmt.setString(3, "unknown");
+            prepStmt.setString(4, "unknown");
+            prepStmt.addBatch();
+            int i = 1;
+            for (String groupName: groups) {
+                prepStmt.setInt(1, i);
+                prepStmt.setString(2, groupName);
+                prepStmt.setString(3, "unknown");
+                prepStmt.setString(4, "unknown");
+                prepStmt.addBatch();
+                i++;
             }
             prepStmt.executeBatch();
         } catch (SQLException e) {
@@ -500,11 +661,15 @@ public class scheduleController implements Serializable {
                 String name = rs.getString("name");
                 String department = rs.getString("department");
                 String title = rs.getString("title");
+                String surname = rs.getString("surname");
+                String patronymic = rs.getString("patronymic");
                 Teacher teacher = new Teacher();
                 teacher.setId(id);
                 teacher.setTeacherName(name);
                 teacher.setDepartment(department);
                 teacher.setTitle(title);
+                teacher.setTeacherSurname(surname);
+                teacher.setTeacherPatronymic(patronymic);
                 teachers.add(teacher);
             }
         } catch (SQLException e) {
@@ -527,7 +692,7 @@ public class scheduleController implements Serializable {
         return teachers;
     }
 
-    public List<Subject> getSubjectList() {
+    public List<Subject> getSubjectListFromSQL() {
         Statement stmt = null;
         ResultSet rs = null;
         Connection conn = null;
@@ -563,7 +728,7 @@ public class scheduleController implements Serializable {
         }
         return subjects;
     }
-    public List<Cabinet> getCabinetList(){
+    public List<Cabinet> getCabinetListFromSQL(){
         Statement stmt = null;
         ResultSet rs = null;
         Connection conn = null;
@@ -603,7 +768,7 @@ public class scheduleController implements Serializable {
         }
         return cabinets;
     }
-    public List<Group> getGroupList(){
+    public List<Group> getGroupListFromSQL(){
         Statement stmt = null;
         ResultSet rs = null;
         Connection conn = null;
@@ -611,7 +776,7 @@ public class scheduleController implements Serializable {
         try {
             conn = ScheduleDatabase.getConnection();
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM webschedule.groups;");
+            rs = stmt.executeQuery("SELECT * FROM webschedule.studentgroups;");
             while (rs.next()) {
                 int id = rs.getInt("id");
                 String name = rs.getString("name");
@@ -642,29 +807,8 @@ public class scheduleController implements Serializable {
                 throw new RuntimeException(e);
             }
         }
+
         return groups;
-    }
-    public boolean checkIfValueExists(Connection conn, String tableName, String columnName, String value) throws SQLException {
-        PreparedStatement stmt = null;
-        ResultSet rs = null;
-        boolean exists = false;
-
-        try {
-            stmt = conn.prepareStatement("SELECT COUNT(*) FROM " + tableName + " WHERE " + columnName + " = ?");
-            stmt.setString(1, value);
-            rs = stmt.executeQuery();
-            rs.next();
-            exists = rs.getInt(1) > 0;
-        } finally {
-            if (stmt != null) {
-                stmt.close();
-            }
-            if (rs != null) {
-                rs.close();
-            }
-        }
-
-        return exists;
     }
 
     public List<String> checkCabinetUsage(List<Lesson> allLessons) {
@@ -694,6 +838,42 @@ public class scheduleController implements Serializable {
         setCabinetChecked(true);
         listOfRepeatedCabinets = repeatedCabinetUse;
         return repeatedCabinetUse;
+    }
+
+    public void getSubjectTeacherCabinetGroupById(Lesson lesson){
+        lesson.setGroupName("unknown");
+        for(Group group: groupsFromSQL){
+            if(lesson.getGroupId() == group.getId()){
+                lesson.setGroupName(group.getGroupName());
+                break;
+            }
+        }
+        lesson.setSubjectName("unknown");
+        for(Subject subject: subjectsFromSQL){
+            if(lesson.getSubjectId() == subject.getId()){
+                lesson.setSubjectName(subject.getSubjectName());
+                break;
+            }
+        }
+        lesson.setCabinetName("unknown");
+        for(Cabinet cabinet: cabinetsFromSQL){
+            if(lesson.getCabinetId() == cabinet.getId()){
+                lesson.setCabinetName(cabinet.getCabinetName());
+                break;
+            }
+        }
+        lesson.setTeacherName("unknown");
+        for(Teacher teacher: teachersFromSQL){
+            if(lesson.getTeacherId() == teacher.getId()){
+                if(!teacher.getTeacherSurname().equalsIgnoreCase("unknown")){
+                    lesson.setTeacherName(teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0)+".");
+                }
+                else{
+                    lesson.setTeacherName(teacher.getTeacherName());
+                }
+                 break;
+            }
+        }
     }
 
 

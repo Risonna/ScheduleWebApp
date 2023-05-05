@@ -8,9 +8,7 @@ import org.apache.commons.io.IOUtils;
 import org.primefaces.model.file.UploadedFile;
 
 import java.io.*;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Named
@@ -20,7 +18,6 @@ public class uploadedFileController implements Serializable {
     private UploadedFile uploadedFile;
     private String filePath;
 
-    private ArrayList<Lesson> listOfLessons;
     public static ArrayList<Lesson> lessonsStatic;
     private ArrayList<Lesson> listOfLessonsForGroup;
 
@@ -41,9 +38,6 @@ public class uploadedFileController implements Serializable {
         return uploadedFile;
     }
 
-    public ArrayList<Lesson> getListOfLessons(){
-        return listOfLessons;
-    }
     public Boolean getIsUploaded(){
         return isUploaded;
     }
@@ -63,9 +57,9 @@ public class uploadedFileController implements Serializable {
     public void parse(String filePath) throws IOException {
         scheduleController getLessonInfoFromSQL = new scheduleController();
         List<Teacher> teachers = getLessonInfoFromSQL.getTeacherListFromSQL();
-        List<Subject> subjects = getLessonInfoFromSQL.getSubjectList();
-        List<Cabinet> cabinets = getLessonInfoFromSQL.getCabinetList();
-        List<Group> groups = getLessonInfoFromSQL.getGroupList();
+        List<Subject> subjects = getLessonInfoFromSQL.getSubjectListFromSQL();
+        List<Cabinet> cabinets = getLessonInfoFromSQL.getCabinetListFromSQL();
+        List<Group> groups = getLessonInfoFromSQL.getGroupListFromSQL();
 
         setExcelSearch(new ExcelSearch(filePath, teachers, subjects, cabinets, groups));
 
@@ -73,11 +67,9 @@ public class uploadedFileController implements Serializable {
         excelSearch.parseStuff();
 
 
-        listOfLessons = excelSearch.getLessonList();
-        listOfLessonsForGroup = getLessonInfoFromSQL.getLessonsByGroup(listOfLessons, "МОА-195");
+        getLessonInfoFromSQL.fillLessons(excelSearch.getLessonList());
+        lessonsStatic = excelSearch.getLessonList();
 
-
-        lessonsStatic = listOfLessons;
 
 
         isUploaded = true;

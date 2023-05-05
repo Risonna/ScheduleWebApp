@@ -54,15 +54,15 @@
                                     <table>
                                         <tbody>
 
-                                            <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listShit">
-                                                <tr>
-                                                        <ui:repeat value="#{listShit}" var="sex">
-                                                            <div class="lesson-item">
-                                                                <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
-                                                            </div>
-                                                        </ui:repeat>
-                                                </tr>
-                                            </ui:repeat>
+                                        <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listShit">
+                                            <tr>
+                                                <ui:repeat value="#{listShit}" var="sex">
+                                                    <td>
+                                                        <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
+                                                    </td>
+                                                </ui:repeat>
+                                            </tr>
+                                        </ui:repeat>
 
                                         </tbody>
                                     </table>

@@ -34,9 +34,14 @@
             <div style="margin-top: 10px">
                 <h:commandButton value="Upload" action="#{uploadedFileController.upload}" styleClass="button" />
                 <h:commandButton value="Parse" action="#{uploadedFileController.parse(uploadedFileController.filePath)}" styleClass="button" />
-                <h:commandButton value="Check Cabinet Usage" action="#{scheduleController.checkCabinetUsage(uploadedFileController.listOfLessons)}" styleClass="button" />
+                <h:commandButton value="Check Cabinet Usage" action="#{scheduleController.checkCabinetUsage(scheduleController.lessonsFromSQL)}" styleClass="button" />
                 <h:commandButton value="Fill Teachers" action="#{scheduleController.fillTeachers(scheduleController.teacherList)}" styleClass="button" />
                 <h:commandButton value="Fill Subjects" action="#{scheduleController.fillSubjects(scheduleController.subjects)}" styleClass="button" />
+                <h:commandButton value="Fill cabinets" action="#{scheduleController.fillCabinets(scheduleController.cabinets)}" styleClass="button" />
+                <h:commandButton value="Get API teachers" action="#{scheduleController.fillTeachers(kemsuDatabase.teacherList)}" styleClass="button"/>
+                <h:commandButton value="Get API subjects" action="#{scheduleController.fillSubjects(kemsuDatabase.subjectList)}" styleClass="button"/>
+                <h:commandButton value="Get API groups" action="#{scheduleController.fillGroups(kemsuDatabase.groupList)}" styleClass="button"/>
+
             </div>
         </h:form>
 
@@ -46,7 +51,7 @@
             </h:column>
         </h:dataTable>
 
-        <h:dataTable value="#{uploadedFileController.listOfLessons}" var="lessonsList" rendered="#{uploadedFileController.isUploaded}" styleClass="table">
+        <h:dataTable value="#{scheduleController.lessonsOk}" var="lessonsList" styleClass="table">
             <h:column>
                 <h:outputText value="Is lessonCell #{lessonsList.lessonCell} "/>
                 <h:outputText value="Potoch #{lessonsList.potochLesson} "/>
