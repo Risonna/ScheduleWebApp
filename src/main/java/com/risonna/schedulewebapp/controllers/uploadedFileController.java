@@ -1,6 +1,7 @@
 package com.risonna.schedulewebapp.controllers;
 
 import com.risonna.schedulewebapp.beans.*;
+import com.risonna.schedulewebapp.database.databaseProcessing;
 import com.risonna.schedulewebapp.excelparsing.ExcelSearch;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
@@ -56,10 +57,11 @@ public class uploadedFileController implements Serializable {
 
     public void parse(String filePath) throws IOException {
         scheduleController getLessonInfoFromSQL = new scheduleController();
-        List<Teacher> teachers = getLessonInfoFromSQL.getTeacherListFromSQL();
-        List<Subject> subjects = getLessonInfoFromSQL.getSubjectListFromSQL();
-        List<Cabinet> cabinets = getLessonInfoFromSQL.getCabinetListFromSQL();
-        List<Group> groups = getLessonInfoFromSQL.getGroupListFromSQL();
+        databaseProcessing database = new databaseProcessing();
+        List<Teacher> teachers = database.getTeacherListFromSQL();
+        List<Subject> subjects = database.getSubjectListFromSQL();
+        List<Cabinet> cabinets = database.getCabinetListFromSQL();
+        List<Group> groups = database.getGroupListFromSQL();
 
         setExcelSearch(new ExcelSearch(filePath, teachers, subjects, cabinets, groups));
 
@@ -67,7 +69,7 @@ public class uploadedFileController implements Serializable {
         excelSearch.parseStuff();
 
 
-        getLessonInfoFromSQL.fillLessons(excelSearch.getLessonList());
+        database.fillLessons(excelSearch.getLessonList());
         lessonsStatic = excelSearch.getLessonList();
 
 
