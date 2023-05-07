@@ -3,7 +3,8 @@ package com.risonna.schedulewebapp.controllers;
 import com.risonna.schedulewebapp.beans.*;
 import com.risonna.schedulewebapp.database.databaseProcessing;
 import com.risonna.schedulewebapp.database.ScheduleDatabase;
-import jakarta.enterprise.context.ApplicationScoped;
+import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
@@ -11,7 +12,7 @@ import java.sql.*;
 import java.util.*;
 
 @Named
-@ApplicationScoped
+@SessionScoped
 public class scheduleController implements Serializable {
     private List<Teacher> teacherList = specifyTheTeachers();
 
@@ -42,6 +43,16 @@ public class scheduleController implements Serializable {
     private List<String> cabinets = Arrays.asList("1бл", "2бл", "2130а", "2130б", "2130в", "2131в", "2134", "2139",
             "2141", "2143", "2204", "2210", "2218", "2219", "2220", "2221", "2226бл", "2226", "2229", "5104", "5106", "5109",
             "5113", "5120", "5121", "5320", "5404", "1517", "1313", "1326", "1333", "1335", "4бл", "5бл", "лыжная база 1 корпус");
+
+    private List<String> departmentsFromSQL;
+
+    public void setDepartmentsFromSQL(List<String> departmentsFromSQL) {
+        this.departmentsFromSQL = departmentsFromSQL;
+    }
+
+    public List<String> getDepartmentsFromSQL() {
+        return departmentsFromSQL;
+    }
 
     private List<Group> groupsFromSQL;
 
@@ -95,13 +106,9 @@ public class scheduleController implements Serializable {
     private List<Lesson> lessonsOk;
 
     public List<Lesson> getLessonsOk() {
-        updateLessonsFromSQL();
         lessonsOk = getLessonsFromSQL();
 
-        updateGroupsFromSQL();
-        updateSubjectsFromSQL();
-        updateCabinetsFromSQL();
-        updateTeachersFromSQL();
+
         for (Lesson lesson: lessonsOk){
             getSubjectTeacherCabinetGroupById(lesson);
         }
@@ -121,17 +128,20 @@ public class scheduleController implements Serializable {
     }
 
     private boolean isCabinetChecked = false;
-    private final String[] TIME_PERIODS = {"8.00-9.35", "9.45-11.20", "11.45-13.20", "13.30-15.05", "15.30-17.05", "17.15-18.50"};
+    private final String[] TIME_PERIODS = {"8.00-9.35", "9.45-11.20", "11.45-13.20", "13.30-15.05", "15.30-17.05", "17.15-18.50", "19.00-20.35"};
 
     public String[] getTIME_PERIODS() {
         return TIME_PERIODS;
     }
 
-    private String selectedDayOfWeek;
     private String selectedGroup;
     private String selectedTeacher;
+    private String selectedDayOfWeek;
+    private String selectedDepartment;
     private List<String> daysOfWeek;
+
     private List<String> groupNames;
+    private List<String> departmentList;
     private List<Lesson> filteredLessonsByDayAndGroup;
     private List<Lesson> lessonsByTimePeriodAndGroupAndDay;
     private List<Lesson> lessonsByTimePeriodAndTeacherAndDay;
@@ -141,6 +151,14 @@ public class scheduleController implements Serializable {
         this.listOfStuff = listOfStuff;
     }
 
+    public String getSelectedDepartment() {
+        return selectedDepartment;
+    }
+
+    public void setSelectedDepartment(String selectedDepartment) {
+        this.selectedDepartment = selectedDepartment;
+    }
+
     public String getSelectedTeacher() {
         return selectedTeacher;
     }
@@ -148,7 +166,6 @@ public class scheduleController implements Serializable {
         this.selectedTeacher = selectedTeacher;
     }
     public List<String> getTeacherNameList() {
-        updateTeachersFromSQL();
         List<String> names = new ArrayList<>();
         for (Teacher teacher : getTeachersFromSQL()) {
             String teacherName;
@@ -167,6 +184,22 @@ public class scheduleController implements Serializable {
     }
 
 
+    public List<String> getTeachersForDepartment(){
+        List<String> names = new ArrayList<>();
+        names.add("Показать Всех");
+        for (Teacher teacher:teachersFromSQL) {
+            if(teacher.getDepartment().equalsIgnoreCase(selectedDepartment)){
+                if(!teacher.getDepartment().equalsIgnoreCase("unknown"))
+                names.add(teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0) + ".");
+                else names.add(teacher.getTeacherName());
+            }
+
+        }
+        return names;
+
+    }
+
+
     public String getSelectedDayOfWeek() {
         return selectedDayOfWeek;
     }
@@ -174,7 +207,17 @@ public class scheduleController implements Serializable {
         this.selectedDayOfWeek = selectedDayOfWeek;
     }
     public List<String> getDaysOfWeek() {
-        return Arrays.asList("ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА");
+        return Arrays.asList("ПОНЕДЕЛЬНИК", "ВТОРНИК", "СРЕДА", "ЧЕТВЕРГ", "ПЯТНИЦА", "СУББОТА", "ВОСКРЕСЕНЬЕ", "ВСЯ НЕДЕЛЯ");
+    }
+    public List<String> getDepartmentList(){
+        List<String> listOfDepartments = new ArrayList<>();
+        for (Teacher teacher:teachersFromSQL) {
+            if(!listOfDepartments.contains(teacher.getDepartment())){
+                listOfDepartments.add(teacher.getDepartment());
+            }
+
+        }
+        return listOfDepartments;
     }
     public String getSelectedGroup() {
         return selectedGroup;
@@ -185,19 +228,18 @@ public class scheduleController implements Serializable {
     }
     public List<String> getGroupNames() {
         List<String> groupNames = new ArrayList<>();
-        updateGroupsFromSQL();
         for(Group group:getGroupsFromSQL()){
             groupNames.add(group.getGroupName());
         }
         return groupNames;
     }
 
-    public List<Lesson> getFilteredLessonsByDayAndTeacher(String day) {
+
+    public List<Lesson> getFilteredLessonsByDayAndTeacher(String day, String teacherName) {
         List<Lesson> filteredLessons = new ArrayList<>();
-        String selectedTeacher = getSelectedTeacher();
-        if (selectedTeacher != null) {
+        if (teacherName != null) {
             for (Lesson lesson : getLessonsOk()) {
-                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getTeacherName().equalsIgnoreCase(selectedTeacher)) {
+                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getTeacherName().equalsIgnoreCase(teacherName)) {
                     filteredLessons.add(lesson);
                     System.out.println("getFilteredLessonsByTeacherAndDay " + lesson.getTeacherName());
                 }
@@ -205,8 +247,8 @@ public class scheduleController implements Serializable {
         }
         return filteredLessons;
     }
-    public List<Lesson> getLessonsByTimePeriodAndTeacherAndDay(String timePeriod, String day) {
-        List<Lesson> lessonsByDayAndTeacher = getFilteredLessonsByDayAndTeacher(day);
+    public List<Lesson> getLessonsByTimePeriodAndTeacherAndDay(String timePeriod, String day, String teacherName) {
+        List<Lesson> lessonsByDayAndTeacher = getFilteredLessonsByDayAndTeacher(day, teacherName);
         List<Lesson> lessonsByTimePeriod = new ArrayList<>();
         for (Lesson lesson : lessonsByDayAndTeacher) {
             if (lesson.getLessonTime().contains(timePeriod)) {
@@ -322,7 +364,7 @@ public class scheduleController implements Serializable {
     }
 
     public scheduleController() {
-
+    updateEverythingFromSQL();
 
     }
 
@@ -462,6 +504,14 @@ public class scheduleController implements Serializable {
         databaseProcessing database = new databaseProcessing();
         setLessonsFromSQL(database.getLessonsListFromSQL());
         database = null;
+    }
+
+    public void updateEverythingFromSQL(){
+        updateTeachersFromSQL();
+        updateGroupsFromSQL();
+        updateCabinetsFromSQL();
+        updateSubjectsFromSQL();
+        updateLessonsFromSQL();
     }
 
 }
