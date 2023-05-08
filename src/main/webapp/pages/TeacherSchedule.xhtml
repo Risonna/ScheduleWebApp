@@ -11,7 +11,7 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html" xmlns:f="http://java.sun.com/jsf/core"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui">
 
 <h:head>
     <title>Title</title>
@@ -21,7 +21,7 @@
 <h:body>
     <ui:composition template="/templates/schedule_template.xhtml">
         <ui:define name="page-specific-css">
-            <h:outputStylesheet library="css" name="style_groups.css" rendered="#{true}"/>
+            <h:outputStylesheet library="css" name="style_departments.css" rendered="#{true}"/>
         </ui:define>
 
         <ui:define name="content">
@@ -29,14 +29,14 @@
             <h1>Расписание преподавателей</h1>
             <h:form>
                 <div class="selection-menu-wrapper">
-                    <h:selectOneMenu value="#{scheduleController.selectedTeacher}">
+                    <p:selectOneMenu value="#{scheduleController.selectedTeacher}">
                         <f:selectItems value="#{scheduleController.teacherNameList}" />
-                        <f:ajax execute="@this" render="@form" />
-                    </h:selectOneMenu>
-                    <h:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
+                        <p:ajax update="@form"  />
+                    </p:selectOneMenu>
+                    <p:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
                         <f:selectItems value="#{scheduleController.daysOfWeek}" />
-                        <f:ajax execute="@this" render="@form" />
-                    </h:selectOneMenu>
+                        <p:ajax update="@form"  />
+                    </p:selectOneMenu>
                 </div>
                 <table class="lesson-table" id="lessonTable">
                     <tr>
@@ -60,7 +60,7 @@
                         <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
                             <td>
                                 <div style="text-align: center">
-                                    <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, scheduleController.selectedDayOfWeek)}" var="filteredLessonsByDayAndTeacher"
+                                    <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, scheduleController.selectedDayOfWeek, scheduleController.selectedTeacher)}" var="filteredLessonsByDayAndTeacher"
                                                  style="display: inline-block">
                                         <h:column>
                                             <div>
@@ -76,7 +76,7 @@
                                     <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
                                     <td>
                                         <div style="text-align: center">
-                                            <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, day)}" var="filteredLessonsByDayAndTeacher"
+                                            <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, day, scheduleController.selectedTeacher)}" var="filteredLessonsByDayAndTeacher"
                                                          style="display: inline-block">
                                                 <h:column>
                                                     <div>

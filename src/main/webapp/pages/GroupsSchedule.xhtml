@@ -30,14 +30,14 @@
             <h1>Расписание по группам</h1>
             <h:form>
                 <div class="selection-menu-wrapper">
-                    <h:selectOneMenu value="#{scheduleController.selectedGroup}">
+                    <p:selectOneMenu value="#{scheduleController.selectedGroup}">
                         <f:selectItems value="#{scheduleController.groupNames}"/>
-                        <f:ajax execute="@this" render="@form"/>
-                    </h:selectOneMenu>
-                    <h:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
+                        <p:ajax update="@form" />
+                    </p:selectOneMenu>
+                    <p:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
                         <f:selectItems value="#{scheduleController.daysOfWeek}"/>
-                        <f:ajax execute="@this" render="@form"/>
-                    </h:selectOneMenu>
+                        <p:ajax update="@form" />
+                    </p:selectOneMenu>
                 </div>
                 <table class="lesson-table" id="lessonTable">
                     <tr>

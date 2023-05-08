@@ -480,6 +480,9 @@ public class scheduleController implements Serializable {
         }
     }
 
+    public void updateTeacherList(){
+        getTeachersForDepartment();
+    }
     private void updateTeachersFromSQL(){
         databaseProcessing database = new databaseProcessing();
         setTeachersFromSQL(database.getTeacherListFromSQL());

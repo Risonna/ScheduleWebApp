@@ -12,7 +12,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
       xmlns:ui="http://java.sun.com/jsf/facelets"
-      xmlns:f="http://java.sun.com/jsf/core">
+      xmlns:f="http://java.sun.com/jsf/core" xmlns:p="http://primefaces.org/ui">
 
 <h:head>
     <title>Title</title>
@@ -21,26 +21,28 @@
 <h:body>
     <ui:composition template="/templates/schedule_template.xhtml">
     <ui:define name="page-specific-css">
-        <h:outputStylesheet library="css" name="style_groups.css" rendered="#{true}"/>
+        <h:outputStylesheet library="css" name="style_departments.css" rendered="#{true}"/>
     </ui:define>
 
     <ui:define name="content">
         <h1>Расписание кафедры</h1>
         <h:form>
             <div class="selection-menu-wrapper">
-                <h:selectOneMenu value="#{scheduleController.selectedDepartment}">
+                <p:selectOneMenu value="#{scheduleController.selectedDepartment}">
                     <f:selectItems value="#{scheduleController.departmentList}" />
-                    <f:ajax execute="@this #{scheduleController}" render="@form" />
-                </h:selectOneMenu>
-                <h:selectOneMenu value="#{scheduleController.selectedTeacher}">
+                    <p:ajax listener="#{scheduleController.updateTeacherList}" update="@form" />
+                </p:selectOneMenu>
+                <p:selectOneMenu value="#{scheduleController.selectedTeacher}">
                     <f:selectItems value="#{scheduleController.teachersForDepartment}" />
-                    <f:ajax execute="@this" render="@form" />
-                </h:selectOneMenu>
-                <h:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
+                    <p:ajax update="@form" />
+                </p:selectOneMenu>
+                <p:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
                     <f:selectItems value="#{scheduleController.daysOfWeek}" />
-                    <f:ajax execute="@this" render="@form" />
-                </h:selectOneMenu>
+                    <p:ajax update="@form" />
+                </p:selectOneMenu>
+
             </div>
+
             <table class="lesson-table" id="lessonTable">
                 <tr>
                     <ui:fragment rendered="#{scheduleController.selectedTeacher == 'Показать Всех'}">
@@ -97,13 +99,16 @@
                         </ui:fragment>
                     </tr>
                 </ui:repeat>
+
+
+
                 <ui:repeat value="#{scheduleController.teachersForDepartment}" var="teacherToSee" rendered="#{scheduleController.selectedTeacher == 'Показать Всех'}">
-
-
 
                 <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod" rendered="#{teacherToSee != 'Показать Всех'}">
                     <tr>
-                        <td>#{teacherToSee}</td>
+                        <ui:fragment rendered="#{timePeriod=='8.00-9.35'}">
+                        <td class="first-teacher" rowspan="#{scheduleController.daysOfWeek.size()-1}">#{teacherToSee}</td>
+                        </ui:fragment>
                         <td>
                             <h:outputText value="#{timePeriod}" />
                         </td>
