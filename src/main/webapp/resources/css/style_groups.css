@@ -6,9 +6,12 @@ table.lesson-table {
     border-collapse: collapse;
     margin: 10px auto;
     text-align: center;
+    max-width: 100%;
+    width: 80%; /* Adjust the width as needed */
 }
 
-.lesson-table td, .lesson-table th {
+.lesson-table td,
+.lesson-table th {
     border: 1px solid #ddd;
     padding: 8px;
 }
@@ -19,29 +22,16 @@ table.lesson-table {
     font-weight: bold;
 }
 
-.lesson-table th:first-child, .lesson-table td:first-child {
-    border-left: none;
-}
-
-.lesson-table th:last-child, .lesson-table td:last-child {
-    border-right: none;
-}
-
+.lesson-table th:first-child,
 .lesson-table td:first-child {
     border-left: none;
 }
 
+.lesson-table th:last-child,
 .lesson-table td:last-child {
     border-right: none;
 }
 
-.lesson-table td > div {
-    padding: 5px;
-}
-
-.lesson-table td > div:last-child {
-    border-bottom: none;
-}
 
 h:form {
     display: flex;

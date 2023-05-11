@@ -31,19 +31,19 @@
         <h:form id="loginForm" class="login-form">
             <h:panelGroup id="messages" layout="block" />
             <h:panelGroup>
-                <h:outputLabel for="username" value="Username: " style="align-self: center; font-size: large" />
-                <h:inputText id="username" value="#{register.username}" class="form-control" />
+                <h:outputLabel for="username" value="#{msg.username}" style="align-self: center; font-size: large" />
+                <h:inputText id="username" value="#{register.username}" class="form-control" requiredMessage="#{msg.usernamerequired}"/>
             </h:panelGroup>
             <h:panelGroup>
-                <h:outputLabel for="password" value="Password: " style="align-self: center; font-size: large" />
-                <h:inputSecret id="password" value="#{register.password}" class="form-control" />
+                <h:outputLabel for="password" value="#{msg.password}" style="align-self: center; font-size: large" />
+                <h:inputSecret id="password" value="#{register.password}" class="form-control" requiredMessage="#{msg.passwordrequired}" />
             </h:panelGroup>
             <h:panelGroup>
-                <h:outputLabel for="password" value="Confirm your password: " style="align-self: center; font-size: large" />
-                <h:inputSecret id="passwordConfirm" value="#{register.password}" class="form-control" />
+                <h:outputLabel for="password" value="#{msg.confirmpassword}" style="align-self: center; font-size: large" />
+                <h:inputSecret id="passwordConfirm" value="#{register.password}" class="form-control" requiredMessage="#{msg.passwordrequired}"/>
             </h:panelGroup>
             <h:panelGroup>
-                <h:outputLabel for="Email" value="Enter your email: " style="align-self: center; font-size: large" />
+                <h:outputLabel for="Email" value="#{msg.emailenter}" style="align-self: center; font-size: large" />
                 <h:inputText id="Email" value="#{register.email}" class="form-control" />
             </h:panelGroup>
             <h:panelGroup class="button-row">

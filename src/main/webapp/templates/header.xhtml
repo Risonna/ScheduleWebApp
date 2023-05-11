@@ -11,7 +11,8 @@
 
 <html xmlns="http://www.w3.org/1999/xhtml"
       xmlns:h="http://java.sun.com/jsf/html"
-      xmlns:ui="http://java.sun.com/jsf/facelets">
+      xmlns:ui="http://java.sun.com/jsf/facelets" xmlns:p="http://primefaces.org/ui"
+      xmlns:f="http://java.sun.com/jsf/core">
 
 <h:head>
     <title>Title</title>
@@ -27,7 +28,9 @@
             </h:link>
 
 
-        <h:form >
+
+
+        <h:form id="formRight">
             <div class="header-buttons">
                 <h:commandButton value="#{msg.login}" action="#{loginController.login}" styleClass="login-button" rendered="#{!user.logged}"/>
                 <h:commandButton value="#{msg.register}" action="#{loginController.register}" styleClass="register-button" rendered="#{!user.logged}"/>

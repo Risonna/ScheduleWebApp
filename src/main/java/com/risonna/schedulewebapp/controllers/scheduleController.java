@@ -11,6 +11,7 @@ import java.io.Serializable;
 import java.sql.*;
 import java.util.*;
 
+
 @Named
 @SessionScoped
 public class scheduleController implements Serializable {
@@ -107,7 +108,6 @@ public class scheduleController implements Serializable {
 
     public List<Lesson> getLessonsOk() {
         lessonsOk = getLessonsFromSQL();
-
 
         for (Lesson lesson: lessonsOk){
             getSubjectTeacherCabinetGroupById(lesson);
@@ -516,5 +516,7 @@ public class scheduleController implements Serializable {
         updateSubjectsFromSQL();
         updateLessonsFromSQL();
     }
+
+
 
 }

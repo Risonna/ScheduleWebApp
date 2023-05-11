@@ -18,6 +18,7 @@
         <jakartaee>9.1.0</jakartaee>
     </properties>
 
+
     <dependencies>
         <dependency>
             <groupId>jakarta.platform</groupId>
@@ -48,6 +49,12 @@
             <version>5.2.3</version>
             <type>pom.sha512</type>
         </dependency>
+        <dependency>
+            <groupId>com.itextpdf</groupId>
+            <artifactId>html2pdf</artifactId>
+            <version>4.0.5</version>
+        </dependency>
+
     </dependencies>
 
     <build>

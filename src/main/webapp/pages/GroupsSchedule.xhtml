@@ -16,18 +16,137 @@
 
 <h:head>
     <title>Title</title>
-    <h:outputStylesheet library="css" name="style_groups.css"/>
 </h:head>
 
 <h:body>
     <ui:composition template="/templates/schedule_template.xhtml">
         <ui:define name="page-specific-css">
-            <h:outputStylesheet library="css" name="style_groups.css" rendered="#{true}"/>
+            <style type="text/css">
+                body{
+                    font-family: "Open Sans", sans-serif;
+                    color: #333;
+                }
+                table.lesson-table {
+                    border-collapse: collapse;
+                    margin: 10px auto;
+                    text-align: center;
+                    max-width: 100%;
+                    width: 80%; /* Adjust the width as needed */
+                }
+
+                .lesson-table td,
+                .lesson-table th {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }
+
+                .lesson-table th {
+                    background-color: #f2f2f2;
+                    color: #333;
+                    font-weight: bold;
+                }
+
+                .lesson-table th:first-child,
+                .lesson-table td:first-child {
+                    border-left: none;
+                }
+
+                .lesson-table th:last-child,
+                .lesson-table td:last-child {
+                    border-right: none;
+                }
+
+
+                /*noinspection CssInvalidPseudoSelector*/
+                h:form {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    width: 100%;
+                }
+
+                .selection-menu-wrapper {
+                    display: flex;
+                    justify-content: center;
+                }
+
+                .ui-selectonemenu {
+                    margin: 0 10px;
+                }
+
+
+                .lesson-table {
+                    margin: 20px auto;
+                }
+
+                select {
+                    font-size: 16px;
+                    padding: 10px;
+                    border: none;
+                    border-radius: 5px;
+                    background-color: #f2f2f2;
+                    color: #333;
+                    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                    width: 200px;
+                }
+
+                select:hover {
+                    cursor: pointer;
+                }
+
+                select+select {
+                    margin-left: 50px;
+                }
+
+                h1 {
+                    text-align: center;
+                    font-family: Arial, sans-serif;
+                    color: #007bff;
+                }
+
+                .lesson-table td:nth-child(2) {
+                    text-align: center;
+                }
+
+                .lesson-table td > div {
+                    padding: 5px;
+                    text-align: center;
+                }
+
+                .lesson-table td > div:last-child {
+                    border-bottom: none;
+                }
+                .lesson-table {
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                }
+
+                .lesson-table td > div > div {
+                    display: inline-block;
+                    color: #555;
+                }
+                .lesson-table tr:hover td:not(.first-teacher){
+                    background-color: #f5f5f5;
+                }
+                .inner-table td {
+                    display: inline-block;
+                }
+                div.lesson-item {
+                    margin-bottom: 10px;
+                    border: 5px solid #ddd;
+                    padding: 5px;
+                    margin: 10px auto;
+                }
+
+            </style>
         </ui:define>
 
         <ui:define name="content">
+            <h:form>
+                <h:commandButton value="Download PDF" action="#{htmlToPdfConverter.convertPdf()}"/>
+            </h:form>
 
-            <h1>Расписание по группам</h1>
+            <h1>#{msg.bygroups}</h1>
             <h:form>
                 <div class="selection-menu-wrapper">
                     <p:selectOneMenu value="#{scheduleController.selectedGroup}">

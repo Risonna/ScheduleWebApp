@@ -27,6 +27,18 @@
           <element id="library" level="project" name="Maven: org.apache.xmlbeans:xmlbeans:5.1.1" />
           <element id="library" level="project" name="Maven: org.apache.commons:commons-compress:1.21" />
           <element id="library" level="project" name="Maven: com.github.virtuald:curvesapi:1.07" />
+          <element id="library" level="project" name="Maven: com.itextpdf:html2pdf:4.0.5" />
+          <element id="library" level="project" name="Maven: com.itextpdf:forms:7.2.5" />
+          <element id="library" level="project" name="Maven: com.itextpdf:kernel:7.2.5" />
+          <element id="library" level="project" name="Maven: com.itextpdf:io:7.2.5" />
+          <element id="library" level="project" name="Maven: com.itextpdf:commons:7.2.5" />
+          <element id="library" level="project" name="Maven: org.bouncycastle:bcpkix-jdk15on:1.70" />
+          <element id="library" level="project" name="Maven: org.bouncycastle:bcutil-jdk15on:1.70" />
+          <element id="library" level="project" name="Maven: org.bouncycastle:bcprov-jdk15on:1.70" />
+          <element id="library" level="project" name="Maven: com.itextpdf:layout:7.2.5" />
+          <element id="library" level="project" name="Maven: com.itextpdf:svg:7.2.5" />
+          <element id="library" level="project" name="Maven: com.itextpdf:styled-xml-parser:7.2.5" />
+          <element id="library" level="project" name="Maven: org.slf4j:slf4j-api:1.7.36" />
         </element>
       </element>
       <element id="directory" name="META-INF">
