@@ -73,7 +73,9 @@ public class ExcelSearch {
 
                                 }
                             }
-
+                            // bool variable to determine whether a cell contains multiple lessons  or not(for multiple lessons we
+                            // will take first lesson's week and set its value for all lessons in a cell)
+                            boolean isMultiple = false;
 
                             if(cabAmount <2){
                                 int teachAmount = 0;
@@ -87,22 +89,23 @@ public class ExcelSearch {
                                 }
                                 if(teachAmount<2){
                                     if(cabAmount >0 || teachAmount >0){
-                                        actualParsing(cellValue, sheet, cell, row, groupMergedCells);
+                                        actualParsing(cellValue, sheet, cell, row, groupMergedCells, isMultiple);
                                     }
                                 }
                             }
                             else {
+                                isMultiple = true;
                                 // If there are multiple cabinet names in the cell, split the cell into multiple lessons
                                 Collections.sort(cabinetPositions);
                                 int start = 0;
                                 for (int i = 0; i < cabinetPositions.size()-1; i++) {
-                                    int end = cabinetPositions.get(i);
-                                    String lesson = cellValue.substring(start, end).trim();
-                                    actualParsing(lesson, sheet, cell, row, groupMergedCells);
-                                    start = end;
+                                        int end = cabinetPositions.get(i);
+                                        String lesson = cellValue.substring(start, end).trim();
+                                        actualParsing(lesson, sheet, cell, row, groupMergedCells, isMultiple);
+                                        start = end;
                                 }
                                 String lastLesson = cellValue.substring(start).trim();
-                                actualParsing(lastLesson, sheet, cell, row, groupMergedCells);
+                                actualParsing(lastLesson, sheet, cell, row, groupMergedCells, isMultiple);
                             }
                         }
                     }
@@ -304,7 +307,7 @@ public class ExcelSearch {
         return null;
     }
 
-    private void actualParsing(String cellValue, Sheet sheet, Cell cell, Row row, Map<String, CellRangeAddress> groupMergedCells){
+    private void actualParsing(String cellValue, Sheet sheet, Cell cell, Row row, Map<String, CellRangeAddress> groupMergedCells, boolean isMultiple){
         Lesson lesson = new Lesson();
         lesson.setTeacherName("unknown");
         lesson.setTeacherId(1);
@@ -320,7 +323,7 @@ public class ExcelSearch {
                 // remove dots and spaces from teacher name
                 String cleanedTeacherName = teacher.getTeacherName().replaceAll("\\.", "");
                 checking = cleanedTeacherName;
-// create a regex pattern for the teacher name
+                // create a regex pattern for the teacher name
                 regex = "(?i)\\b" + cleanedTeacherName + "\\b";
             }
 
@@ -328,7 +331,8 @@ public class ExcelSearch {
 
             Pattern pattern = Pattern.compile(regex.trim());
             System.out.println("THe checking is " + checking);
-            if (cellValue.trim().toLowerCase().contains(checking.trim().toLowerCase()) || pattern.matcher(cellValue.replaceAll("\\.", "").trim()).find()) {
+            if (cellValue.trim().toLowerCase().contains(checking.trim().toLowerCase()) ||
+            cellValue.replaceAll("\\.", "").trim().toLowerCase().contains(checking.trim().toLowerCase()) || pattern.matcher(cellValue.replaceAll("\\.", "").trim()).find()) {
                 // Print the position of the cell
                 lesson.setTeacherId(teacher.getId());
                 lesson.setTeacherName(checking);
@@ -360,7 +364,12 @@ public class ExcelSearch {
         }
 
         String weekDay;
-        weekDay = checkWeek(cellValue.trim().toLowerCase());
+        if(!isMultiple) {
+            weekDay = checkWeek(cellValue.trim().toLowerCase());
+        }
+        else{
+            weekDay = checkWeek(cell.getStringCellValue().trim().toLowerCase());
+        }
         lesson.setLessonWeek(weekDay);
 
 

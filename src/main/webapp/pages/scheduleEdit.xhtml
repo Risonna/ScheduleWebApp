@@ -50,6 +50,9 @@
                 <h:outputText value="#{cabinetCheckedList}"/>
             </h:column>
         </h:dataTable>
+        <h:form>
+            <h:commandButton value="Update Everything" action="#{scheduleController.updateEverythingFromSQL()}"/>
+        </h:form>
 
         <h:dataTable value="#{scheduleController.lessonsOk}" var="lessonsList" styleClass="table">
             <h:column>

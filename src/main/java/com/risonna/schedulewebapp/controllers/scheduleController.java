@@ -138,13 +138,18 @@ public class scheduleController implements Serializable {
     private String selectedTeacher;
     private String selectedDayOfWeek;
     private String selectedDepartment;
+    private String selectedCabinet;
     private List<String> daysOfWeek;
-
+    private List<String> cabinetList = new ArrayList<>();
     private List<String> groupNames;
     private List<String> departmentList;
     private List<Lesson> filteredLessonsByDayAndGroup;
     private List<Lesson> lessonsByTimePeriodAndGroupAndDay;
     private List<Lesson> lessonsByTimePeriodAndTeacherAndDay;
+    private List<Lesson> filteredLessonsByDayAndCabinet;
+    private List<Lesson> lessonsByTimePeriodAndCabinetAndDay;
+
+
     private List<Lesson> listOfStuff;
 
     public void setListOfStuff(List<Lesson> listOfStuff) {
@@ -157,6 +162,28 @@ public class scheduleController implements Serializable {
 
     public void setSelectedDepartment(String selectedDepartment) {
         this.selectedDepartment = selectedDepartment;
+    }
+
+    public List<String> getCabinetList() {
+        List<String> listOfCabinets = new ArrayList<>();
+        for (Cabinet cabinet:getCabinetsFromSQL()) {
+            if(cabinet.getCabinetName() != null){
+                listOfCabinets.add(cabinet.getCabinetName());
+            }
+        }
+        return listOfCabinets;
+    }
+
+    public String getSelectedCabinet() {
+        return selectedCabinet;
+    }
+
+    public void setSelectedCabinet(String selectedCabinet) {
+        this.selectedCabinet = selectedCabinet;
+    }
+
+    public void setCabinetList(List<String> cabinetList) {
+        this.cabinetList = cabinetList;
     }
 
     public String getSelectedTeacher() {
@@ -234,7 +261,7 @@ public class scheduleController implements Serializable {
         return groupNames;
     }
 
-
+    //get which lessons to show for schedule
     public List<Lesson> getFilteredLessonsByDayAndTeacher(String day, String teacherName) {
         List<Lesson> filteredLessons = new ArrayList<>();
         if (teacherName != null) {
@@ -331,6 +358,50 @@ public class scheduleController implements Serializable {
 
         }
         return listOfListsOfLessons;
+    }
+    public List<Lesson> getFilteredLessonsByDayAndCabinet(String day, String cabinetName) {
+        List<Lesson> filteredLessons = new ArrayList<>();
+        if (cabinetName != null) {
+            for (Lesson lesson : getLessonsOk()) {
+                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getCabinetName().equalsIgnoreCase(cabinetName)) {
+                    filteredLessons.add(lesson);
+                    System.out.println("getFilteredLessonsByDayAndCabinet " + lesson.getCabinetName());
+                }
+                else{
+                    System.out.println("the statement in if() in for() in getFilteredLessonsByDayAndCabinet isn't true");
+                }
+            }
+        }
+        else{
+            System.out.println("cabinetName is null in getFilteredLessonsByDayAndCabinet");
+        }
+        return filteredLessons;
+    }
+    public List<Lesson> getLessonsByTimePeriodAndCabinetAndDay(String timePeriod, String day, String cabinetName){
+        List<Lesson> lessonsByDayAndTeacher = getFilteredLessonsByDayAndCabinet(day, cabinetName);
+        List<Lesson> lessonsByTimePeriod = new ArrayList<>();
+        for (Lesson lesson : lessonsByDayAndTeacher) {
+            if (lesson.getLessonTime().contains(timePeriod)) {
+                boolean hasLessonWithDayTime = false;
+                if(!lessonsByTimePeriod.isEmpty()) {
+                    for (Lesson lessonByTime : lessonsByTimePeriod) {
+                        if (lessonByTime.getLessonTime().equalsIgnoreCase(lesson.getLessonTime()) &&
+                                lessonByTime.getLessonDay().equalsIgnoreCase(lesson.getLessonDay()) &&
+                                lessonByTime.getLessonWeek().equalsIgnoreCase(lesson.getLessonWeek())) {
+                            hasLessonWithDayTime = true;
+                            break;
+                        }
+                    }
+                }
+                if(!hasLessonWithDayTime){
+                    lessonsByTimePeriod.add(lesson);
+                }
+                System.out.println("getLessonsByTimePeriodAndDayAndCabinet: " + lesson.getSubjectName() + lesson.getGroupName() + lesson.getLessonDay() + lesson.getLessonTime());
+            }
+        }
+        System.out.println("Lessons by time period getLessonsByTimePeriodAndCabinetAndDay: " + lessonsByTimePeriod);
+
+        return lessonsByTimePeriod;
     }
 
 

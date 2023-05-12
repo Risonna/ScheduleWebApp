@@ -10,15 +10,213 @@
         "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 
 <html xmlns="http://www.w3.org/1999/xhtml"
-      xmlns:h="http://java.sun.com/jsf/html">
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui" xmlns:f="http://java.sun.com/jsf/core">
 
 <h:head>
     <title>Title</title>
 </h:head>
 
 <h:body>
+    <ui:composition template="/templates/schedule_template.xhtml">
+        <ui:define name="page-specific-css">
+            <style type="text/css">
+                body{
+                    font-family: "Open Sans", sans-serif;
+                    color: #333;
+                }
+                table.lesson-table {
+                    border-collapse: collapse;
+                    margin: 10px auto;
+                    text-align: center;
+                }
 
-    <h:button value="hello my friend"/>
+                .lesson-table td, .lesson-table th {
+                    border: 1px solid #ddd;
+                    padding: 8px;
+                }
+
+                .lesson-table th {
+                    background-color: #f2f2f2;
+                    color: #333;
+                    font-weight: bold;
+                }
+
+                .lesson-table th:first-child, .lesson-table td:first-child {
+                    border-left: none;
+                }
+
+                .lesson-table th:last-child, .lesson-table td:last-child {
+                    border-right: none;
+                }
+
+                .lesson-table td:first-child {
+                    border-left: none;
+                }
+
+                .lesson-table td:last-child {
+                    border-right: none;
+                }
+
+                .lesson-table td > div {
+                    padding: 5px;
+                }
+
+                .lesson-table td > div:last-child {
+                    border-bottom: none;
+                }
+
+                /*noinspection CssInvalidPseudoSelector*/
+                h:form {
+                    display: flex;
+                    justify-content: center;
+                    align-items: center;
+                    flex-wrap: wrap;
+                    width: 100%;
+                }
+
+                .selection-menu-wrapper {
+                    display: flex;
+                    justify-content: center;
+                }
+
+                .ui-selectonemenu {
+                    margin: 0 10px;
+                }
+
+                .lesson-table {
+                    margin: 20px auto;
+                }
+
+                select {
+                    font-size: 16px;
+                    padding: 10px;
+                    border: none;
+                    border-radius: 5px;
+                    background-color: #f2f2f2;
+                    color: #333;
+                    box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+                    width: 200px;
+                }
+
+                select:hover {
+                    cursor: pointer;
+                }
+
+                select+select {
+                    margin-left: 50px;
+                }
+
+                h1 {
+                    text-align: center;
+                    font-family: Arial, sans-serif;
+                    color: #007bff;
+                }
+
+                .lesson-table td:nth-child(2) {
+                    text-align: center;
+                }
+
+                .lesson-table td > div {
+                    padding: 5px;
+                    text-align: center;
+                }
+
+                .lesson-table td > div:last-child {
+                    border-bottom: none;
+                }
+                .lesson-table {
+                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                }
+
+                .lesson-table td > div > div {
+                    display: inline-block;
+                    color: #555;
+                }
+                .inner-table td {
+                    display: inline-block;
+                }
+
+
+            </style>
+        </ui:define>
+
+        <ui:define name="content">
+            <h:form>
+                <h:commandButton value="Download PDF" action="#{htmlToPdfConverter.convertPdf()}"/>
+            </h:form>
+            <h1>Расписание преподавателей</h1>
+            <h:form>
+                <div class="selection-menu-wrapper">
+                    <p:selectOneMenu value="#{scheduleController.selectedCabinet}">
+                        <f:selectItems value="#{scheduleController.cabinetList}" />
+                        <p:ajax update="@form"  />
+                    </p:selectOneMenu>
+                    <p:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
+                        <f:selectItems value="#{scheduleController.daysOfWeek}" />
+                        <p:ajax update="@form"  />
+                    </p:selectOneMenu>
+                </div>
+                <table class="lesson-table" id="lessonTable">
+                    <tr>
+                        <th>Время</th>
+                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek!='ВСЯ НЕДЕЛЯ'}">
+                            <th>#{scheduleController.selectedDayOfWeek}</th>
+                        </ui:fragment>
+                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
+                            <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
+                                <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
+                                    <th>#{day}</th>
+                                </ui:fragment>
+                            </ui:repeat>
+                        </ui:fragment>
+                    </tr>
+                    <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod">
+                        <tr>
+                            <td>
+                                <h:outputText value="#{timePeriod}" />
+                            </td>
+                            <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
+                                <td>
+                                    <div style="text-align: center">
+                                        <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndCabinetAndDay(timePeriod, scheduleController.selectedDayOfWeek, scheduleController.selectedCabinet)}" var="filteredLessonsByDayAndCabinet"
+                                                     style="display: inline-block">
+                                            <h:column>
+                                                <div>
+                                                    <h:outputText value="#{filteredLessonsByDayAndCabinet.lessonWeek} #{filteredLessonsByDayAndCabinet.subjectName} #{filteredLessonsByDayAndCabinet.teacherName} ауд. #{filteredLessonsByDayAndCabinet.cabinetName}" />
+                                                </div>
+                                            </h:column>
+                                        </h:dataTable>
+                                    </div>
+                                </td>
+                            </ui:fragment>
+                            <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
+                                <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
+                                    <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
+                                        <td>
+                                            <div style="text-align: center">
+                                                <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndCabinetAndDay(timePeriod, day, scheduleController.selectedCabinet)}" var="filteredLessonsByDayAndCabinet"
+                                                             style="display: inline-block">
+                                                    <h:column>
+                                                        <div>
+                                                            <h:outputText value="#{filteredLessonsByDayAndCabinet.lessonWeek} #{filteredLessonsByDayAndCabinet.subjectName} #{filteredLessonsByDayAndCabinet.teacherName} ауд. #{filteredLessonsByDayAndCabinet.cabinetName}" />
+                                                        </div>
+                                                    </h:column>
+                                                </h:dataTable>
+                                            </div>
+                                        </td>
+                                    </ui:fragment>
+                                </ui:repeat>
+                            </ui:fragment>
+                        </tr>
+                    </ui:repeat>
+                </table>
+            </h:form>
+
+
+        </ui:define>
+
+    </ui:composition>
 
 </h:body>
 
