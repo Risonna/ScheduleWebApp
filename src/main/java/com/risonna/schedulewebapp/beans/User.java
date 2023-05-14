@@ -60,7 +60,7 @@ public class User implements Serializable {
             request.login(username, password);
             this.logged = true;
 
-            return "/pages/MySchedule.xhtml?faces-redirect=true";
+            return "homePage";
         } catch (ServletException ex) {
             ResourceBundle bundle = ResourceBundle.getBundle("ru.javabegin.training.web.nls.messages", FacesContext.getCurrentInstance().getViewRoot().getLocale());
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);

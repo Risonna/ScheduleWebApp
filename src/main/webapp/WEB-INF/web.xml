@@ -17,15 +17,14 @@
         <welcome-file>index.xhtml</welcome-file>
     </welcome-file-list>
     <security-constraint>
-        <display-name>pages</display-name>
+        <display-name>editing</display-name>
         <web-resource-collection>
-            <web-resource-name>pages</web-resource-name>
+            <web-resource-name>editing</web-resource-name>
             <description/>
-            <url-pattern>/pages/MySchedule.xhtml</url-pattern>
+            <url-pattern>/pages/editing/*</url-pattern>
         </web-resource-collection>
         <auth-constraint>
             <description/>
-            <role-name>user</role-name>
             <role-name>admin</role-name>
         </auth-constraint>
         <user-data-constraint>

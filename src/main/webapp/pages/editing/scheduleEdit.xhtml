@@ -1,0 +1,130 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: rison
+  Date: 29.03.2023
+  Time: 18:04
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:f="http://java.sun.com/jsf/core"
+      xmlns:p="http://primefaces.org/ui"
+      xmlns:h="http://xmlns.jcp.org/jsf/html"
+      xmlns:ui="http://java.sun.com/jsf/facelets"
+>
+
+<h:head>
+    <title>Title</title>
+</h:head>
+
+<h:body>
+
+    <ui:composition template="/templates/schedule_template.xhtml">
+        <ui:define name="page-specific-css">
+            <style type="text/css">
+                .options-container {
+                    text-align: center;
+                }
+
+                .option {
+                    margin: 10px 0;
+                }
+
+                .option-button {
+                    background-color: #0A1929;
+                    color: #FFF;
+                    padding: 8px 16px;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                    width: 100%;
+                }
+
+                .option-button:hover {
+                    background-color: #06101D;
+                }
+
+                .nested-options {
+                    display: none;
+                    margin-top: 10px;
+                    padding: 10px;
+                }
+
+                .nested-option {
+                    background-color: #0A1929;
+                    color: #FFF;
+                    padding: 6px 12px;
+                    margin: 5px 0;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    transition: background-color 0.3s;
+                    width: 100%;
+                }
+
+                .nested-option:hover {
+                    background-color: #06101D;
+                }
+
+            </style>
+        </ui:define>
+        <ui:define name="page-specific-script">
+            <script type="text/javascript">
+                function toggleNestedOptions() {
+                    var nestedOptions = document.getElementById('nestedOptions');
+                    if (nestedOptions.style.display === 'none') {
+                        nestedOptions.style.display = 'block';
+                    } else {
+                        nestedOptions.style.display = 'none';
+                    }
+                }
+            </script>
+        </ui:define>
+
+    <ui:define name="content">
+
+        <h:form>
+            <div class="options-container">
+                <div class="option">
+                    <p:commandButton value="#{msg.parsing}" action="#{editController.parsing()}" styleClass="option-button" />
+                </div>
+                <div class="option">
+                    <p:commandButton value="#{msg.dataupdate}" onclick="toggleNestedOptions()" styleClass="option-button" />
+                </div>
+                <div class="nested-options" id="nestedOptions">
+                    <p:commandButton value="#{msg.dataupdateautomatic}" action="#{editController.dataAutomatic()}" styleClass="nested-option" />
+                    <p:commandButton value="#{msg.dataupdatemanual}" action="#{editController.dataManual()}" styleClass="nested-option" />
+                </div>
+                <div class="option">
+                    <p:commandButton value="#{msg.testing}" action="#{editController.testing()}" styleClass="option-button" />
+                </div>
+            </div>
+        </h:form>
+
+
+
+
+
+
+
+
+
+    </ui:define>
+    </ui:composition>
+
+
+
+
+
+
+
+
+</h:body>
+
+</html>

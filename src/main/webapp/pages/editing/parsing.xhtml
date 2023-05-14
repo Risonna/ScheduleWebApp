@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: rison
+  Date: 13.05.2023
+  Time: 17:11
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets"
+      xmlns:p="http://primefaces.org/ui">
+
+<h:head>
+    <title>Title</title>
+</h:head>
+
+<h:body>
+    <ui:composition template="/templates/schedule_template.xhtml">
+        <ui:define name="page-specific-css">
+            <h:outputStylesheet library="css" name="schedule_edit_style.css" rendered="#{true}"/>
+        </ui:define>
+
+
+        <ui:define name="content">
+
+            <h:form enctype="multipart/form-data" styleClass="file-upload">
+                <div style="margin-top: 10px">
+                    <h:form enctype="multipart/form-data" styleClass="file-upload">
+                        <p:fileUpload value="#{uploadedFileController.uploadedFile}" mode="simple"/>
+                        <div style="margin-top: 10px">
+                            <h:commandButton value="#{msg.fileupload}" action="#{uploadedFileController.upload}" styleClass="button" />
+                            <h:commandButton value="#{msg.fileparse}" action="#{uploadedFileController.parse(uploadedFileController.filePath)}" styleClass="button" />
+
+                        </div>
+                    </h:form>
+
+                    <h:form>
+                        <h:commandButton value="#{msg.updateeverything}" action="#{scheduleController.updateEverythingFromSQL()}"/>
+                    </h:form>
+
+                    <h:dataTable value="#{scheduleController.lessonsOk}" var="lessonsList" styleClass="table">
+                        <h:column>
+                            <h:outputText value="#{msg.subjectname} #{lessonsList.subjectName} "/>
+                            <h:outputText value="#{msg.teachername} #{lessonsList.teacherName} "/>
+                            <h:outputText value="#{msg.dayofweek} #{lessonsList.lessonDay} "/>
+                            <h:outputText value="#{msg.oddoreven} #{lessonsList.lessonWeek} "/>
+                            <h:outputText value="#{msg.groupname} #{lessonsList.groupName} "/>
+                            <h:outputText value="#{msg.cabinetname} #{lessonsList.cabinetName} "/>
+                            <h:outputText value="#{msg.timeoflesson} #{lessonsList.lessonTime} "/>
+                        </h:column>
+                    </h:dataTable>
+
+                </div>
+            </h:form>
+        </ui:define>
+
+
+
+    </ui:composition>
+
+</h:body>
+
+</html>

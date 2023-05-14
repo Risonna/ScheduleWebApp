@@ -19,4 +19,7 @@ public class loginController {
     public String register(){
         return "register";
     }
+    public String edit(){
+        return "edit";
+    }
 }

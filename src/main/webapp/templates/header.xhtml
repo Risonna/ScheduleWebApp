@@ -35,8 +35,9 @@
                 <h:commandButton value="#{msg.login}" action="#{loginController.login}" styleClass="login-button" rendered="#{!user.logged}"/>
                 <h:commandButton value="#{msg.register}" action="#{loginController.register}" styleClass="register-button" rendered="#{!user.logged}"/>
             </div>
-            <h:outputText value="Hello, #{user.username} \n" rendered="#{user.logged}" />
-            <h:commandLink value="Log out" action="#{user.logout()}" rendered="#{user.logged}"/>
+            <h:outputText value="#{msg.hellouser}, #{user.username}" rendered="#{user.logged}" />
+            <br/>
+            <h:commandLink value="#{msg.logout}" action="#{user.logout()}" rendered="#{user.logged}" style="color: #f2f2f2; font-size: large; font: bold"/>
         </h:form>
     </div>
 

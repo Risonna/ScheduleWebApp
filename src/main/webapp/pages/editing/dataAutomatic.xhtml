@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Created by IntelliJ IDEA.
+  User: rison
+  Date: 13.05.2023
+  Time: 16:48
+-->
+<!DOCTYPE html
+        PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+        "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:h="http://java.sun.com/jsf/html" xmlns:ui="http://java.sun.com/jsf/facelets">
+
+<h:head>
+    <title>Title</title>
+</h:head>
+
+<h:body>
+    <ui:composition template="/templates/schedule_template.xhtml">
+    <ui:define name="page-specific-css">
+        <h:outputStylesheet library="css" name="schedule_edit_style.css" rendered="#{true}"/>
+    </ui:define>
+
+
+        <ui:define name="content">
+    <h:form enctype="multipart/form-data" styleClass="file-upload">
+        <div style="margin-top: 10px">
+            <h:commandButton value="#{msg.fillteachers}" action="#{databaseProcessing.fillTeachers(scheduleController.teacherList)}" styleClass="button" />
+            <h:commandButton value="#{msg.fillsubjects}" action="#{databaseProcessing.fillSubjects(scheduleController.subjects)}" styleClass="button" />
+            <h:commandButton value="#{msg.fillcabinets}" action="#{databaseProcessing.fillCabinets(scheduleController.cabinets)}" styleClass="button" />
+            <h:commandButton value="#{msg.fillteachersapi}" action="#{databaseProcessing.fillTeachers(kemsuDatabase.teacherList)}" styleClass="button"/>
+            <h:commandButton value="#{msg.fillsubjectsapi}" action="#{databaseProcessing.fillSubjects(kemsuDatabase.subjectList)}" styleClass="button"/>
+            <h:commandButton value="#{msg.fillgroupsapi}" action="#{databaseProcessing.fillGroups(kemsuDatabase.groupList)}" styleClass="button"/>
+
+        </div>
+    </h:form>
+        </ui:define>
+
+
+
+    </ui:composition>
+
+</h:body>
+
+</html>

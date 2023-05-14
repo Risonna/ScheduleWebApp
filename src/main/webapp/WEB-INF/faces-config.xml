@@ -25,6 +25,7 @@
             <redirect/>
         </navigation-case>
     </navigation-rule>
+
     <navigation-rule>
         <from-view-id>*</from-view-id>
         <navigation-case>
