@@ -161,7 +161,7 @@
                 <table class="lesson-table" id="lessonTable">
                     <tr>
                         <th>Время</th>
-                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek!='ВСЯ НЕДЕЛЯ'}">
+                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
                             <th>#{scheduleController.selectedDayOfWeek}</th>
                         </ui:fragment>
                         <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
@@ -175,62 +175,54 @@
                     <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod">
                         <tr>
                             <td>
-                                <h:outputText value="#{timePeriod}"/>
+                                <h:outputText value="#{timePeriod}" />
                             </td>
                             <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
-                            <td>
-                                <div style="text-align: center">
-                                    <table>
-                                        <tbody>
-
-                                        <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listShit">
-                                            <tr>
-                                                <ui:repeat value="#{listShit}" var="sex">
-                                                    <td>
-                                                        <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
-                                                    </td>
-                                                </ui:repeat>
-                                            </tr>
-                                        </ui:repeat>
-
-                                        </tbody>
-                                    </table>
-
-
-                                </div>
-                            </td>
-                            </ui:fragment>
-                            <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
-                            <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
-                            <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
                                 <td>
                                     <div style="text-align: center">
                                         <table>
                                             <tbody>
-
-                                            <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listShit">
+                                            <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listShit">
                                                 <tr>
                                                     <ui:repeat value="#{listShit}" var="sex">
-                                                        <td>
+                                                        <td colspan="#{sex.colSpan}" rowspan="#{sex.rowSpan}">
                                                             <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
                                                         </td>
                                                     </ui:repeat>
                                                 </tr>
                                             </ui:repeat>
-
                                             </tbody>
                                         </table>
-
-
                                     </div>
                                 </td>
-
                             </ui:fragment>
-                            </ui:repeat>
+                            <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
+                                <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
+                                    <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
+                                        <td>
+                                            <div style="text-align: center">
+                                                <table>
+                                                    <tbody>
+                                                    <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listShit">
+                                                        <tr>
+                                                            <ui:repeat value="#{listShit}" var="sex">
+                                                                <td colspan="#{sex.colSpan}" rowspan="#{sex.rowSpan}">
+                                                                    <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
+                                                                </td>
+                                                            </ui:repeat>
+                                                        </tr>
+                                                    </ui:repeat>
+                                                    </tbody>
+                                                </table>
+                                            </div>
+                                        </td>
+                                    </ui:fragment>
+                                </ui:repeat>
                             </ui:fragment>
                         </tr>
                     </ui:repeat>
                 </table>
+
             </h:form>
 
         </ui:define>

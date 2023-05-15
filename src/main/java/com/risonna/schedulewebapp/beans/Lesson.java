@@ -22,6 +22,8 @@ public class Lesson implements Serializable {
     private String lessonWeek;
     private String cellId;
     private int rowNum;
+    private int colSpan;
+    private int rowSpan;
     private int teacherId;
     private int subjectId;
     private int cabinetId;
@@ -38,6 +40,14 @@ public class Lesson implements Serializable {
 
     //setters
 
+
+    public int getColSpan() {
+        return colSpan;
+    }
+
+    public int getRowSpan() {
+        return rowSpan;
+    }
 
     public int getRowNum() {
         return rowNum;
@@ -98,6 +108,14 @@ public class Lesson implements Serializable {
     }
     public void setInstituteName(String instituteName){
         this.instituteName = instituteName;
+    }
+
+    public void setColSpan(int colSpan) {
+        this.colSpan = colSpan;
+    }
+
+    public void setRowSpan(int rowSpan) {
+        this.rowSpan = rowSpan;
     }
 
     public void setCabinetId(int cabinetId) { this.cabinetId = cabinetId; }

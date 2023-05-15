@@ -24,67 +24,10 @@
 
     <ui:composition template="/templates/schedule_template.xhtml">
         <ui:define name="page-specific-css">
-            <style type="text/css">
-                .options-container {
-                    text-align: center;
-                }
-
-                .option {
-                    margin: 10px 0;
-                }
-
-                .option-button {
-                    background-color: #0A1929;
-                    color: #FFF;
-                    padding: 8px 16px;
-                    border: none;
-                    border-radius: 5px;
-                    font-size: 14px;
-                    cursor: pointer;
-                    transition: background-color 0.3s;
-                    width: 100%;
-                }
-
-                .option-button:hover {
-                    background-color: #06101D;
-                }
-
-                .nested-options {
-                    display: none;
-                    margin-top: 10px;
-                    padding: 10px;
-                }
-
-                .nested-option {
-                    background-color: #0A1929;
-                    color: #FFF;
-                    padding: 6px 12px;
-                    margin: 5px 0;
-                    border: none;
-                    border-radius: 5px;
-                    font-size: 14px;
-                    cursor: pointer;
-                    transition: background-color 0.3s;
-                    width: 100%;
-                }
-
-                .nested-option:hover {
-                    background-color: #06101D;
-                }
-
-            </style>
+            <h:outputStylesheet name="css/scheduleEdit.css"/>
         </ui:define>
         <ui:define name="page-specific-script">
-            <script type="text/javascript">
-                function toggleNestedOptions() {
-                    var nestedOptions = document.getElementById('nestedOptions');
-                    if (nestedOptions.style.display === 'none') {
-                        nestedOptions.style.display = 'block';
-                    } else {
-                        nestedOptions.style.display = 'none';
-                    }
-                }
-            </script>
+            <h:outputScript name="js/scheduleEdit.js"/>
         </ui:define>
 
     <ui:define name="content">
@@ -98,8 +41,8 @@
                     <p:commandButton value="#{msg.dataupdate}" onclick="toggleNestedOptions()" styleClass="option-button" />
                 </div>
                 <div class="nested-options" id="nestedOptions">
-                    <p:commandButton value="#{msg.dataupdateautomatic}" action="#{editController.dataAutomatic()}" styleClass="nested-option" />
-                    <p:commandButton value="#{msg.dataupdatemanual}" action="#{editController.dataManual()}" styleClass="nested-option" />
+                    <p:commandButton value="#{msg.dataupdateautomatic}" action="#{editController.dataAutomatic()}" styleClass="nested-option" style="margin-bottom: 10px;" />
+                    <p:commandButton value="#{msg.dataupdatemanual}" action="#{editController.dataManual()}" styleClass="nested-option" style="margin-top: 10px;" />
                 </div>
                 <div class="option">
                     <p:commandButton value="#{msg.testing}" action="#{editController.testing()}" styleClass="option-button" />
@@ -107,15 +50,10 @@
             </div>
         </h:form>
 
-
-
-
-
-
-
-
-
     </ui:define>
+
+
+
     </ui:composition>
 
 

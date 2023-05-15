@@ -13,17 +13,17 @@ public class editController implements Serializable {
     }
 
     public String dataAutomatic(){
-        return "dataAutomatic";
+        return "dataAutomatic.xhtml?faces-redirect=true";
     }
     public String dataManual(){
         return "homePage";
     }
 
     public String parsing(){
-        return "parsing";
+        return "parsing.xhtml?faces-redirect=true";
     }
 
     public String testing(){
-        return "testing";
+        return "testing.xhtml?faces-redirect=true";
     }
 }

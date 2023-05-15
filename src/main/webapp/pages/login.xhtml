@@ -28,20 +28,25 @@
 
     <ui:define name="content">
         <h:form id="loginForm" class="login-form">
-            <h:panelGroup id="messages" layout="block" />
             <h:panelGroup>
                 <h:outputLabel for="username" value="#{msg.username}" style="align-self: center; font-size: large" />
-                <h:inputText id="username" value="#{user.username}" class="form-control" required="true" requiredMessage="#{msg.usernamerequired}}" />
+                <h:inputText id="username" value="#{user.username}" class="form-control" required="true" requiredMessage="#{msg.usernamerequired}" />
             </h:panelGroup>
             <h:panelGroup>
                 <h:outputLabel for="password" value="#{msg.password}" style="align-self: center; font-size: large" />
-                <h:inputSecret id="password" value="#{user.password}" class="form-control" required="true" redisplay="true" requiredMessage="#{msg.passwordrequired}"/>
+                <h:inputSecret id="password" value="#{user.password}" class="form-control" required="true" redisplay="true" requiredMessage="#{msg.passwordrequired}" />
+            </h:panelGroup>
+            <h:panelGroup>
+                <h:messages id="messages" for="loginForm" style="color: red"/>
             </h:panelGroup>
             <h:panelGroup class="button-row">
-                <h:commandButton id="loginButton" value="Login" action="#{user.login()}" styleClass="logbib-button"/>
+                <h:commandButton id="loginButton" value="Login" action="#{user.login()}" styleClass="logbib-button" />
             </h:panelGroup>
         </h:form>
     </ui:define>
+
+
+
 
 </ui:composition>
 </body>

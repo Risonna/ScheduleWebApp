@@ -10,6 +10,7 @@ import jakarta.inject.Named;
 import java.io.Serializable;
 import java.sql.*;
 import java.util.*;
+import java.util.stream.Collectors;
 
 
 @Named
@@ -301,20 +302,19 @@ public class scheduleController implements Serializable {
         return lessonsByTimePeriod;
     }
 
+
     public List<Lesson> getFilteredLessonsByDayAndGroup(String day) {
         List<Lesson> filteredLessons = new ArrayList<>();
         String selectedGroup = getSelectedGroup();
         if (selectedGroup != null) {
             for (Lesson lesson : getLessonsOk()) {
                 if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getGroupName().trim().equalsIgnoreCase(selectedGroup.trim())) {
-
                     filteredLessons.add(lesson);
                 }
             }
         }
         return filteredLessons;
     }
-
     public List<Lesson> getLessonsByTimePeriodAndGroupAndDay(String timePeriod, String day) {
         List<Lesson> lessonsByDayAndGroup = getFilteredLessonsByDayAndGroup(day);
         List<Lesson> lessonsByTimePeriod = new ArrayList<>();
@@ -323,42 +323,60 @@ public class scheduleController implements Serializable {
                 lessonsByTimePeriod.add(lesson);
             }
         }
-
         return lessonsByTimePeriod;
     }
 
     public List<List<Lesson>> getListsStuff(List<Lesson> listHuh) {
-        List<Integer> rowPositions = new ArrayList<>();
-        int rowAmount = 0;
-        for (Lesson lesson : listHuh) {
-            if (!rowPositions.contains(lesson.getRowNum())) {
-                rowPositions.add(lesson.getRowNum());
-                rowAmount++;
-            }
-        }
-
         List<List<Lesson>> listOfListsOfLessons = new ArrayList<>();
-        for (int j = 0; j < rowAmount; j++) {
+
+        // Group lessons by row number
+        Map<Integer, List<Lesson>> lessonsByRow = listHuh.stream()
+                .collect(Collectors.groupingBy(Lesson::getRowNum));
+
+        // Iterate over each row
+        for (List<Lesson> lessonList : lessonsByRow.values()) {
             List<Lesson> listOfLessons = new ArrayList<>();
-            int rownum = rowPositions.get(j);
-            for (Lesson lesson : listHuh) {
-                if (lesson.getRowNum() == rownum) {
-                    listOfLessons.add(lesson);
+            listOfLessons.addAll(lessonList);
+
+            // Check if the lessons in the row need to be expanded
+            for (int i = 0; i < listOfLessons.size(); i++) {
+                Lesson lesson = listOfLessons.get(i);
+                int colspan = 1;
+                int rowspan = 1;
+
+                // Check if the lesson needs to span multiple columns
+                if (i < listOfLessons.size() - 1) {
+                    Lesson nextLesson = listOfLessons.get(i + 1);
+                    if (lesson.getGroupName().equals(nextLesson.getGroupName())) {
+                        colspan++;
+                        i++; // Skip the next lesson since it's part of the colspan
+                    }
                 }
+
+                // Check if the lesson needs to span multiple rows
+                int rowIndex = lesson.getRowNum();
+                if (rowIndex < lessonsByRow.size() - 1) {
+                    List<Lesson> nextLessonList = lessonsByRow.get(rowIndex + 1);
+                    for (Lesson nextLesson : nextLessonList) {
+                        if (lesson.getLessonWeek().equals(nextLesson.getLessonWeek()) &&
+                                lesson.getGroupName().equals(nextLesson.getGroupName())) {
+                            rowspan++;
+                            break;
+                        }
+                    }
+                }
+
+                lesson.setColSpan(colspan);
+                lesson.setRowSpan(rowspan);
             }
-            System.out.println("new teach is: " + listOfLessons.get(0).getTeacherName());
+
             listOfListsOfLessons.add(listOfLessons);
         }
 
-        for (List<Lesson> lessonList:listOfListsOfLessons) {
-            for (Lesson lesson:lessonList) {
-
-
-            }
-
-        }
         return listOfListsOfLessons;
     }
+
+
     public List<Lesson> getFilteredLessonsByDayAndCabinet(String day, String cabinetName) {
         List<Lesson> filteredLessons = new ArrayList<>();
         if (cabinetName != null) {
@@ -436,6 +454,11 @@ public class scheduleController implements Serializable {
 
     public scheduleController() {
     updateEverythingFromSQL();
+    this.selectedTeacher = getTeacherNameList().get(0);
+    this.selectedCabinet = getCabinetList().get(0);
+    this.selectedGroup = getGroupNames().get(0);
+    this.selectedDepartment = getDepartmentList().get(0);
+    this.selectedDayOfWeek = getDaysOfWeek().get(0);
 
     }
 

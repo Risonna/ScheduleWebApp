@@ -61,17 +61,16 @@ public class User implements Serializable {
             this.logged = true;
 
             return "homePage";
-        } catch (ServletException ex) {
-            ResourceBundle bundle = ResourceBundle.getBundle("ru.javabegin.training.web.nls.messages", FacesContext.getCurrentInstance().getViewRoot().getLocale());
+        }catch (ServletException ex) {
+            String baseName = "nls.messages"; // Without the "resources" folder and file extension
+            ResourceBundle bundle = ResourceBundle.getBundle(baseName, FacesContext.getCurrentInstance().getViewRoot().getLocale());
             Logger.getLogger(User.class.getName()).log(Level.SEVERE, null, ex);
             FacesContext context = FacesContext.getCurrentInstance();
             FacesMessage message = new FacesMessage(bundle.getString("login_error"));
             message.setSeverity(FacesMessage.SEVERITY_ERROR);
-            context.addMessage("login_form", message);
-
+            context.addMessage("loginForm", message);
+            return null;
         }
-
-        return "index";
 
     }
 
