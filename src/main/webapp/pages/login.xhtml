@@ -26,6 +26,10 @@
 
 <ui:composition template="/templates/schedule_template.xhtml">
 
+    <ui:define name="page-specific-css">
+        <h:outputStylesheet name="css/stylelogin.css"/>
+    </ui:define>
+
     <ui:define name="content">
         <h:form id="loginForm" class="login-form">
             <h:panelGroup>

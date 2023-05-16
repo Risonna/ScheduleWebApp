@@ -18,10 +18,28 @@ import java.util.logging.Logger;
 public class User implements Serializable {
     private String username;
     private String password;
+    private String email;
+    private String registration_time;
     private boolean logged;
 
     public User(){
 
+    }
+
+    public void setEmail(String email) {
+        this.email = email;
+    }
+
+    public void setRegistration_time(String registration_time) {
+        this.registration_time = registration_time;
+    }
+
+    public String getEmail() {
+        return email;
+    }
+
+    public String getRegistration_time() {
+        return registration_time;
     }
 
     public void setLogged(boolean logged) {

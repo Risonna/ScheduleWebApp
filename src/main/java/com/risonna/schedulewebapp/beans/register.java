@@ -16,6 +16,7 @@ import java.sql.SQLException;
 public class register implements Serializable {
     private String username;
     private String password;
+    private String passwordConfirm;
     private String email;
 
     public String getEmail() {
@@ -24,6 +25,9 @@ public class register implements Serializable {
 
     public String getPassword() {
         return password;
+    }
+    public String getPasswordConfirm(){
+        return passwordConfirm;
     }
 
     public String getUsername() {

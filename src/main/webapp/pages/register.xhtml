@@ -12,50 +12,54 @@
 <body>
 
 <ui:composition template="/templates/schedule_template.xhtml">
+
+    <ui:define name="page-specific-css">
+        <h:outputStylesheet name="css/stylelogin.css"/>
+    </ui:define>
+
     <ui:define name="page-specific-script">
         <h:outputScript name="js/register.js" />
     </ui:define>
 
+
     <ui:define name="content">
+
         <h:form id="loginForm" class="login-form">
             <h:panelGroup id="messages" layout="block" />
 
             <h:panelGroup>
                 <h:outputLabel for="username" value="#{msg.username}" style="align-self: center; font-size: large" />
-                <h:inputText id="username" value="#{register.username}" class="form-control" required="true" requiredMessage="Username is required" placeholder="Enter your username">
-                    <f:validateLength minimum="6" />
-                    <f:validateRegex pattern="[a-zA-Z0-9]*" />
+                <h:inputText id="username" value="#{register.username}" class="form-control" required="true" validator="validateUsername" requiredMessage="Username is required">
                 </h:inputText>
                 <h:message for="username" styleClass="error" />
             </h:panelGroup>
 
             <h:panelGroup>
                 <h:outputLabel for="password" value="#{msg.password}" style="align-self: center; font-size: large" />
-                <h:inputSecret id="password" value="#{register.password}" class="form-control" required="true" requiredMessage="Password is required" placeholder="Enter your password">
-                    <f:validateLength minimum="6" />
-                    <f:validateRegex pattern="[a-zA-Z0-9]*" />
+                <h:inputSecret id="password" value="#{register.password}" validator="validatePassword" class="form-control" required="true" requiredMessage="Password is required">
                 </h:inputSecret>
                 <h:message for="password" styleClass="error" />
             </h:panelGroup>
 
             <h:panelGroup>
                 <h:outputLabel for="passwordConfirm" value="#{msg.confirmpassword}" style="align-self: center; font-size: large" />
-                <h:inputSecret id="passwordConfirm" value="#{register.password}" class="form-control" required="true" requiredMessage="Password is required" placeholder="Enter your password again">
-                    <f:validateLength minimum="6" />
-                    <f:validateRegex pattern="[a-zA-Z0-9]*" />
+                <h:inputSecret id="passwordConfirm" value="#{register.passwordConfirm}" class="form-control" required="true" requiredMessage="Password confirmation is required">
+                    <f:validator validatorId="validatePasswordConfirmation" />
+                    <f:attribute name="password" value="#{register.password}" />
                 </h:inputSecret>
                 <h:message for="passwordConfirm" styleClass="error" />
             </h:panelGroup>
 
             <h:panelGroup>
                 <h:outputLabel for="Email" value="#{msg.email}" style="align-self: center; font-size: large" />
-                <h:inputText id="Email" value="#{register.email}" class="form-control" placeholder="Enter your email" />
+                <h:inputText id="Email" value="#{register.email}" class="form-control"/>
             </h:panelGroup>
 
             <h:panelGroup class="button-row">
                 <h:commandButton id="RegisterButton" value="#{msg.register}" action="#{register.registerUser()}" styleClass="logbib-button" />
             </h:panelGroup>
         </h:form>
+
     </ui:define>
 
 

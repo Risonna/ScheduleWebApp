@@ -229,6 +229,45 @@ public class databaseProcessing implements Serializable {
 
         return groups;
     }
+    public List<User> getUsersFromSQL(){
+        Statement stmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        List<User> users = new ArrayList<>();
+        try {
+            conn = ScheduleDatabase.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * FROM webschedule.users");
+            while (rs.next()) {
+                String userid = rs.getString("userid");
+                String email = rs.getString("email");
+                String creation_time = rs.getString("creation_time");
+                User user = new User();
+                user.setUsername(userid);
+                user.setEmail(email);
+                user.setRegistration_time(creation_time);
+                users.add(user);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return users;
+    }
 
     public void fillTeachers(List<Teacher> teacherNames){
         PreparedStatement prepStmt = null;

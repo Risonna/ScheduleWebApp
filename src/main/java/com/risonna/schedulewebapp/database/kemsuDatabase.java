@@ -60,7 +60,7 @@ public class kemsuDatabase {
             URL url = new URL("https://api-next.kemsu.ru/api/stud-sch/main/groupList");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVzZXJJZCI6MjI0NTMsImlhdCI6MTY4MzI5MDg5MiwiZXhwIjoxNjgzMzc3MjkyfQ.QaJz1ydv8sQbZXNk6MtjFn3v2rZey3TwMRb5MwPBZM8");
+            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVzZXJJZCI6MjI0NTMsImlhdCI6MTY4NDIyMDc0OCwiZXhwIjoxNjg0MzA3MTQ4fQ.HgTknqMOcWeOKt74m4SQ3pZEGx4JRKGnjraJI3tfvL4");
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             StringBuffer content = new StringBuffer();
