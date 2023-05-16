@@ -21,9 +21,13 @@ public class Lesson implements Serializable {
     private String instituteName;
     private String lessonWeek;
     private String cellId;
-    private int rowNum;
+    private int rowFirst;
+    private int rowLast;
+    private int colFirst;
+    private int colLast;
+    private boolean forWholeGroup;
     private int colSpan;
-    private int rowSpan;
+    private boolean multipleLessonsInOneCell;
     private int teacherId;
     private int subjectId;
     private int cabinetId;
@@ -41,21 +45,9 @@ public class Lesson implements Serializable {
     //setters
 
 
-    public int getColSpan() {
-        return colSpan;
-    }
 
-    public int getRowSpan() {
-        return rowSpan;
-    }
 
-    public int getRowNum() {
-        return rowNum;
-    }
 
-    public void setRowNum(int rowNum) {
-        this.rowNum = rowNum;
-    }
 
     public int getGroupsForLesson() {
         return groupsForLesson;
@@ -110,13 +102,6 @@ public class Lesson implements Serializable {
         this.instituteName = instituteName;
     }
 
-    public void setColSpan(int colSpan) {
-        this.colSpan = colSpan;
-    }
-
-    public void setRowSpan(int rowSpan) {
-        this.rowSpan = rowSpan;
-    }
 
     public void setCabinetId(int cabinetId) { this.cabinetId = cabinetId; }
 
@@ -175,5 +160,61 @@ public class Lesson implements Serializable {
 
     public String getLessonWeek() {
         return lessonWeek;
+    }
+
+    public int getRowFirst() {
+        return rowFirst;
+    }
+
+    public void setRowFirst(int rowFirst) {
+        this.rowFirst = rowFirst;
+    }
+
+    public int getRowLast() {
+        return rowLast;
+    }
+
+    public void setRowLast(int rowLast) {
+        this.rowLast = rowLast;
+    }
+
+    public int getColFirst() {
+        return colFirst;
+    }
+
+    public void setColFirst(int colFirst) {
+        this.colFirst = colFirst;
+    }
+
+    public int getColLast() {
+        return colLast;
+    }
+
+    public void setColLast(int colLast) {
+        this.colLast = colLast;
+    }
+
+    public boolean isForWholeGroup() {
+        return forWholeGroup;
+    }
+
+    public void setForWholeGroup(boolean forWholeGroup) {
+        this.forWholeGroup = forWholeGroup;
+    }
+
+    public int getColSpan() {
+        return colSpan;
+    }
+
+    public void setColSpan(int colSpan) {
+        this.colSpan = colSpan;
+    }
+
+    public boolean isMultipleLessonsInOneCell() {
+        return multipleLessonsInOneCell;
+    }
+
+    public void setMultipleLessonsInOneCell(boolean multipleLessonsInOneCell) {
+        this.multipleLessonsInOneCell = multipleLessonsInOneCell;
     }
 }

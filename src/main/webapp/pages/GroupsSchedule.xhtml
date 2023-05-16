@@ -185,7 +185,7 @@
                                             <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listShit">
                                                 <tr>
                                                     <ui:repeat value="#{listShit}" var="sex">
-                                                        <td colspan="#{sex.colSpan}" rowspan="#{sex.rowSpan}">
+                                                        <td colspan="#{sex.colSpan}">
                                                             <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
                                                         </td>
                                                     </ui:repeat>
@@ -206,7 +206,7 @@
                                                     <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listShit">
                                                         <tr>
                                                             <ui:repeat value="#{listShit}" var="sex">
-                                                                <td colspan="#{sex.colSpan}" rowspan="#{sex.rowSpan}">
+                                                                <td colspan="#{sex.colSpan}">
                                                                     <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
                                                                 </td>
                                                             </ui:repeat>
