@@ -2,6 +2,7 @@ package com.risonna.schedulewebapp.validators;
 
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.component.UIComponent;
+import jakarta.faces.component.UIInput;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.validator.FacesValidator;
 import jakarta.faces.validator.Validator;
@@ -14,12 +15,16 @@ public class validatePasswordConfirmation implements Validator<String> {
 
     @Override
     public void validate(FacesContext context, UIComponent component, String value) throws ValidatorException {
-        String password = (String) component.getAttributes().get("password");
+        UIInput passwordField = (UIInput) context.getViewRoot().findComponent("loginForm:password");
+        if (passwordField == null)
+            throw new IllegalArgumentException(String.format("Unable to find component."));
+        String password = (String) passwordField.getValue();
 
-        if (password == null || !password.equals(value)) {
+        if (!((String) value).equals(password)) {
             String baseName = "nls.messages"; // Without the "resources" folder and file extension
-            ResourceBundle bundle = ResourceBundle.getBundle(baseName, FacesContext.getCurrentInstance().getViewRoot().getLocale());
+            ResourceBundle bundle = ResourceBundle.getBundle(baseName, context.getViewRoot().getLocale());
             throw new ValidatorException(new FacesMessage(bundle.getString("password_confirmation_error")));
         }
+
     }
 }

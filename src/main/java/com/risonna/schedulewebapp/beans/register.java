@@ -29,6 +29,10 @@ public class register implements Serializable {
     public String getPasswordConfirm(){
         return passwordConfirm;
     }
+    public void setPasswordConfirm(String passwordConfirm) {
+        this.passwordConfirm = passwordConfirm;
+    }
+
 
     public String getUsername() {
         return username;

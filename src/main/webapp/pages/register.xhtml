@@ -43,8 +43,7 @@
 
             <h:panelGroup>
                 <h:outputLabel for="passwordConfirm" value="#{msg.confirmpassword}" style="align-self: center; font-size: large" />
-                <h:inputSecret id="passwordConfirm" value="#{register.passwordConfirm}" class="form-control" required="true" requiredMessage="Password confirmation is required">
-                    <f:validator validatorId="validatePasswordConfirmation" />
+                <h:inputSecret id="passwordConfirm" value="#{register.passwordConfirm}" validator="validatePasswordConfirmation" class="form-control" required="true" requiredMessage="Password confirmation is required">
                     <f:attribute name="password" value="#{register.password}" />
                 </h:inputSecret>
                 <h:message for="passwordConfirm" styleClass="error" />
