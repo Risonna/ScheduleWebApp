@@ -35,7 +35,12 @@ public class databaseProcessing implements Serializable {
                 int groupId = rs.getInt("groupid");
                 int cabinetid = rs.getInt("cabinetid");
                 String week = rs.getString("week");
-                int rowNum = rs.getInt("rownum");
+                int rowFirst = rs.getInt("rowfirst");
+                int rowLast = rs.getInt("rowlast");
+                int colFirst = rs.getInt("colfirst");
+                int colLast = rs.getInt("collast");
+                boolean forWholeGroup = rs.getBoolean("forwholegroup");
+                boolean multipleLessonsInOneCell = rs.getBoolean("multiplelessons");
                 Lesson lesson = new Lesson();
                 lesson.setTeacherId(teacherid);
                 lesson.setSubjectId(subjectid);
@@ -44,7 +49,12 @@ public class databaseProcessing implements Serializable {
                 lesson.setGroupId(groupId);
                 lesson.setCabinetId(cabinetid);
                 lesson.setLessonWeek(week);
-                lesson.setRowNum(rowNum);
+                lesson.setRowFirst(rowFirst);
+                lesson.setRowLast(rowLast);
+                lesson.setColFirst(colFirst);
+                lesson.setColLast(colLast);
+                lesson.setForWholeGroup(forWholeGroup);
+                lesson.setMultipleLessonsInOneCell(multipleLessonsInOneCell);
                 lessonsList.add(lesson);
             }
         } catch (SQLException e) {
@@ -399,7 +409,8 @@ public class databaseProcessing implements Serializable {
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
-            prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, rownum) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons) VALUES" +
+                    " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             int i = 1;
             for (Lesson lesson: lessons) {
                 prepStmt.setInt(1, i);
@@ -410,7 +421,12 @@ public class databaseProcessing implements Serializable {
                 prepStmt.setInt(6, lesson.getGroupId());
                 prepStmt.setInt(7, lesson.getCabinetId());
                 prepStmt.setString(8, lesson.getLessonWeek());
-                prepStmt.setInt(9, lesson.getRowNum());
+                prepStmt.setInt(9, lesson.getRowFirst());
+                prepStmt.setInt(10, lesson.getRowLast());
+                prepStmt.setInt(11, lesson.getColFirst());
+                prepStmt.setInt(12, lesson.getColLast());
+                prepStmt.setBoolean(13, lesson.isForWholeGroup());
+                prepStmt.setBoolean(14, lesson.isMultipleLessonsInOneCell());
                 prepStmt.addBatch();
                 i++;
 

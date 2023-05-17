@@ -2,19 +2,17 @@ package com.risonna.schedulewebapp.controllers;
 
 import com.risonna.schedulewebapp.beans.*;
 import com.risonna.schedulewebapp.database.databaseProcessing;
-import com.risonna.schedulewebapp.database.ScheduleDatabase;
-import jakarta.enterprise.context.SessionScoped;
-import jakarta.faces.context.FacesContext;
+import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 
 import java.io.Serializable;
-import java.sql.*;
+
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 
 @Named
-@SessionScoped
+@ViewScoped
 public class scheduleController implements Serializable {
     private List<Teacher> teacherList = specifyTheTeachers();
 
@@ -302,6 +300,64 @@ public class scheduleController implements Serializable {
         return lessonsByTimePeriod;
     }
 
+    public List<List<Lesson>> getListsStuff(List<Lesson> listHuh) {
+        List<List<Lesson>> listOfListsOfLessons = new ArrayList<>();
+
+        List<Integer> rowPositions = new ArrayList<>();
+        List<Integer> colPositions = new ArrayList<>();
+        int rowAmount = 0;
+        int colAmount = 0;
+        for (Lesson lesson : listHuh) {
+            if (!rowPositions.contains(lesson.getRowFirst())) {
+                rowPositions.add(lesson.getRowFirst());
+                rowAmount++;
+            }
+            if(!colPositions.contains(lesson.getColFirst())){
+                colPositions.add(lesson.getColFirst());
+                colAmount++;
+            }
+            if(lesson.isMultipleLessonsInOneCell()){
+                if(colAmount <2)colAmount++;
+            }
+        }
+
+        for (int i = 0; i < rowAmount; i++) {
+            List<Lesson> listOfLessons = new ArrayList<>();
+            int rownumFirst = rowPositions.get(i);
+            int rowFirst = rowPositions.get(i);
+            int rowLast = rowPositions.get(rowAmount-1);
+            int colFirst;
+            int colLast;
+            for (Lesson lesson : listHuh) {
+                if (lesson.getRowFirst() == rownumFirst) {
+                    if(!lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell() &&
+                            (lesson.getRowLast() != rowFirst || lesson.getRowFirst() != rowFirst))lesson.setRowSpan(rowAmount);
+                    else lesson.setRowSpan(1);
+                    if(lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell())lesson.setColSpan(colAmount);
+                    else lesson.setColSpan(1);
+
+
+                    listOfLessons.add(lesson);
+                }
+                rowFirst = lesson.getRowFirst();
+                rowLast = lesson.getRowLast();
+                colFirst = lesson.getColFirst();
+                colLast = lesson.getColLast();
+            }
+            listOfListsOfLessons.add(listOfLessons);
+        }
+
+        return listOfListsOfLessons;
+    }
+
+
+
+
+
+
+
+
+
 
     public List<Lesson> getFilteredLessonsByDayAndGroup(String day) {
         List<Lesson> filteredLessons = new ArrayList<>();
@@ -326,55 +382,6 @@ public class scheduleController implements Serializable {
         return lessonsByTimePeriod;
     }
 
-    public List<List<Lesson>> getListsStuff(List<Lesson> listHuh) {
-        List<List<Lesson>> listOfListsOfLessons = new ArrayList<>();
-
-        // Group lessons by row number
-        Map<Integer, List<Lesson>> lessonsByRow = listHuh.stream()
-                .collect(Collectors.groupingBy(Lesson::getRowNum));
-
-        // Iterate over each row
-        for (List<Lesson> lessonList : lessonsByRow.values()) {
-            List<Lesson> listOfLessons = new ArrayList<>();
-            listOfLessons.addAll(lessonList);
-
-            // Check if the lessons in the row need to be expanded
-            for (int i = 0; i < listOfLessons.size(); i++) {
-                Lesson lesson = listOfLessons.get(i);
-                int colspan = 1;
-                int rowspan = 1;
-
-                // Check if the lesson needs to span multiple columns
-                if (i < listOfLessons.size() - 1) {
-                    Lesson nextLesson = listOfLessons.get(i + 1);
-                    if (lesson.getGroupName().equals(nextLesson.getGroupName())) {
-                        colspan++;
-                        i++; // Skip the next lesson since it's part of the colspan
-                    }
-                }
-
-                // Check if the lesson needs to span multiple rows
-                int rowIndex = lesson.getRowNum();
-                if (rowIndex < lessonsByRow.size() - 1) {
-                    List<Lesson> nextLessonList = lessonsByRow.get(rowIndex + 1);
-                    for (Lesson nextLesson : nextLessonList) {
-                        if (lesson.getLessonWeek().equals(nextLesson.getLessonWeek()) &&
-                                lesson.getGroupName().equals(nextLesson.getGroupName())) {
-                            rowspan++;
-                            break;
-                        }
-                    }
-                }
-
-                lesson.setColSpan(colspan);
-                lesson.setRowSpan(rowspan);
-            }
-
-            listOfListsOfLessons.add(listOfLessons);
-        }
-
-        return listOfListsOfLessons;
-    }
 
 
     public List<Lesson> getFilteredLessonsByDayAndCabinet(String day, String cabinetName) {

@@ -182,11 +182,11 @@
                                     <div style="text-align: center">
                                         <table>
                                             <tbody>
-                                            <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listShit">
+                                            <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listOfLessons">
                                                 <tr>
-                                                    <ui:repeat value="#{listShit}" var="sex">
-                                                        <td colspan="#{sex.colSpan}" rowspan="#{sex.rowSpan}">
-                                                            <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
+                                                    <ui:repeat value="#{listOfLessons}" var="singlelesson">
+                                                        <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}">
+                                                            <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}" />
                                                         </td>
                                                     </ui:repeat>
                                                 </tr>
@@ -203,11 +203,11 @@
                                             <div style="text-align: center">
                                                 <table>
                                                     <tbody>
-                                                    <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listShit">
+                                                    <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listOfLessons">
                                                         <tr>
-                                                            <ui:repeat value="#{listShit}" var="sex">
-                                                                <td colspan="#{sex.colSpan}" rowspan="#{sex.rowSpan}">
-                                                                    <h:outputText value="#{sex.lessonWeek} #{sex.subjectName} #{sex.teacherName} #{sex.cabinetName}" />
+                                                            <ui:repeat value="#{listOfLessons}" var="singlelesson">
+                                                                <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}">
+                                                                    <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}" />
                                                                 </td>
                                                             </ui:repeat>
                                                         </tr>

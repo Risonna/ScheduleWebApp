@@ -127,7 +127,6 @@ public class ExcelSearch {
                 sb.append(cabinetb).append("\n");
             }
             String result = sb.toString();
-            System.out.println(result);
         }
 
     }
@@ -250,6 +249,31 @@ public class ExcelSearch {
 
         return groupName;
     }
+    private boolean isGroupMerged(Sheet sheet, Cell cell){
+        int numMergedRegions = sheet.getNumMergedRegions();
+        boolean foundMergedRegion = false;
+        // Search for merged region that contains the current cell in row 3
+        for (int i = 0; i < numMergedRegions; i++) {
+            CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
+            if (mergedRegion.isInRange(2, cell.getColumnIndex())) {
+                foundMergedRegion = true;
+                }
+            }
+
+        return foundMergedRegion;
+    }
+    private int getGroupColumn(Sheet sheet, Cell cell){
+        int groupCol = -1;
+        Row groupRow = sheet.getRow(2);
+        if(groupRow != null){
+            Cell groupCell = groupRow.getCell(cell.getColumnIndex());
+            if(groupCell != null){
+                groupCol = groupCell.getColumnIndex();
+            }
+        }
+
+        return groupCol;
+    }
     private String checkWeek(String lessonNameString){
 
         String week;
@@ -330,7 +354,6 @@ public class ExcelSearch {
 
 
             Pattern pattern = Pattern.compile(regex.trim());
-            System.out.println("THe checking is " + checking);
             if (cellValue.trim().toLowerCase().contains(checking.trim().toLowerCase()) ||
             cellValue.replaceAll("\\.", "").trim().toLowerCase().contains(checking.trim().toLowerCase()) || pattern.matcher(cellValue.replaceAll("\\.", "").trim()).find()) {
                 // Print the position of the cell
@@ -344,6 +367,7 @@ public class ExcelSearch {
         for (Subject subj : subjects) {
             if (cellValue.trim().toLowerCase().contains(subj.getSubjectName().trim().toLowerCase())) {
                 lesson.setSubjectId(subj.getId());
+                lesson.setSubjectName(subj.getSubjectName());
                 isSubjectThere = true;
             }
         }
@@ -371,6 +395,7 @@ public class ExcelSearch {
             weekDay = checkWeek(cell.getStringCellValue().trim().toLowerCase());
         }
         lesson.setLessonWeek(weekDay);
+        lesson.setMultipleLessonsInOneCell(isMultiple);
 
 
         String cellTime;
@@ -426,6 +451,12 @@ public class ExcelSearch {
 
         //if lessonCell isn't null we treat it as a merged cell
         if (lessonCell != null) {
+            //set lesson's rows and columns from excel
+            lesson.setColFirst(lessonCell.getFirstColumn());
+            lesson.setColLast(lessonCell.getLastColumn());
+            lesson.setRowFirst(lessonCell.getFirstRow());
+            lesson.setRowLast(lessonCell.getLastRow());
+
             lesson.setLessonCell(true);
             int lessonFirstColumn = lessonCell.getFirstColumn();
             int lessonLastColumn = lessonCell.getLastColumn();
@@ -457,6 +488,14 @@ public class ExcelSearch {
         }
         //otherwise just treat as normal cell
         else {
+            //set lesson's rows and columns from excel
+            lesson.setColFirst(cell.getColumnIndex());
+            lesson.setColLast(cell.getColumnIndex());
+            lesson.setRowFirst(cell.getRowIndex());
+            lesson.setRowLast(cell.getRowIndex());
+
+
+
             lesson.setLessonCell(false);
             groupsForLesson = 1;
         }
@@ -464,10 +503,17 @@ public class ExcelSearch {
         lesson.setGroupsForLesson(groupsForLesson);
         lesson.setPotochLesson(potochLesson);
 
+
+
+
+
+
         if (potochLesson) {
             for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
                 String groupName = entry.getKey();
                 CellRangeAddress mergedCell = entry.getValue();
+                //if lesson's group name is not from an entry, which means that the entry group isn't straight above the lesson(case for potoch lessons)
+                //then there is a check if lesson's borders(first/last columns) join the group's borders
                 if (!groupName.equalsIgnoreCase(lesson.getGroupName()) && lessonCell != null) {
                     int firstRow = mergedCell.getFirstRow();
                     int lastRow = mergedCell.getLastRow();
@@ -488,8 +534,19 @@ public class ExcelSearch {
                         lessonPotoch.setGroupName(groupName);
                         lessonPotoch.setGroupsForLesson(groupsForLesson);
                         lessonPotoch.setLessonCell(true);
-                        lessonPotoch.setPotochLesson(potochLesson);
-                        lessonPotoch.setRowNum(cell.getRowIndex());
+                        lessonPotoch.setPotochLesson(true);
+                        lessonPotoch.setRowFirst(lessonCell.getFirstRow());
+                        lessonPotoch.setRowLast(lessonCell.getLastRow());
+                        lessonPotoch.setColFirst(lessonCell.getFirstColumn());
+                        lessonPotoch.setColLast(lessonCell.getLastColumn());
+
+                        lessonPotoch.setForWholeGroup(lessonPotoch.getColFirst()<= firstCol && lessonPotoch.getColLast() >= lastCol);
+
+                        if(!lessonPotoch.isForWholeGroup()){
+                            System.out.println("First last columns for lesson: " + lessonPotoch.getColFirst() + "/" + lessonPotoch.getColLast()
+                            + "first last col for group: " + firstCol + "/" + lastCol);
+                        }
+
                         boolean found = false;
                         for (Group group : groupList) {
                             if (lessonPotoch.getGroupName().equalsIgnoreCase(group.getGroupName())) {
@@ -506,9 +563,40 @@ public class ExcelSearch {
 
                     }
                 }
+                else{
+                    int firstCol = mergedCell.getFirstColumn();
+                    int lastCol = mergedCell.getLastColumn();
+                    lesson.setForWholeGroup(lesson.getColFirst()<= firstCol && lesson.getColLast() >= lastCol);
+                    if(!lesson.isForWholeGroup()){
+                        System.out.println("First last columns for lesson: " + lesson.getColFirst() + "/" + lesson.getColLast()
+                                + "first last col for group: " + firstCol + "/" + lastCol + " potoch-self");
+                    }
+                }
+
             }
         }
-        lesson.setRowNum(cell.getRowIndex());
+        //if not potochLesson, then the program will just assign this lesson its forWholeGroup bool variable
+        else{
+            if(isGroupMerged(sheet, cell)) {
+                for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
+                    String groupName = entry.getKey();
+                    CellRangeAddress mergedCell = entry.getValue();
+                    //if lesson's group name is not from an entry, which means that the entry group isn't straight above the lesson(case for potoch lessons)
+                    //then there is a check if lesson's borders(first/last columns) join the group's borders
+                    if (groupName.equalsIgnoreCase(lesson.getGroupName())) {
+                        int firstRow = mergedCell.getFirstRow();
+                        int lastRow = mergedCell.getLastRow();
+                        int firstCol = mergedCell.getFirstColumn();
+                        int lastCol = mergedCell.getLastColumn();
+                        lesson.setForWholeGroup(lesson.getColFirst() <= firstCol && lesson.getColLast() >= lastCol);
+                    }
+                }
+            }
+            else{
+                lesson.setForWholeGroup(lesson.getColFirst() == getGroupColumn(sheet, cell) && lesson.getColLast() == getGroupColumn(sheet, cell));
+            }
+
+        }
 
         if (lesson != null&& lesson.getLessonTime() != null && lesson.getLessonDay() != null &&
                 !(lesson.getLessonDay().equalsIgnoreCase("день") ||
@@ -518,7 +606,6 @@ public class ExcelSearch {
             lessonArrayList.add(lesson);
         }
 
-        System.out.println("teachers amount: " + teacherNames.size() + "cabinets amount: " + cabinetList.size());
     }
 
 
