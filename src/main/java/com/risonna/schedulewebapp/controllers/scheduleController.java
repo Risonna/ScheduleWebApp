@@ -316,17 +316,33 @@ public class scheduleController implements Serializable {
                 colPositions.add(lesson.getColFirst());
                 colAmount++;
             }
+            if(lesson.isMultipleLessonsInOneCell()){
+                if(colAmount <2)colAmount++;
+            }
         }
 
         for (int i = 0; i < rowAmount; i++) {
             List<Lesson> listOfLessons = new ArrayList<>();
             int rownumFirst = rowPositions.get(i);
+            int rowFirst = rowPositions.get(i);
+            int rowLast = rowPositions.get(rowAmount-1);
+            int colFirst;
+            int colLast;
             for (Lesson lesson : listHuh) {
                 if (lesson.getRowFirst() == rownumFirst) {
+                    if(!lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell() &&
+                            (lesson.getRowLast() != rowFirst || lesson.getRowFirst() != rowFirst))lesson.setRowSpan(rowAmount);
+                    else lesson.setRowSpan(1);
                     if(lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell())lesson.setColSpan(colAmount);
                     else lesson.setColSpan(1);
+
+
                     listOfLessons.add(lesson);
                 }
+                rowFirst = lesson.getRowFirst();
+                rowLast = lesson.getRowLast();
+                colFirst = lesson.getColFirst();
+                colLast = lesson.getColLast();
             }
             listOfListsOfLessons.add(listOfLessons);
         }

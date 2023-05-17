@@ -28,6 +28,7 @@ public class Lesson implements Serializable {
     private boolean forWholeGroup;
     private int colSpan;
     private boolean multipleLessonsInOneCell;
+    private int rowSpan;
     private int teacherId;
     private int subjectId;
     private int cabinetId;
@@ -216,5 +217,13 @@ public class Lesson implements Serializable {
 
     public void setMultipleLessonsInOneCell(boolean multipleLessonsInOneCell) {
         this.multipleLessonsInOneCell = multipleLessonsInOneCell;
+    }
+
+    public int getRowSpan() {
+        return rowSpan;
+    }
+
+    public void setRowSpan(int rowSpan) {
+        this.rowSpan = rowSpan;
     }
 }

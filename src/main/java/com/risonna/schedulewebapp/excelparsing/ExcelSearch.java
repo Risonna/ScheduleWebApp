@@ -249,6 +249,31 @@ public class ExcelSearch {
 
         return groupName;
     }
+    private boolean isGroupMerged(Sheet sheet, Cell cell){
+        int numMergedRegions = sheet.getNumMergedRegions();
+        boolean foundMergedRegion = false;
+        // Search for merged region that contains the current cell in row 3
+        for (int i = 0; i < numMergedRegions; i++) {
+            CellRangeAddress mergedRegion = sheet.getMergedRegion(i);
+            if (mergedRegion.isInRange(2, cell.getColumnIndex())) {
+                foundMergedRegion = true;
+                }
+            }
+
+        return foundMergedRegion;
+    }
+    private int getGroupColumn(Sheet sheet, Cell cell){
+        int groupCol = -1;
+        Row groupRow = sheet.getRow(2);
+        if(groupRow != null){
+            Cell groupCell = groupRow.getCell(cell.getColumnIndex());
+            if(groupCell != null){
+                groupCol = groupCell.getColumnIndex();
+            }
+        }
+
+        return groupCol;
+    }
     private String checkWeek(String lessonNameString){
 
         String week;
@@ -552,22 +577,23 @@ public class ExcelSearch {
         }
         //if not potochLesson, then the program will just assign this lesson its forWholeGroup bool variable
         else{
-            for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
-                String groupName = entry.getKey();
-                CellRangeAddress mergedCell = entry.getValue();
-                //if lesson's group name is not from an entry, which means that the entry group isn't straight above the lesson(case for potoch lessons)
-                //then there is a check if lesson's borders(first/last columns) join the group's borders
-                if (groupName.equalsIgnoreCase(lesson.getGroupName())) {
-                    int firstRow = mergedCell.getFirstRow();
-                    int lastRow = mergedCell.getLastRow();
-                    int firstCol = mergedCell.getFirstColumn();
-                    int lastCol = mergedCell.getLastColumn();
-                    lesson.setForWholeGroup(lesson.getColFirst() == firstCol && lesson.getColLast() == lastCol);
-                    if(!lesson.isForWholeGroup()){
-                        System.out.println("First last columns for lesson: " + lesson.getColFirst() + "/" + lesson.getColLast()
-                                + "first last col for group: " + firstCol + "/" + lastCol + " not-potoch-self, group is " + groupName + "lesson is " + lesson.getSubjectName());
+            if(isGroupMerged(sheet, cell)) {
+                for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
+                    String groupName = entry.getKey();
+                    CellRangeAddress mergedCell = entry.getValue();
+                    //if lesson's group name is not from an entry, which means that the entry group isn't straight above the lesson(case for potoch lessons)
+                    //then there is a check if lesson's borders(first/last columns) join the group's borders
+                    if (groupName.equalsIgnoreCase(lesson.getGroupName())) {
+                        int firstRow = mergedCell.getFirstRow();
+                        int lastRow = mergedCell.getLastRow();
+                        int firstCol = mergedCell.getFirstColumn();
+                        int lastCol = mergedCell.getLastColumn();
+                        lesson.setForWholeGroup(lesson.getColFirst() <= firstCol && lesson.getColLast() >= lastCol);
                     }
                 }
+            }
+            else{
+                lesson.setForWholeGroup(lesson.getColFirst() == getGroupColumn(sheet, cell) && lesson.getColLast() == getGroupColumn(sheet, cell));
             }
 
         }
