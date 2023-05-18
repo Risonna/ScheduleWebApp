@@ -33,6 +33,8 @@ public class Lesson implements Serializable {
     private int subjectId;
     private int cabinetId;
     private int groupId;
+    private int groupColFirst;
+    private int groupColLast;
     private boolean potochLesson;
     private boolean lessonCell;
     private int groupsForLesson;
@@ -225,5 +227,21 @@ public class Lesson implements Serializable {
 
     public void setRowSpan(int rowSpan) {
         this.rowSpan = rowSpan;
+    }
+
+    public int getGroupColFirst() {
+        return groupColFirst;
+    }
+
+    public void setGroupColFirst(int groupColFirst) {
+        this.groupColFirst = groupColFirst;
+    }
+
+    public int getGroupColLast() {
+        return groupColLast;
+    }
+
+    public void setGroupColLast(int groupColLast) {
+        this.groupColLast = groupColLast;
     }
 }

@@ -57,14 +57,20 @@ public class ExcelSearch {
 
                             int cabAmount = 0;
                             for (Cabinet cabinet : cabinetList) {
-                                if (cellValue.trim().toLowerCase().contains(cabinet.getCabinetName().trim().toLowerCase())) {
-                                    int certainCabAmount = (cellValue.trim().toLowerCase().length()-cellValue.replace(cabinet.getCabinetName().trim().toLowerCase(),
-                                            "").length())/cabinet.getCabinetName().trim().toLowerCase().length();
+                                String processedCabinetName = cabinet.getCabinetName().trim().toLowerCase().replaceAll("\\s",
+                                        "");
+                                String processedCellValue = cellValue.toLowerCase().replaceAll("\\s", "");
+
+                                if (processedCellValue.contains(processedCabinetName)) {
+                                    int certainCabAmount = (processedCellValue.length()-processedCellValue.replace(processedCabinetName,
+                                            "").length())/processedCabinetName.length();
                                     cabAmount += certainCabAmount;
 
                                     int startIndex = 0;
                                     for(int i = 0; i < certainCabAmount; i++) {
-                                        int cabinetPosition = cellValue.toLowerCase().indexOf(cabinet.getCabinetName().toLowerCase(), startIndex)+cabinet.getCabinetName().toLowerCase().length();
+                                        int cabinetPosition = processedCellValue.indexOf(processedCabinetName, startIndex)+
+                                                processedCabinetName.length();
+
                                         if (cabinetPosition != -1) {
                                             cabinetPositions.add(cabinetPosition);
                                             startIndex = cabinetPosition + 1;
@@ -80,13 +86,16 @@ public class ExcelSearch {
                             if(cabAmount <2){
                                 int teachAmount = 0;
                                 for (Teacher teacher : teacherNames) {
-                                    if (cellValue.trim().toLowerCase().contains(teacher.getTeacherName().trim().toLowerCase())) {
-                                        teachAmount += (cellValue.trim().toLowerCase().length()-cellValue.replace(teacher.getTeacherName().trim().toLowerCase(),
-                                                "").length())/teacher.getTeacherName().trim().toLowerCase().length();
+                                    String processedCellValue = cellValue.toLowerCase().replaceAll("\\s", "");
+                                    String processedTeacherName = getProcessedTeacherName(teacher).trim().toLowerCase().replaceAll("\\s", "");
+                                    if (processedCellValue.contains(processedTeacherName)) {
+                                        teachAmount += (processedCellValue.length()-processedCellValue.replace(processedTeacherName,
+                                                "").length())/processedTeacherName.length();
 
                                     }
                                     if(teachAmount>1)break;
                                 }
+
                                 if(teachAmount<2){
                                     if(cabAmount >0 || teachAmount >0){
                                         actualParsing(cellValue, sheet, cell, row, groupMergedCells, isMultiple);
@@ -94,17 +103,19 @@ public class ExcelSearch {
                                 }
                             }
                             else {
+                                String processedCellValue = cellValue.toLowerCase().replaceAll("\\s", "");
                                 isMultiple = true;
                                 // If there are multiple cabinet names in the cell, split the cell into multiple lessons
                                 Collections.sort(cabinetPositions);
                                 int start = 0;
                                 for (int i = 0; i < cabinetPositions.size()-1; i++) {
                                         int end = cabinetPositions.get(i);
-                                        String lesson = cellValue.substring(start, end).trim();
+                                        String lesson = processedCellValue.substring(start, end).trim();
                                         actualParsing(lesson, sheet, cell, row, groupMergedCells, isMultiple);
                                         start = end;
                                 }
-                                String lastLesson = cellValue.substring(start).trim();
+                                String lastLesson = processedCellValue.substring(start);
+                                System.out.println("multiple lesson is :" + lastLesson);
                                 actualParsing(lastLesson, sheet, cell, row, groupMergedCells, isMultiple);
                             }
                         }
@@ -207,6 +218,8 @@ public class ExcelSearch {
         }
         return instituteName;
     }
+
+    //get group column if a group's cell is a single cell(not merged cell)
     private String getGroupName(Sheet sheet, Cell cell) {
         String groupName = null;
         int numMergedRegions = sheet.getNumMergedRegions();
@@ -249,6 +262,8 @@ public class ExcelSearch {
 
         return groupName;
     }
+
+    //check whether a group is a merged cell or just a cell
     private boolean isGroupMerged(Sheet sheet, Cell cell){
         int numMergedRegions = sheet.getNumMergedRegions();
         boolean foundMergedRegion = false;
@@ -287,6 +302,18 @@ public class ExcelSearch {
             week = "";
         }
         return week;
+    }
+    private String getProcessedTeacherName(Teacher teacher){
+        if(!teacher.getTeacherSurname().equalsIgnoreCase("unknown")){
+            return getTeacherNameIfLastNameIsKnown(teacher);
+        }
+        else{
+            return teacher.getTeacherName();
+        }
+
+    }
+    private String getTeacherNameIfLastNameIsKnown(Teacher teacher){
+        return teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0)+".";
     }
     private String getCabinetName(String teacherName, String lessonString){
         Pattern pattern = Pattern.compile("(?i)" + teacherName + "\\s*[.,]+\\s*");
@@ -332,14 +359,15 @@ public class ExcelSearch {
     }
 
     private void actualParsing(String cellValue, Sheet sheet, Cell cell, Row row, Map<String, CellRangeAddress> groupMergedCells, boolean isMultiple){
+       String processedCellValue = cellValue.toLowerCase().replaceAll("\\s", "");
         Lesson lesson = new Lesson();
         lesson.setTeacherName("unknown");
-        lesson.setTeacherId(1);
+        lesson.setTeacherId(0);
         for (Teacher teacher : teacherNames) {
             String regex;
             String checking;
             if(!teacher.getTeacherSurname().equalsIgnoreCase("unknown")){
-                String surPatrTeacherName = teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0)+".";
+                String surPatrTeacherName = getTeacherNameIfLastNameIsKnown(teacher);
                 regex = "(?i)\\b" + surPatrTeacherName + "\\b";
                 checking = surPatrTeacherName;
             }
@@ -353,10 +381,16 @@ public class ExcelSearch {
 
 
 
-            Pattern pattern = Pattern.compile(regex.trim());
-            if (cellValue.trim().toLowerCase().contains(checking.trim().toLowerCase()) ||
-            cellValue.replaceAll("\\.", "").trim().toLowerCase().contains(checking.trim().toLowerCase()) || pattern.matcher(cellValue.replaceAll("\\.", "").trim()).find()) {
-                // Print the position of the cell
+            Pattern pattern = Pattern.compile(regex.trim().replaceAll("\\.", "").replaceAll("\\s", ""));
+            String processedChecking = checking.trim().toLowerCase().replaceAll("\\s",
+                    "");
+            if (processedCellValue.contains(processedChecking) ||
+            processedCellValue.replaceAll("\\.", "").replaceAll("\\s",
+                    "").contains(processedChecking.replaceAll("\\.", "").replaceAll("\\s", "")) ||
+                    pattern.matcher(processedCellValue.replaceAll("\\.",
+                    "").replaceAll("\\s", "")).find()) {
+
+
                 lesson.setTeacherId(teacher.getId());
                 lesson.setTeacherName(checking);
             }
@@ -365,7 +399,8 @@ public class ExcelSearch {
 
         boolean isSubjectThere = false;
         for (Subject subj : subjects) {
-            if (cellValue.trim().toLowerCase().contains(subj.getSubjectName().trim().toLowerCase())) {
+            String processedSubject = subj.getSubjectName().trim().toLowerCase().replaceAll("\\s", "");
+            if (processedCellValue.contains(processedSubject)) {
                 lesson.setSubjectId(subj.getId());
                 lesson.setSubjectName(subj.getSubjectName());
                 isSubjectThere = true;
@@ -373,14 +408,15 @@ public class ExcelSearch {
         }
         if (!isSubjectThere) {
             lesson.setSubjectName("Subject isn't specified or not found");
-            lesson.setSubjectId(1);
+            lesson.setSubjectId(0);
         }
 
 
         lesson.setCabinetName("unknown");
         lesson.setCabinetId(0);
         for (Cabinet cabinet : cabinetList) {
-            if (cellValue.trim().toLowerCase().contains(cabinet.getCabinetName().trim().toLowerCase())) {
+            String processedCabinetName = cabinet.getCabinetName().trim().toLowerCase().replaceAll("\\s", "");
+            if (processedCellValue.contains(processedCabinetName)) {
                 lesson.setCabinetId(cabinet.getId());
                 lesson.setCabinetName(cabinet.getCabinetName());
                 break;
@@ -389,7 +425,7 @@ public class ExcelSearch {
 
         String weekDay;
         if(!isMultiple) {
-            weekDay = checkWeek(cellValue.trim().toLowerCase());
+            weekDay = checkWeek(cellValue.toLowerCase());
         }
         else{
             weekDay = checkWeek(cell.getStringCellValue().trim().toLowerCase());
@@ -534,14 +570,16 @@ public class ExcelSearch {
                         lessonPotoch.setCabinetId(lesson.getCabinetId());
                         lessonPotoch.setGroupName(groupName);
                         lessonPotoch.setGroupsForLesson(groupsForLesson);
+                        lessonPotoch.setMultipleLessonsInOneCell(lesson.isMultipleLessonsInOneCell());
                         lessonPotoch.setLessonCell(true);
                         lessonPotoch.setPotochLesson(true);
                         lessonPotoch.setRowFirst(lessonCell.getFirstRow());
                         lessonPotoch.setRowLast(lessonCell.getLastRow());
                         lessonPotoch.setColFirst(lessonCell.getFirstColumn());
                         lessonPotoch.setColLast(lessonCell.getLastColumn());
-                        if(groupName.equalsIgnoreCase("моа-205"))System.out.println("group cols are: " + firstCol + "/" + lastCol +
-                                " lesson cols are: " + lessonCell.getFirstColumn() + "/" + lessonCell.getLastColumn() + "the lesson is " + lesson.getSubjectName());
+                        lessonPotoch.setGroupColFirst(firstCol);
+                        lessonPotoch.setGroupColLast(lastCol);
+
                         if(lessonCell.getFirstColumn() <= firstCol) {
                             lessonPotoch.setColFirst(firstCol);
 
@@ -567,10 +605,6 @@ public class ExcelSearch {
 
                         lessonPotoch.setForWholeGroup(lessonPotoch.getColFirst()<= firstCol && lessonPotoch.getColLast() >= lastCol);
 
-                        if(!lessonPotoch.isForWholeGroup()){
-                            System.out.println("First last columns for lesson: " + lessonPotoch.getColFirst() + "/" + lessonPotoch.getColLast()
-                            + "first last col for group: " + firstCol + "/" + lastCol);
-                        }
 
                         boolean found = false;
                         for (Group group : groupList) {
@@ -593,11 +627,11 @@ public class ExcelSearch {
                     int lastRow = mergedCell.getLastRow();
                     int firstCol = mergedCell.getFirstColumn();
                     int lastCol = mergedCell.getLastColumn();
+
                     lesson.setForWholeGroup(lesson.getColFirst()<= firstCol && lesson.getColLast() >= lastCol);
-                    if(!lesson.isForWholeGroup()){
-                        System.out.println("First last columns for lesson: " + lesson.getColFirst() + "/" + lesson.getColLast()
-                                + "first last col for group: " + firstCol + "/" + lastCol + " potoch-self");
-                    }
+
+                    lesson.setGroupColFirst(firstCol);
+                    lesson.setGroupColLast(lastCol);
 
                     if(lessonCell.getFirstColumn() <= firstCol) {
                         lesson.setColFirst(firstCol);
@@ -638,11 +672,15 @@ public class ExcelSearch {
                         int firstCol = mergedCell.getFirstColumn();
                         int lastCol = mergedCell.getLastColumn();
                         lesson.setForWholeGroup(lesson.getColFirst() <= firstCol && lesson.getColLast() >= lastCol);
+                        lesson.setGroupColFirst(firstCol);
+                        lesson.setGroupColLast(lastCol);
                     }
                 }
             }
             else{
                 lesson.setForWholeGroup(lesson.getColFirst() == getGroupColumn(sheet, cell) && lesson.getColLast() == getGroupColumn(sheet, cell));
+                lesson.setGroupColFirst(getGroupColumn(sheet, cell));
+                lesson.setGroupColLast(getGroupColumn(sheet, cell));
             }
 
         }

@@ -312,11 +312,11 @@ public class scheduleController implements Serializable {
                 rowPositions.add(lesson.getRowFirst());
                 rowAmount++;
             }
-
-            if(!colPositions.contains(lesson.getColFirst())){
-                    colPositions.add(lesson.getColFirst());
-                    colAmount++;
-            }
+            if(lesson.getGroupColLast()-lesson.getGroupColFirst()>0)colAmount=lesson.getGroupColLast()-lesson.getGroupColFirst()+1;
+//            if(!colPositions.contains(lesson.getColFirst()) && !colPositions.contains(lesson.getColLast())){
+//                    colPositions.add(lesson.getColFirst());
+//                    colAmount++;
+//            }
 
 
             if(lesson.isMultipleLessonsInOneCell()){
@@ -330,18 +330,15 @@ public class scheduleController implements Serializable {
             int currentrownum = rowPositions.get(i);
             int rowFirst = rowPositions.get(0);
             int rowLast = rowPositions.get(rowAmount-1);
-            int colFirst = colPositions.get(0);
-            int colLast = colPositions.get(colAmount-1);
             for (Lesson lesson : listHuh) {
+                int colFirst = lesson.getGroupColFirst();
+                int colLast = lesson.getGroupColLast();
                 if (lesson.getRowFirst() == currentrownum) {
-                    System.out.println("-----------------------------------");
-                    System.out.println("colAmount: " + colAmount);
-                    System.out.println("lesson.getColLast(): " + lesson.getColLast());
-                    System.out.println("colLast: " + colLast);
-                    System.out.println("lesson.getColFirst(): " + lesson.getColFirst());
-                    System.out.println("colFirst: " + colFirst);
-                    System.out.println("lesson is " + lesson.getSubjectName());
-                    System.out.println("-----------------------------------");
+                    if(lesson.getGroupName().equalsIgnoreCase("фит-204") && lesson.getLessonTime().equalsIgnoreCase("13.30-15.05")){
+                        System.out.println("Lesson cols: " + lesson.getColFirst() +"/" + lesson.getColLast() + "group cols and colamount: " +
+                                colFirst + "/" + colLast + "//" + colAmount);
+                    }
+
 
                     if(!lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell() &&
                             (lesson.getRowLast() != currentrownum || lesson.getRowFirst() != currentrownum))lesson.setRowSpan(rowAmount);
@@ -351,7 +348,9 @@ public class scheduleController implements Serializable {
                     if(lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell())lesson.setColSpan(colAmount);
                     else lesson.setColSpan(1);
 
-                    if(colAmount>1 && lesson.getColLast() >= colLast && lesson.getColFirst() != colFirst){
+                    boolean isThereLessonAfter = true;
+
+                    if(colAmount>1 && lesson.getColLast() == colLast && lesson.getColFirst() != colFirst){
                         boolean isThereLessonBefore = false;
                         for (Lesson lesson1:listHuh) {
                             if ((lesson1.getRowFirst() == currentrownum || lesson1.getRowLast() == currentrownum)
@@ -371,8 +370,29 @@ public class scheduleController implements Serializable {
                         }
                     }
 
+                    if(colAmount>1 && lesson.getColFirst() == colFirst && lesson.getColLast() != colLast){
+                        isThereLessonAfter = false;
+                        for (Lesson lesson1:listHuh) {
+                            if ((lesson1.getRowFirst() == currentrownum || lesson1.getRowLast() == currentrownum)
+                                    && lesson1.getColLast() != lesson.getColLast()) {
+                                isThereLessonAfter = true;
+                                break;
+                            }
 
-                    listOfLessons.add(lesson);
+                        }
+
+                        if(!isThereLessonAfter && lesson.getRowFirst() == currentrownum) {
+                            Lesson emptyLesson = new Lesson();
+                            emptyLesson.setColSpan(1);
+                            emptyLesson.setRowSpan(1);
+                            listOfLessons.add(lesson);
+                            listOfLessons.add(emptyLesson);
+                            System.out.println("adding empty lesson for " + lesson.getGroupName());
+                        }
+                    }
+
+                    if(isThereLessonAfter){listOfLessons.add(lesson);}
+
                 }
 //                rowFirst = lesson.getRowFirst();
 //                rowLast = lesson.getRowLast();
@@ -496,11 +516,14 @@ public class scheduleController implements Serializable {
 
     public scheduleController() {
     updateEverythingFromSQL();
-    this.selectedTeacher = getTeacherNameList().get(0);
-    this.selectedCabinet = getCabinetList().get(0);
-    this.selectedGroup = getGroupNames().get(0);
-    this.selectedDepartment = getDepartmentList().get(0);
-    this.selectedDayOfWeek = getDaysOfWeek().get(0);
+    if(getTeacherNameList().size() > 1 && getDepartmentList().size() >1 && getGroupNames().size() >1 &&
+            getCabinetList().size() > 1 && getDaysOfWeek().size() >1){
+        this.selectedTeacher = getTeacherNameList().get(0);
+        this.selectedCabinet = getCabinetList().get(0);
+        this.selectedGroup = getGroupNames().get(0);
+        this.selectedDepartment = getDepartmentList().get(0);
+        this.selectedDayOfWeek = getDaysOfWeek().get(0);
+    }
 
     }
 
