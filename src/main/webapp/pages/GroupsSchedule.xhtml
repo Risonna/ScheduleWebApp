@@ -179,14 +179,14 @@
                             </td>
                             <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
                                 <td>
-                                    <div style="text-align: center">
-                                        <table>
+                                    <div style="text-align: center; display: inline-block">
+                                        <table style="width: 100%; table-layout: fixed;">
                                             <tbody>
                                             <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listOfLessons">
                                                 <tr>
                                                     <ui:repeat value="#{listOfLessons}" var="singlelesson">
-                                                        <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}">
-                                                            <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}" />
+                                                        <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}" style="width: 25%; padding: 5px;">
+                                                            <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}" style="word-wrap: break-word;" />
                                                         </td>
                                                     </ui:repeat>
                                                 </tr>

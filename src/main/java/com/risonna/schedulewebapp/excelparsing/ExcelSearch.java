@@ -509,6 +509,7 @@ public class ExcelSearch {
 
 
         if (potochLesson) {
+            lesson.setPotochLesson(true);
             for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
                 String groupName = entry.getKey();
                 CellRangeAddress mergedCell = entry.getValue();
@@ -539,6 +540,30 @@ public class ExcelSearch {
                         lessonPotoch.setRowLast(lessonCell.getLastRow());
                         lessonPotoch.setColFirst(lessonCell.getFirstColumn());
                         lessonPotoch.setColLast(lessonCell.getLastColumn());
+                        if(groupName.equalsIgnoreCase("моа-205"))System.out.println("group cols are: " + firstCol + "/" + lastCol +
+                                " lesson cols are: " + lessonCell.getFirstColumn() + "/" + lessonCell.getLastColumn() + "the lesson is " + lesson.getSubjectName());
+                        if(lessonCell.getFirstColumn() <= firstCol) {
+                            lessonPotoch.setColFirst(firstCol);
+
+                            if(lessonCell.getLastColumn() >= lastCol){
+                                lessonPotoch.setColLast(lastCol);
+                            }
+                            else{
+                                lessonPotoch.setColLast(firstCol);
+                            }
+                        }
+
+                        if(lessonCell.getFirstColumn() == lastCol){
+                            lessonPotoch.setColFirst(lastCol);
+                            lessonPotoch.setColLast(lastCol);
+                        }
+
+                        if(lessonCell.getLastColumn() == firstCol){
+                            lessonPotoch.setColFirst(firstCol);
+                            lessonPotoch.setColLast(firstCol);
+                        }
+
+                        lesson.setPotochLesson(true);
 
                         lessonPotoch.setForWholeGroup(lessonPotoch.getColFirst()<= firstCol && lessonPotoch.getColLast() >= lastCol);
 
@@ -564,6 +589,8 @@ public class ExcelSearch {
                     }
                 }
                 else{
+                    int firstRow = mergedCell.getFirstRow();
+                    int lastRow = mergedCell.getLastRow();
                     int firstCol = mergedCell.getFirstColumn();
                     int lastCol = mergedCell.getLastColumn();
                     lesson.setForWholeGroup(lesson.getColFirst()<= firstCol && lesson.getColLast() >= lastCol);
@@ -571,12 +598,34 @@ public class ExcelSearch {
                         System.out.println("First last columns for lesson: " + lesson.getColFirst() + "/" + lesson.getColLast()
                                 + "first last col for group: " + firstCol + "/" + lastCol + " potoch-self");
                     }
+
+                    if(lessonCell.getFirstColumn() <= firstCol) {
+                        lesson.setColFirst(firstCol);
+
+                        if(lessonCell.getLastColumn() >= lastCol){
+                            lesson.setColLast(lastCol);
+                        }
+                        else{
+                            lesson.setColLast(firstCol);
+                        }
+                    }
+
+                    if(lessonCell.getFirstColumn() == lastCol){
+                        lesson.setColFirst(lastCol);
+                        lesson.setColLast(lastCol);
+                    }
+
+                    if(lessonCell.getLastColumn() == firstCol){
+                        lesson.setColFirst(firstCol);
+                        lesson.setColLast(firstCol);
+                    }
                 }
 
             }
         }
         //if not potochLesson, then the program will just assign this lesson its forWholeGroup bool variable
         else{
+            lesson.setPotochLesson(false);
             if(isGroupMerged(sheet, cell)) {
                 for (Map.Entry<String, CellRangeAddress> entry : groupMergedCells.entrySet()) {
                     String groupName = entry.getKey();

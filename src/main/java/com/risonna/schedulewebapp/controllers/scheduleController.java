@@ -312,37 +312,72 @@ public class scheduleController implements Serializable {
                 rowPositions.add(lesson.getRowFirst());
                 rowAmount++;
             }
+
             if(!colPositions.contains(lesson.getColFirst())){
-                colPositions.add(lesson.getColFirst());
-                colAmount++;
+                    colPositions.add(lesson.getColFirst());
+                    colAmount++;
             }
+
+
             if(lesson.isMultipleLessonsInOneCell()){
+                colPositions.add(lesson.getColLast()+1);
                 if(colAmount <2)colAmount++;
             }
         }
 
         for (int i = 0; i < rowAmount; i++) {
             List<Lesson> listOfLessons = new ArrayList<>();
-            int rownumFirst = rowPositions.get(i);
-            int rowFirst = rowPositions.get(i);
+            int currentrownum = rowPositions.get(i);
+            int rowFirst = rowPositions.get(0);
             int rowLast = rowPositions.get(rowAmount-1);
-            int colFirst;
-            int colLast;
+            int colFirst = colPositions.get(0);
+            int colLast = colPositions.get(colAmount-1);
             for (Lesson lesson : listHuh) {
-                if (lesson.getRowFirst() == rownumFirst) {
+                if (lesson.getRowFirst() == currentrownum) {
+                    System.out.println("-----------------------------------");
+                    System.out.println("colAmount: " + colAmount);
+                    System.out.println("lesson.getColLast(): " + lesson.getColLast());
+                    System.out.println("colLast: " + colLast);
+                    System.out.println("lesson.getColFirst(): " + lesson.getColFirst());
+                    System.out.println("colFirst: " + colFirst);
+                    System.out.println("lesson is " + lesson.getSubjectName());
+                    System.out.println("-----------------------------------");
+
                     if(!lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell() &&
-                            (lesson.getRowLast() != rowFirst || lesson.getRowFirst() != rowFirst))lesson.setRowSpan(rowAmount);
+                            (lesson.getRowLast() != currentrownum || lesson.getRowFirst() != currentrownum))lesson.setRowSpan(rowAmount);
                     else lesson.setRowSpan(1);
+
+
                     if(lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell())lesson.setColSpan(colAmount);
                     else lesson.setColSpan(1);
+
+                    if(colAmount>1 && lesson.getColLast() >= colLast && lesson.getColFirst() != colFirst){
+                        boolean isThereLessonBefore = false;
+                        for (Lesson lesson1:listHuh) {
+                            if ((lesson1.getRowFirst() == currentrownum || lesson1.getRowLast() == currentrownum)
+                                    && lesson1.getColLast() != lesson.getColLast()) {
+                                isThereLessonBefore = true;
+                                break;
+                            }
+
+                        }
+
+                        if(!isThereLessonBefore && lesson.getRowFirst() == currentrownum) {
+                            Lesson emptyLesson = new Lesson();
+                            emptyLesson.setColSpan(1);
+                            emptyLesson.setRowSpan(1);
+                            listOfLessons.add(emptyLesson);
+                            System.out.println("adding empty lesson for " + lesson.getGroupName());
+                        }
+                    }
 
 
                     listOfLessons.add(lesson);
                 }
-                rowFirst = lesson.getRowFirst();
-                rowLast = lesson.getRowLast();
-                colFirst = lesson.getColFirst();
-                colLast = lesson.getColLast();
+//                rowFirst = lesson.getRowFirst();
+//                rowLast = lesson.getRowLast();
+//                colFirst = lesson.getColFirst();
+//                colLast = lesson.getColLast();
             }
             listOfListsOfLessons.add(listOfLessons);
         }
