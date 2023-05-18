@@ -41,6 +41,7 @@ public class databaseProcessing implements Serializable {
                 int colLast = rs.getInt("collast");
                 boolean forWholeGroup = rs.getBoolean("forwholegroup");
                 boolean multipleLessonsInOneCell = rs.getBoolean("multiplelessons");
+                boolean potochLesson = rs.getBoolean("lessonpotoch");
                 Lesson lesson = new Lesson();
                 lesson.setTeacherId(teacherid);
                 lesson.setSubjectId(subjectid);
@@ -55,6 +56,7 @@ public class databaseProcessing implements Serializable {
                 lesson.setColLast(colLast);
                 lesson.setForWholeGroup(forWholeGroup);
                 lesson.setMultipleLessonsInOneCell(multipleLessonsInOneCell);
+                lesson.setPotochLesson(potochLesson);
                 lessonsList.add(lesson);
             }
         } catch (SQLException e) {
@@ -409,8 +411,8 @@ public class databaseProcessing implements Serializable {
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
-            prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons) VALUES" +
-                    " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons, lessonpotoch) VALUES" +
+                    " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             int i = 1;
             for (Lesson lesson: lessons) {
                 prepStmt.setInt(1, i);
@@ -427,6 +429,7 @@ public class databaseProcessing implements Serializable {
                 prepStmt.setInt(12, lesson.getColLast());
                 prepStmt.setBoolean(13, lesson.isForWholeGroup());
                 prepStmt.setBoolean(14, lesson.isMultipleLessonsInOneCell());
+                prepStmt.setBoolean(15, lesson.isPotochLesson());
                 prepStmt.addBatch();
                 i++;
 
