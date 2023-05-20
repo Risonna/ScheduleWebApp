@@ -2,6 +2,7 @@ package com.risonna.schedulewebapp.controllers;
 
 import com.risonna.schedulewebapp.beans.*;
 import com.risonna.schedulewebapp.database.databaseProcessing;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 
@@ -443,7 +444,9 @@ public class scheduleController implements Serializable {
         List<Lesson> filteredLessons = new ArrayList<>();
         if (cabinetName != null) {
             for (Lesson lesson : getLessonsOk()) {
-                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getCabinetName().equalsIgnoreCase(cabinetName)) {
+                if (lesson.getLessonDay().replaceAll("\\s", "").equalsIgnoreCase(day.replaceAll("\\s",
+                        "")) && lesson.getCabinetName().replaceAll("\\s", "").equalsIgnoreCase(cabinetName.replaceAll("\\s",
+                        ""))) {
                     filteredLessons.add(lesson);
                     System.out.println("getFilteredLessonsByDayAndCabinet " + lesson.getCabinetName());
                 }
@@ -461,13 +464,17 @@ public class scheduleController implements Serializable {
         List<Lesson> lessonsByDayAndTeacher = getFilteredLessonsByDayAndCabinet(day, cabinetName);
         List<Lesson> lessonsByTimePeriod = new ArrayList<>();
         for (Lesson lesson : lessonsByDayAndTeacher) {
-            if (lesson.getLessonTime().contains(timePeriod)) {
+            if (lesson.getLessonTime().replaceAll("\\s", "").contains(timePeriod.replaceAll("\\s", ""))) {
                 boolean hasLessonWithDayTime = false;
                 if(!lessonsByTimePeriod.isEmpty()) {
                     for (Lesson lessonByTime : lessonsByTimePeriod) {
-                        if (lessonByTime.getLessonTime().equalsIgnoreCase(lesson.getLessonTime()) &&
-                                lessonByTime.getLessonDay().equalsIgnoreCase(lesson.getLessonDay()) &&
-                                lessonByTime.getLessonWeek().equalsIgnoreCase(lesson.getLessonWeek())) {
+                        if (lessonByTime.getLessonTime().replaceAll("\\s",
+                                "").equalsIgnoreCase(lesson.getLessonTime().replaceAll("\\s", "")) &&
+                                lessonByTime.getLessonDay().replaceAll("\\s", "").equalsIgnoreCase(lesson.getLessonDay().replaceAll(
+                                        "\\s", "")) &&
+                                lessonByTime.getLessonWeek().equalsIgnoreCase(lesson.getLessonWeek()) &&
+                                lessonByTime.getTeacherName().replaceAll("\\s", "").equalsIgnoreCase(lesson.getTeacherName().replaceAll(
+                                        "\\s", ""))) {
                             hasLessonWithDayTime = true;
                             break;
                         }
@@ -574,22 +581,32 @@ public class scheduleController implements Serializable {
 
 
     public List<String> checkCabinetUsage(List<Lesson> allLessons) {
+        String baseName = "nls.messages"; // Without the "resources" folder and file extension
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName, FacesContext.getCurrentInstance().getViewRoot().getLocale());
+        String cabinet = bundle.getString("cabinet");
+        String inuse = bundle.getString("inuse");
+        String byteachers = bundle.getString("usedbyteachers");
+        String usedand = bundle.getString("and");
         List<String> repeatedCabinetUse = new ArrayList<>();
         Set<String> seenCabinetUses = new HashSet<>(); // Keep track of identified cabinet usage combinations
+
         for (int i = 0; i < allLessons.size(); i++) {
             Lesson lesson = allLessons.get(i);
             String cabinetToCheck = lesson.getCabinetName();
             String cabinetTime = lesson.getLessonTime();
             String cabinetDay = lesson.getLessonDay();
+            String teacherToCheck = lesson.getTeacherName(); // Get the teacher name
+
             for (int j = i + 1; j < allLessons.size(); j++) { // Only check the remaining lessons in the list
                 Lesson lessonj = allLessons.get(j);
-                if (lesson.getLessonWeek().equals(lessonj.getLessonWeek()) &&
-                        cabinetToCheck.equals(lessonj.getCabinetName()) &&
-                        cabinetTime.equals(lessonj.getLessonTime()) &&
-                        cabinetDay.equals(lessonj.getLessonDay())) {
-                    String cabinetUse = "Cabinet " + cabinetToCheck + " is in use on " +
-                            cabinetTime + cabinetDay + " by groups " + lessonj.getGroupName() +
-                            " and " + lesson.getGroupName();
+                if (lesson.getLessonWeek().replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonWeek().replaceAll("\\s", "")) &&
+                        cabinetToCheck.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getCabinetName().replaceAll("\\s", "")) &&
+                        cabinetTime.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonTime().replaceAll("\\s", "")) &&
+                        cabinetDay.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonDay().replaceAll("\\s", "")) &&
+                        !teacherToCheck.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getTeacherName().replaceAll("\\s", ""))) { // Check if different teachers are using the same cabinet
+                    String cabinetUse = cabinet + " " + cabinetToCheck + " " + inuse + " " +
+                            cabinetTime + " " + cabinetDay + " " + byteachers + " " + lessonj.getTeacherName() + " " +
+                            usedand + " " + teacherToCheck;
                     if (!seenCabinetUses.contains(cabinetUse)) {
                         repeatedCabinetUse.add(cabinetUse);
                         seenCabinetUses.add(cabinetUse);
@@ -597,10 +614,12 @@ public class scheduleController implements Serializable {
                 }
             }
         }
+
         setCabinetChecked(true);
         listOfRepeatedCabinets = repeatedCabinetUse;
         return repeatedCabinetUse;
     }
+
 
     public void getSubjectTeacherCabinetGroupById(Lesson lesson){
 

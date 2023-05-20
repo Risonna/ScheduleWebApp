@@ -148,7 +148,7 @@
             <h1>#{msg.bycabinets}</h1>
             <h:form>
                 <div class="selection-menu-wrapper">
-                    <p:selectOneMenu value="#{scheduleController.selectedCabinet}">
+                    <p:selectOneMenu value="#{scheduleController.selectedCabinet}" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{scheduleController.cabinetList}" />
                         <p:ajax update="@form"  />
                     </p:selectOneMenu>

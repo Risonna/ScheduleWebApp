@@ -158,11 +158,11 @@
         <h1>#{msg.scheduledepartments}</h1>
         <h:form>
             <div class="selection-menu-wrapper">
-                <p:selectOneMenu value="#{scheduleController.selectedDepartment}">
+                <p:selectOneMenu value="#{scheduleController.selectedDepartment}" filter="true" filterMatchMode="startsWith">
                     <f:selectItems value="#{scheduleController.departmentList}" />
                     <p:ajax listener="#{scheduleController.updateTeacherList}" update="@form" />
                 </p:selectOneMenu>
-                <p:selectOneMenu value="#{scheduleController.selectedTeacher}">
+                <p:selectOneMenu value="#{scheduleController.selectedTeacher}" filter="true" filterMatchMode="startsWith">
                     <f:selectItems value="#{scheduleController.teachersForDepartment}" />
                     <p:ajax update="@form" />
                 </p:selectOneMenu>

@@ -158,7 +158,7 @@
             <h1>Расписание преподавателей</h1>
             <h:form>
                 <div class="selection-menu-wrapper">
-                    <p:selectOneMenu value="#{scheduleController.selectedTeacher}">
+                    <p:selectOneMenu value="#{scheduleController.selectedTeacher}" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{scheduleController.teacherNameList}" />
                         <p:ajax update="@form"  />
                     </p:selectOneMenu>

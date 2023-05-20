@@ -1,6 +1,7 @@
 package com.risonna.schedulewebapp.controllers;
 
 import jakarta.enterprise.context.SessionScoped;
+import jakarta.faces.component.UIViewRoot;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 
@@ -14,14 +15,14 @@ import java.util.Locale;
 @SessionScoped
 public class LocaleChanger implements Serializable {
     private String selectedLanguage;
-    private List<String>  supportedLocales;
+    private List<String> supportedLocales;
 
     public void setSupportedLocales(List<String> supportedLocales) {
         this.supportedLocales = supportedLocales;
     }
 
     public List<String> getSupportedLocales() {
-        List<String> listOfLocales = Arrays.asList("en", "ru");
+        List<String> listOfLocales = Arrays.asList("ru", "en");
         setSupportedLocales(listOfLocales);
         return supportedLocales;
     }
@@ -34,26 +35,22 @@ public class LocaleChanger implements Serializable {
         this.selectedLanguage = selectedLanguage;
     }
 
-    public LocaleChanger(){
-
+    public void changeLocale(String localeCode) {
+        currentLocale = new Locale(localeCode);
+        FacesContext.getCurrentInstance().getViewRoot().setLocale(currentLocale);
+        FacesContext.getCurrentInstance().getExternalContext().getSessionMap().put("locale", localeCode);
     }
-
 
     private Locale currentLocale;
 
-    public void changeLocale(String localeCode) {
-        currentLocale = new Locale(localeCode);
-
-    }
-
     public Locale getCurrentLocale() {
-
-
         if (currentLocale == null) {
-            currentLocale = new Locale("ru");// по-умолчанию ставим русский язык
+            currentLocale = new Locale("ru"); // Default locale
+            Object storedLocale = FacesContext.getCurrentInstance().getExternalContext().getSessionMap().get("locale");
+            if (storedLocale != null) {
+                currentLocale = new Locale(storedLocale.toString());
+            }
         }
-
         return currentLocale;
-
     }
 }
