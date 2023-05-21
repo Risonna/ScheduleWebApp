@@ -78,6 +78,8 @@ public class User implements Serializable {
             request.login(username, password);
             this.logged = true;
 
+            this.password = null;
+
             return "homePage";
         }catch (ServletException ex) {
             String baseName = "nls.messages"; // Without the "resources" folder and file extension

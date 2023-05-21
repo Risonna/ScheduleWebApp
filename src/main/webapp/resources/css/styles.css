@@ -105,3 +105,8 @@ html, body {
     text-align: center;
     color: #555;
 }
+.footerform h:form {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+}

@@ -30,30 +30,22 @@
                     border-collapse: collapse;
                     margin: 10px auto;
                     text-align: center;
-                    max-width: 100%;
-                    width: 80%; /* Adjust the width as needed */
+                    max-width: 50%;
+                    width: fit-content; /* Adjust the width as needed */
                 }
 
                 .lesson-table td,
                 .lesson-table th {
-                    border: 1px solid #ddd;
+                    border: 2px solid #ddd;
                     padding: 8px;
+
                 }
 
                 .lesson-table th {
-                    background-color: #f2f2f2;
-                    color: #333;
+                    background-color: #3f51b5;
+                    color: white;
                     font-weight: bold;
-                }
 
-                .lesson-table th:first-child,
-                .lesson-table td:first-child {
-                    border-left: none;
-                }
-
-                .lesson-table th:last-child,
-                .lesson-table td:last-child {
-                    border-right: none;
                 }
 
 
@@ -75,10 +67,6 @@
                     margin: 0 10px;
                 }
 
-
-                .lesson-table {
-                    margin: 20px auto;
-                }
 
                 select {
                     font-size: 16px;
@@ -118,7 +106,9 @@
                     border-bottom: none;
                 }
                 .lesson-table {
-                    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+                    border-radius: 10px;
+                    box-shadow: 0px 0px 10px #888888;
+                    margin: 20px auto;
                 }
 
                 .lesson-table td > div > div {
@@ -128,9 +118,18 @@
                 .lesson-table tr:hover td:not(.first-teacher){
                     background-color: #f5f5f5;
                 }
-                .inner-table td {
-                    display: inline-block;
+
+                .inner-table {
+                    font-family: Arial, sans-serif;
+                    font-size: 10px;
                 }
+
+                .inner-table td{
+                    border: 1px solid black;
+                    border-collapse: collapse;
+                    text-align: center;
+                }
+
                 div.lesson-item {
                     margin-bottom: 10px;
                     border: 5px solid #ddd;
@@ -149,7 +148,7 @@
             <h1>#{msg.bygroups}</h1>
             <h:form>
                 <div class="selection-menu-wrapper">
-                    <p:selectOneMenu value="#{scheduleController.selectedGroup}">
+                    <p:selectOneMenu value="#{scheduleController.selectedGroup}" filter="true" filterMatchMode="startsWith">
                         <f:selectItems value="#{scheduleController.groupNames}"/>
                         <p:ajax update="@form" />
                     </p:selectOneMenu>
@@ -158,6 +157,7 @@
                         <p:ajax update="@form" />
                     </p:selectOneMenu>
                 </div>
+                <div style="overflow:auto">
                 <table class="lesson-table" id="lessonTable">
                     <tr>
                         <th>Время</th>
@@ -178,9 +178,9 @@
                                 <h:outputText value="#{timePeriod}" />
                             </td>
                             <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
-                                <td>
-                                    <div style="text-align: center; display: inline-block">
-                                        <table style="width: 100%; table-layout: fixed;">
+                                <td style="height: inherit; width: auto">
+                                    <div style="text-align: center; display: inline-block; height: inherit">
+                                        <table style="width: 100%; table-layout: fixed; height: inherit">
                                             <tbody>
                                             <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listOfLessons">
                                                 <tr>
@@ -200,14 +200,15 @@
                                 <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
                                     <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
                                         <td>
-                                            <div style="text-align: center">
-                                                <table>
+                                            <div style=" text-align: center; align-content: center">
+                                                <!--suppress CssInvalidPropertyValue -->
+                                                <table style="width: 100%" class="inner-table">
                                                     <tbody>
                                                     <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listOfLessons">
                                                         <tr>
                                                             <ui:repeat value="#{listOfLessons}" var="singlelesson">
-                                                                <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}">
-                                                                    <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}" />
+                                                                <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}" style="min-width: 150px; max-width: 150px" >
+                                                                    <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}"/>
                                                                 </td>
                                                             </ui:repeat>
                                                         </tr>
@@ -222,6 +223,7 @@
                         </tr>
                     </ui:repeat>
                 </table>
+                </div>
 
             </h:form>
 

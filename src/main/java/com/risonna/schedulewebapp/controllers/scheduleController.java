@@ -2,6 +2,7 @@ package com.risonna.schedulewebapp.controllers;
 
 import com.risonna.schedulewebapp.beans.*;
 import com.risonna.schedulewebapp.database.databaseProcessing;
+import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 
@@ -312,11 +313,11 @@ public class scheduleController implements Serializable {
                 rowPositions.add(lesson.getRowFirst());
                 rowAmount++;
             }
-
-            if(!colPositions.contains(lesson.getColFirst())){
-                    colPositions.add(lesson.getColFirst());
-                    colAmount++;
-            }
+            if(lesson.getGroupColLast()-lesson.getGroupColFirst()>0)colAmount=lesson.getGroupColLast()-lesson.getGroupColFirst()+1;
+//            if(!colPositions.contains(lesson.getColFirst()) && !colPositions.contains(lesson.getColLast())){
+//                    colPositions.add(lesson.getColFirst());
+//                    colAmount++;
+//            }
 
 
             if(lesson.isMultipleLessonsInOneCell()){
@@ -330,18 +331,15 @@ public class scheduleController implements Serializable {
             int currentrownum = rowPositions.get(i);
             int rowFirst = rowPositions.get(0);
             int rowLast = rowPositions.get(rowAmount-1);
-            int colFirst = colPositions.get(0);
-            int colLast = colPositions.get(colAmount-1);
             for (Lesson lesson : listHuh) {
+                int colFirst = lesson.getGroupColFirst();
+                int colLast = lesson.getGroupColLast();
                 if (lesson.getRowFirst() == currentrownum) {
-                    System.out.println("-----------------------------------");
-                    System.out.println("colAmount: " + colAmount);
-                    System.out.println("lesson.getColLast(): " + lesson.getColLast());
-                    System.out.println("colLast: " + colLast);
-                    System.out.println("lesson.getColFirst(): " + lesson.getColFirst());
-                    System.out.println("colFirst: " + colFirst);
-                    System.out.println("lesson is " + lesson.getSubjectName());
-                    System.out.println("-----------------------------------");
+                    if(lesson.getGroupName().equalsIgnoreCase("фит-204") && lesson.getLessonTime().equalsIgnoreCase("13.30-15.05")){
+                        System.out.println("Lesson cols: " + lesson.getColFirst() +"/" + lesson.getColLast() + "group cols and colamount: " +
+                                colFirst + "/" + colLast + "//" + colAmount);
+                    }
+
 
                     if(!lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell() &&
                             (lesson.getRowLast() != currentrownum || lesson.getRowFirst() != currentrownum))lesson.setRowSpan(rowAmount);
@@ -351,7 +349,9 @@ public class scheduleController implements Serializable {
                     if(lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell())lesson.setColSpan(colAmount);
                     else lesson.setColSpan(1);
 
-                    if(colAmount>1 && lesson.getColLast() >= colLast && lesson.getColFirst() != colFirst){
+                    boolean isThereLessonAfter = true;
+
+                    if(colAmount>1 && lesson.getColLast() == colLast && lesson.getColFirst() != colFirst){
                         boolean isThereLessonBefore = false;
                         for (Lesson lesson1:listHuh) {
                             if ((lesson1.getRowFirst() == currentrownum || lesson1.getRowLast() == currentrownum)
@@ -371,8 +371,29 @@ public class scheduleController implements Serializable {
                         }
                     }
 
+                    if(colAmount>1 && lesson.getColFirst() == colFirst && lesson.getColLast() != colLast){
+                        isThereLessonAfter = false;
+                        for (Lesson lesson1:listHuh) {
+                            if ((lesson1.getRowFirst() == currentrownum || lesson1.getRowLast() == currentrownum)
+                                    && lesson1.getColLast() != lesson.getColLast()) {
+                                isThereLessonAfter = true;
+                                break;
+                            }
 
-                    listOfLessons.add(lesson);
+                        }
+
+                        if(!isThereLessonAfter && lesson.getRowFirst() == currentrownum) {
+                            Lesson emptyLesson = new Lesson();
+                            emptyLesson.setColSpan(1);
+                            emptyLesson.setRowSpan(1);
+                            listOfLessons.add(lesson);
+                            listOfLessons.add(emptyLesson);
+                            System.out.println("adding empty lesson for " + lesson.getGroupName());
+                        }
+                    }
+
+                    if(isThereLessonAfter){listOfLessons.add(lesson);}
+
                 }
 //                rowFirst = lesson.getRowFirst();
 //                rowLast = lesson.getRowLast();
@@ -423,7 +444,9 @@ public class scheduleController implements Serializable {
         List<Lesson> filteredLessons = new ArrayList<>();
         if (cabinetName != null) {
             for (Lesson lesson : getLessonsOk()) {
-                if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getCabinetName().equalsIgnoreCase(cabinetName)) {
+                if (lesson.getLessonDay().replaceAll("\\s", "").equalsIgnoreCase(day.replaceAll("\\s",
+                        "")) && lesson.getCabinetName().replaceAll("\\s", "").equalsIgnoreCase(cabinetName.replaceAll("\\s",
+                        ""))) {
                     filteredLessons.add(lesson);
                     System.out.println("getFilteredLessonsByDayAndCabinet " + lesson.getCabinetName());
                 }
@@ -441,13 +464,17 @@ public class scheduleController implements Serializable {
         List<Lesson> lessonsByDayAndTeacher = getFilteredLessonsByDayAndCabinet(day, cabinetName);
         List<Lesson> lessonsByTimePeriod = new ArrayList<>();
         for (Lesson lesson : lessonsByDayAndTeacher) {
-            if (lesson.getLessonTime().contains(timePeriod)) {
+            if (lesson.getLessonTime().replaceAll("\\s", "").contains(timePeriod.replaceAll("\\s", ""))) {
                 boolean hasLessonWithDayTime = false;
                 if(!lessonsByTimePeriod.isEmpty()) {
                     for (Lesson lessonByTime : lessonsByTimePeriod) {
-                        if (lessonByTime.getLessonTime().equalsIgnoreCase(lesson.getLessonTime()) &&
-                                lessonByTime.getLessonDay().equalsIgnoreCase(lesson.getLessonDay()) &&
-                                lessonByTime.getLessonWeek().equalsIgnoreCase(lesson.getLessonWeek())) {
+                        if (lessonByTime.getLessonTime().replaceAll("\\s",
+                                "").equalsIgnoreCase(lesson.getLessonTime().replaceAll("\\s", "")) &&
+                                lessonByTime.getLessonDay().replaceAll("\\s", "").equalsIgnoreCase(lesson.getLessonDay().replaceAll(
+                                        "\\s", "")) &&
+                                lessonByTime.getLessonWeek().equalsIgnoreCase(lesson.getLessonWeek()) &&
+                                lessonByTime.getTeacherName().replaceAll("\\s", "").equalsIgnoreCase(lesson.getTeacherName().replaceAll(
+                                        "\\s", ""))) {
                             hasLessonWithDayTime = true;
                             break;
                         }
@@ -496,11 +523,14 @@ public class scheduleController implements Serializable {
 
     public scheduleController() {
     updateEverythingFromSQL();
-    this.selectedTeacher = getTeacherNameList().get(0);
-    this.selectedCabinet = getCabinetList().get(0);
-    this.selectedGroup = getGroupNames().get(0);
-    this.selectedDepartment = getDepartmentList().get(0);
-    this.selectedDayOfWeek = getDaysOfWeek().get(0);
+    if(getTeacherNameList().size() > 1 && getDepartmentList().size() >1 && getGroupNames().size() >1 &&
+            getCabinetList().size() > 1 && getDaysOfWeek().size() >1){
+        this.selectedTeacher = getTeacherNameList().get(0);
+        this.selectedCabinet = getCabinetList().get(0);
+        this.selectedGroup = getGroupNames().get(0);
+        this.selectedDepartment = getDepartmentList().get(0);
+        this.selectedDayOfWeek = getDaysOfWeek().get(0);
+    }
 
     }
 
@@ -551,22 +581,32 @@ public class scheduleController implements Serializable {
 
 
     public List<String> checkCabinetUsage(List<Lesson> allLessons) {
+        String baseName = "nls.messages"; // Without the "resources" folder and file extension
+        ResourceBundle bundle = ResourceBundle.getBundle(baseName, FacesContext.getCurrentInstance().getViewRoot().getLocale());
+        String cabinet = bundle.getString("cabinet");
+        String inuse = bundle.getString("inuse");
+        String byteachers = bundle.getString("usedbyteachers");
+        String usedand = bundle.getString("and");
         List<String> repeatedCabinetUse = new ArrayList<>();
         Set<String> seenCabinetUses = new HashSet<>(); // Keep track of identified cabinet usage combinations
+
         for (int i = 0; i < allLessons.size(); i++) {
             Lesson lesson = allLessons.get(i);
             String cabinetToCheck = lesson.getCabinetName();
             String cabinetTime = lesson.getLessonTime();
             String cabinetDay = lesson.getLessonDay();
+            String teacherToCheck = lesson.getTeacherName(); // Get the teacher name
+
             for (int j = i + 1; j < allLessons.size(); j++) { // Only check the remaining lessons in the list
                 Lesson lessonj = allLessons.get(j);
-                if (lesson.getLessonWeek().equals(lessonj.getLessonWeek()) &&
-                        cabinetToCheck.equals(lessonj.getCabinetName()) &&
-                        cabinetTime.equals(lessonj.getLessonTime()) &&
-                        cabinetDay.equals(lessonj.getLessonDay())) {
-                    String cabinetUse = "Cabinet " + cabinetToCheck + " is in use on " +
-                            cabinetTime + cabinetDay + " by groups " + lessonj.getGroupName() +
-                            " and " + lesson.getGroupName();
+                if (lesson.getLessonWeek().replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonWeek().replaceAll("\\s", "")) &&
+                        cabinetToCheck.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getCabinetName().replaceAll("\\s", "")) &&
+                        cabinetTime.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonTime().replaceAll("\\s", "")) &&
+                        cabinetDay.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonDay().replaceAll("\\s", "")) &&
+                        !teacherToCheck.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getTeacherName().replaceAll("\\s", ""))) { // Check if different teachers are using the same cabinet
+                    String cabinetUse = cabinet + " " + cabinetToCheck + " " + inuse + " " +
+                            cabinetTime + " " + cabinetDay + " " + byteachers + " " + lessonj.getTeacherName() + " " +
+                            usedand + " " + teacherToCheck;
                     if (!seenCabinetUses.contains(cabinetUse)) {
                         repeatedCabinetUse.add(cabinetUse);
                         seenCabinetUses.add(cabinetUse);
@@ -574,10 +614,12 @@ public class scheduleController implements Serializable {
                 }
             }
         }
+
         setCabinetChecked(true);
         listOfRepeatedCabinets = repeatedCabinetUse;
         return repeatedCabinetUse;
     }
+
 
     public void getSubjectTeacherCabinetGroupById(Lesson lesson){
 

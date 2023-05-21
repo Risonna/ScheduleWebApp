@@ -95,7 +95,9 @@ public class kemsuDatabase {
             URL url = new URL("https://api-next.kemsu.ru/api/stud-sch/main/disciplineList");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVzZXJJZCI6MjI0NTMsImlhdCI6MTY4MzI5MDg5MiwiZXhwIjoxNjgzMzc3MjkyfQ.QaJz1ydv8sQbZXNk6MtjFn3v2rZey3TwMRb5MwPBZM8");
+            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwia" +
+                    "XAiOiIxNzYuMTk2LjE0OC43OSIsInVzZXJJZCI6MjI0NT" +
+                    "MsImlhdCI6MTY4NDQyNzA3NiwiZXhwIjoxNjg0NTEzNDc2fQ.xhrkH4L_VSaTXpiWw7Qlb7mM0uHbvj-BAF3ofWQKFJM");
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             StringBuffer content = new StringBuffer();
@@ -108,6 +110,7 @@ public class kemsuDatabase {
             try (JsonReader jsonReader = Json.createReader(new StringReader(content.toString()))) {
                 JsonObject json = jsonReader.readObject();
                 JsonArray results = json.getJsonArray("result");
+                subjectList.add("unknown");
                 for (JsonObject result : results.getValuesAs(JsonObject.class)) {
                     String disciplineName = result.getString("disciplineName");
 
@@ -130,7 +133,9 @@ public class kemsuDatabase {
             URL url = new URL("https://api-next.kemsu.ru/api/stud-sch/main/prepList");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
             con.setRequestMethod("GET");
-            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVzZXJJZCI6MjI0NTMsImlhdCI6MTY4MzI5MDg5MiwiZXhwIjoxNjgzMzc3MjkyfQ.QaJz1ydv8sQbZXNk6MtjFn3v2rZey3TwMRb5MwPBZM8");
+            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjo" +
+                    "iYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVzZXJJZCI6MjI0NTMsImlhd" +
+                    "CI6MTY4NDQyNTc4OSwiZXhwIjoxNjg0NTEyMTg5fQ.f622wTTtIy4-4t7Ky1KZ-SV6fD05rzQE23OM5GMg3-c");
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             StringBuffer content = new StringBuffer();

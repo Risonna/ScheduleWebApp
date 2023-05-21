@@ -28,6 +28,15 @@
                 <h:graphicImage library="images" name="university_design.jpg" />
             </h:link>
 
+        <h:form>
+            <p:selectOneMenu value="#{localeChanger.selectedLanguage}">
+                <f:selectItems value="#{localeChanger.supportedLocales}"/>
+                <p:ajax listener="#{localeChanger.changeLocale(localeChanger.selectedLanguage)}" update="@all" />
+            </p:selectOneMenu>
+        </h:form>
+
+
+
 
         <h:form id="formRight">
             <div class="header-buttons">

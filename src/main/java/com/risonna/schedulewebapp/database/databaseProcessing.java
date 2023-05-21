@@ -42,6 +42,8 @@ public class databaseProcessing implements Serializable {
                 boolean forWholeGroup = rs.getBoolean("forwholegroup");
                 boolean multipleLessonsInOneCell = rs.getBoolean("multiplelessons");
                 boolean potochLesson = rs.getBoolean("lessonpotoch");
+                int groupColFirst = rs.getInt("groupcolfirst");
+                int groupColLast = rs.getInt("groupcollast");
                 Lesson lesson = new Lesson();
                 lesson.setTeacherId(teacherid);
                 lesson.setSubjectId(subjectid);
@@ -57,6 +59,8 @@ public class databaseProcessing implements Serializable {
                 lesson.setForWholeGroup(forWholeGroup);
                 lesson.setMultipleLessonsInOneCell(multipleLessonsInOneCell);
                 lesson.setPotochLesson(potochLesson);
+                lesson.setGroupColFirst(groupColFirst);
+                lesson.setGroupColLast(groupColLast);
                 lessonsList.add(lesson);
             }
         } catch (SQLException e) {
@@ -289,7 +293,7 @@ public class databaseProcessing implements Serializable {
             conn = ScheduleDatabase.getConnection();
             Statement stmt = conn.createStatement();
             rs = stmt.executeQuery("SELECT * from teachers");
-            int i = 1;
+            int i = 0;
             while (rs.next()){
                 i = rs.getInt("id") + 1;
             }
@@ -333,7 +337,7 @@ public class databaseProcessing implements Serializable {
         try {
             conn = ScheduleDatabase.getConnection();
             prepStmt = conn.prepareStatement("INSERT INTO subjects (id, name) VALUES (?, ?)");
-            int i = 1;
+            int i = 0;
 
             for (String subject: subjectNames) {
                 prepStmt.setInt(1, i);
@@ -411,8 +415,9 @@ public class databaseProcessing implements Serializable {
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
-            prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons, lessonpotoch) VALUES" +
-                    " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+            prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, " +
+                    "rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons, lessonpotoch, groupcolfirst, groupcollast) VALUES" +
+                    " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             int i = 1;
             for (Lesson lesson: lessons) {
                 prepStmt.setInt(1, i);
@@ -430,6 +435,8 @@ public class databaseProcessing implements Serializable {
                 prepStmt.setBoolean(13, lesson.isForWholeGroup());
                 prepStmt.setBoolean(14, lesson.isMultipleLessonsInOneCell());
                 prepStmt.setBoolean(15, lesson.isPotochLesson());
+                prepStmt.setInt(16, lesson.getGroupColFirst());
+                prepStmt.setInt(17, lesson.getGroupColLast());
                 prepStmt.addBatch();
                 i++;
 
