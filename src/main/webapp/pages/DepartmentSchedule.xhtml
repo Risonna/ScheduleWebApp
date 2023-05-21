@@ -38,8 +38,8 @@
             }
 
             .lesson-table th {
-                background-color: #f2f2f2;
-                color: #333;
+                background-color: #3f51b5;
+                color: white;
                 font-weight: bold;
             }
 
@@ -173,6 +173,8 @@
 
             </div>
 
+            <div style="overflow: auto">
+
             <table class="lesson-table" id="lessonTable">
                 <tr>
                     <ui:fragment rendered="#{scheduleController.selectedTeacher == 'Показать Всех'}">
@@ -279,6 +281,7 @@
 
                 </ui:repeat>
             </table>
+            </div>
         </h:form>
 
 

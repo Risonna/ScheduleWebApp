@@ -19,32 +19,24 @@
 <h:body>
     <ui:composition template="/templates/schedule_template.xhtml">
         <ui:define name="page-specific-css">
-            <h:outputStylesheet library="css" name="schedule_edit_style.css" rendered="#{true}"/>
+            <h:outputStylesheet name="css/schedule_edit_style.css" rendered="#{true}" />
         </ui:define>
-
 
         <ui:define name="content">
             <h:form enctype="multipart/form-data" styleClass="file-upload">
                 <div style="margin-top: 10px">
-                    <h:form enctype="multipart/form-data" styleClass="file-upload">
-                        <div style="margin-top: 10px">
-                            <h:commandButton value="#{msg.checkcabinetusage}" action="#{scheduleController.checkCabinetUsage(scheduleController.lessonsOk)}" styleClass="button" />
-                        </div>
-                    </h:form>
-
-                    <h:dataTable value="#{scheduleController.listOfRepeatedCabinets}" var="cabinetCheckedList" rendered="#{scheduleController.cabinetChecked}" styleClass="table">
-                        <h:column>
-                            <h:outputText value="#{cabinetCheckedList}"/>
-                        </h:column>
-                    </h:dataTable>
-
+                    <h:commandButton value="#{msg.checkcabinetusage}" action="#{scheduleController.checkCabinetUsage(scheduleController.lessonsOk)}" styleClass="button" />
                 </div>
+
+                <h:dataTable value="#{scheduleController.listOfRepeatedCabinets}" var="cabinetCheckedList" rendered="#{scheduleController.cabinetChecked}" styleClass="table">
+                    <h:column>
+                        <h:outputText value="#{cabinetCheckedList}" />
+                    </h:column>
+                </h:dataTable>
             </h:form>
         </ui:define>
-
-
-
     </ui:composition>
+
 
 </h:body>
 
