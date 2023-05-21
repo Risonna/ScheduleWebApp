@@ -298,16 +298,17 @@ public class databaseProcessing implements Serializable {
                 i = rs.getInt("id") + 1;
             }
             prepStmt = conn.prepareStatement("INSERT INTO teachers (id, name, department, title, surname, patronymic) VALUES (?, ?, ?, ?, ?, ?)");
-            for (Teacher teacher: teacherNames) {
-                prepStmt.setInt(1, i);
-                prepStmt.setString(2, teacher.getTeacherName());
-                prepStmt.setString(3, teacher.getDepartment());
-                prepStmt.setString(4, teacher.getTitle());
-                prepStmt.setString(5, teacher.getTeacherSurname());
-                prepStmt.setString(6, teacher.getTeacherPatronymic());
-                prepStmt.addBatch();
-                i++;
-
+            for (Teacher teacher : teacherNames) {
+                if (!isTeacherExists(teacher)) {
+                    prepStmt.setInt(1, i);
+                    prepStmt.setString(2, teacher.getTeacherName());
+                    prepStmt.setString(3, teacher.getDepartment());
+                    prepStmt.setString(4, teacher.getTitle());
+                    prepStmt.setString(5, teacher.getTeacherSurname());
+                    prepStmt.setString(6, teacher.getTeacherPatronymic());
+                    prepStmt.addBatch();
+                    i++;
+                }
             }
             prepStmt.executeBatch();
         } catch (SQLException e) {
@@ -336,15 +337,21 @@ public class databaseProcessing implements Serializable {
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
-            prepStmt = conn.prepareStatement("INSERT INTO subjects (id, name) VALUES (?, ?)");
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * from subjects");
             int i = 0;
+            while (rs.next()){
+                i = rs.getInt("id") + 1;
+            }
+            prepStmt = conn.prepareStatement("INSERT INTO subjects (id, name) VALUES (?, ?)");
 
-            for (String subject: subjectNames) {
-                prepStmt.setInt(1, i);
-                prepStmt.setString(2, subject);
-                prepStmt.addBatch();
-                i++;
-
+            for (String subject : subjectNames) {
+                if (!isSubjectExists(subject)) {
+                    prepStmt.setInt(1, i);
+                    prepStmt.setString(2, subject);
+                    prepStmt.addBatch();
+                    i++;
+                }
             }
             prepStmt.executeBatch();
         } catch (SQLException e) {
@@ -469,20 +476,30 @@ public class databaseProcessing implements Serializable {
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * from studentgroups");
+            int i = 0;
+            while (rs.next()){
+                i = rs.getInt("id") + 1;
+            }
             prepStmt = conn.prepareStatement("INSERT INTO studentgroups (id, name, fullname, institute) VALUES (?, ?, ?, ?)");
-            prepStmt.setInt(1, 0);
-            prepStmt.setString(2, "unknown");
-            prepStmt.setString(3, "unknown");
-            prepStmt.setString(4, "unknown");
-            prepStmt.addBatch();
-            int i = 1;
-            for (String groupName: groups) {
+            if(i==0){
                 prepStmt.setInt(1, i);
-                prepStmt.setString(2, groupName);
+                prepStmt.setString(2, "unknown");
                 prepStmt.setString(3, "unknown");
                 prepStmt.setString(4, "unknown");
                 prepStmt.addBatch();
                 i++;
+            }
+            for (String groupName: groups) {
+                if(!isGroupExists(groupName)) {
+                    prepStmt.setInt(1, i);
+                    prepStmt.setString(2, groupName);
+                    prepStmt.setString(3, "unknown");
+                    prepStmt.setString(4, "unknown");
+                    prepStmt.addBatch();
+                    i++;
+                }
             }
             prepStmt.executeBatch();
         } catch (SQLException e) {
@@ -504,6 +521,55 @@ public class databaseProcessing implements Serializable {
             }
 
         }
+    }
+
+    private boolean isTeacherExists(Teacher teacher) {
+        try (Connection conn = ScheduleDatabase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM teachers WHERE name = ? AND surname = ? AND patronymic = ? AND department = ?")) {
+            stmt.setString(1, teacher.getTeacherName());
+            stmt.setString(2, teacher.getTeacherSurname());
+            stmt.setString(3, teacher.getTeacherPatronymic());
+            stmt.setString(4, teacher.getDepartment());
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+    private boolean isSubjectExists(String subject) {
+        try (Connection conn = ScheduleDatabase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM subjects WHERE name = ?")) {
+            stmt.setString(1, subject);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
+    }
+    private boolean isGroupExists(String groupName) {
+        try (Connection conn = ScheduleDatabase.getConnection();
+             PreparedStatement stmt = conn.prepareStatement("SELECT COUNT(*) FROM studentgroups WHERE name = ?")) {
+            stmt.setString(1, groupName);
+            try (ResultSet rs = stmt.executeQuery()) {
+                if (rs.next()) {
+                    int count = rs.getInt(1);
+                    return count > 0;
+                }
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        }
+        return false;
     }
 
 }
