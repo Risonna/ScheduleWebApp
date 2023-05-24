@@ -6,6 +6,7 @@ import org.apache.poi.hssf.usermodel.HSSFWorkbook;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -26,12 +27,19 @@ public class ExcelSearch {
 
     public ExcelSearch(String pathString, List<Teacher> namesOfTeachers, List<Subject> subjectList, List<Cabinet> cabinetList, List<Group> groupList) throws IOException {
 
-        inputStreamFile = new FileInputStream(pathString);
-        workbook = new HSSFWorkbook(inputStreamFile);
         teacherNames = namesOfTeachers;
         subjects = subjectList;
         this.cabinetList = cabinetList;
         this.groupList = groupList;
+
+
+//        if (inputStreamFile.toString().endsWith(".xls")) {
+//            workbook = new HSSFWorkbook();
+//        } else {
+//            workbook = new XSSFWorkbook();
+//        }
+        inputStreamFile = new FileInputStream(pathString);
+        workbook = WorkbookFactory.create(inputStreamFile);
     }
 
 
@@ -40,11 +48,15 @@ public class ExcelSearch {
             Map<String, CellRangeAddress> groupMergedCells = new HashMap<>();
             for (int colIndex = 2; colIndex < sheet.getRow(2).getLastCellNum(); colIndex += 1) {
                 Cell cell = sheet.getRow(2).getCell(colIndex);
-                if (!cell.getStringCellValue().trim().equals("")) {
-                    String groupName = cell.getStringCellValue().trim();
-                    CellRangeAddress mergedCell = getMergedCellRanges(sheet, cell.getRowIndex(), colIndex);
-                    if (mergedCell != null) {
-                        groupMergedCells.put(groupName, mergedCell);
+                if (cell != null) {
+
+
+                    if (!cell.getStringCellValue().trim().equals("")) {
+                        String groupName = cell.getStringCellValue().trim();
+                        CellRangeAddress mergedCell = getMergedCellRanges(sheet, cell.getRowIndex(), colIndex);
+                        if (mergedCell != null) {
+                            groupMergedCells.put(groupName, mergedCell);
+                        }
                     }
                 }
             }

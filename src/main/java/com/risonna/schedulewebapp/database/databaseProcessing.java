@@ -422,10 +422,17 @@ public class databaseProcessing implements Serializable {
         Connection conn = null;
         try {
             conn = ScheduleDatabase.getConnection();
+            Statement stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT * from lessons");
+            int i = 0;
+            while (rs.next()){
+                i = rs.getInt("id") + 1;
+            }
+
+
             prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, " +
                     "rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons, lessonpotoch, groupcolfirst, groupcollast) VALUES" +
                     " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
-            int i = 1;
             for (Lesson lesson: lessons) {
                 prepStmt.setInt(1, i);
                 prepStmt.setInt(2, lesson.getTeacherId());
