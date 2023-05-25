@@ -407,21 +407,7 @@ public class ExcelSearch {
                 lesson.setTeacherName(checking);
             }
         }
-
-
-        boolean isSubjectThere = false;
-        for (Subject subj : subjects) {
-            String processedSubject = subj.getSubjectName().trim().toLowerCase().replaceAll("\\s", "");
-            if (processedCellValue.contains(processedSubject)) {
-                lesson.setSubjectId(subj.getId());
-                lesson.setSubjectName(subj.getSubjectName());
-                isSubjectThere = true;
-            }
-        }
-        if (!isSubjectThere) {
-            lesson.setSubjectName("Subject isn't specified or not found");
-            lesson.setSubjectId(0);
-        }
+        
 
 
         lesson.setCabinetName("unknown");
@@ -444,6 +430,32 @@ public class ExcelSearch {
         }
         lesson.setLessonWeek(weekDay);
         lesson.setMultipleLessonsInOneCell(isMultiple);
+
+        boolean isSubjectThere = false;
+        String subjectname = getSubjectName(cellValue);
+        if(!subjectname.equals("nope")) {
+            for (Subject subj : subjects) {
+                String processedSubject = subj.getSubjectName().trim().toLowerCase().replaceAll("\\s", "");
+                if (subjectname.toLowerCase().replaceAll("\\s", "").equals(processedSubject)) {
+                    lesson.setSubjectId(subj.getId());
+                    lesson.setSubjectName(subj.getSubjectName());
+                    isSubjectThere = true;
+                }
+            }
+            if (!isSubjectThere) {
+                lesson.setSubjectName("Subject isn't specified or not found");
+                lesson.setSubjectId(0);
+            }
+        }
+        else{
+            lesson.setSubjectName("Couldn't parse the subjectName");
+            lesson.setSubjectId(0);
+        }
+
+        String fromWeekToWeek;
+        fromWeekToWeek = getFromWeekToWeek(processedCellValue);
+
+        lesson.setFromWeekToWeek(fromWeekToWeek);
 
 
         String cellTime;
@@ -591,6 +603,7 @@ public class ExcelSearch {
                         lessonPotoch.setColLast(lessonCell.getLastColumn());
                         lessonPotoch.setGroupColFirst(firstCol);
                         lessonPotoch.setGroupColLast(lastCol);
+                        lessonPotoch.setFromWeekToWeek(fromWeekToWeek);
 
                         if(lessonCell.getFirstColumn() <= firstCol) {
                             lessonPotoch.setColFirst(firstCol);
@@ -707,11 +720,120 @@ public class ExcelSearch {
 
     }
 
+    private String getFromWeekToWeek(String cellValue) {
+        String regex = "с\\s*(\\d+)(?:-(\\d+))?\\s*нед\\.?";
+        Pattern pattern = Pattern.compile(regex);
+        Matcher matcher = pattern.matcher(cellValue);
+
+        if(matcher.find()){
+            System.out.println("Week cell is " + cellValue + " matcher is " + matcher.group());
+            return matcher.group();
+        }
+        else{
+            System.out.println("Week cell is " + cellValue + " and no matcher");
+            return "";
+        }
+    }
+
+    private String getSubjectName(String lesson) {
+        String weekDay = checkWeek(lesson);
+        boolean weekDayOk = weekDay.length() > 1;
+        String lessonProcessed = lesson.toLowerCase().replaceAll("\\s", "");
+        String typeOfLesson = "none";
+        boolean isThereType = false;
+        int typeOfLessonInt = 0;
+        String lessonString = "nope";
+        int byChoiceInt;
+        if(lessonProcessed.contains("(пр)")){
+            typeOfLesson = "(пр)";
+            typeOfLessonInt = lessonProcessed.indexOf("(пр)");
+            isThereType = true;
+        }
+        if (lessonProcessed.contains("(л")) {
+            typeOfLesson = "(л)";
+            typeOfLessonInt = lessonProcessed.indexOf("(л)");
+            isThereType = true;
+        }
+        if (lessonProcessed.contains("(лаб")) {
+            typeOfLesson = "(лаб)";
+            typeOfLessonInt = lessonProcessed.indexOf("(лаб)");
+            isThereType = true;
+
+        }
+        if(!lessonProcessed.contains("нед.")){
+            if (weekDayOk) {
+                if (!lessonProcessed.contains("повыбору") && typeOfLessonInt != 0 && typeOfLessonInt != -1) {
+                    lessonString = lesson.toLowerCase().replaceAll("\\s", "").substring(lesson.indexOf(weekDay) + weekDay.length() + 1, typeOfLessonInt);
+                }
+                if (lessonProcessed.contains("повыбору")) {
+                    lessonString = lesson.toLowerCase().replaceAll("\\s", "").substring(lesson.indexOf(weekDay) + weekDay.length() + 1, lessonProcessed.indexOf("(повыбору"));
+                }
+            }
+            else{
+                if (!lessonProcessed.contains("повыбору") && typeOfLessonInt != 0 && typeOfLessonInt != -1) {
+                    lessonString = lesson.toLowerCase().replaceAll("\\s", "").substring(0, typeOfLessonInt);
+                }
+                if(typeOfLessonInt == 0 || typeOfLessonInt == -1) {
+                    String teachTitle = "none";
+                    if (lessonProcessed.contains("доц.")) teachTitle = "доц.";
+                    if (lessonProcessed.contains("асс.")) teachTitle = "асс.";
+                    if (lessonProcessed.contains("проф.")) teachTitle = "проф.";
+                    if (lessonProcessed.contains("ст.пр.")) teachTitle = "ст.пр.";
+                    if (lessonProcessed.contains("работодатель")) teachTitle = "работодатель";
+
+                    if (!teachTitle.equals("none")) {
+                        int teachTitleInt = lessonProcessed.indexOf(teachTitle);
+                        if (!lessonProcessed.contains("нед.")) {
+                                lessonString = lesson.toLowerCase().replaceAll("\\s", "").substring(0, teachTitleInt);
 
 
+                        } else {
+                            lessonString = lessonProcessed.substring(lessonProcessed.indexOf("нед.") + "нед.".length(), teachTitleInt);
+                        }
+                    }
+                }
+                if (lessonProcessed.contains("повыбору")) {
+                    lessonString = lesson.toLowerCase().replaceAll("\\s", "").substring(0, lessonProcessed.indexOf("(повыбору"));
+                }
+            }
+
+        }
+        else{
+            if (!lessonProcessed.contains("повыбору") && typeOfLessonInt != 0 && typeOfLessonInt != -1) {
+                lessonString = lessonProcessed.substring(lessonProcessed.indexOf("нед.") + "нед.".length(), typeOfLessonInt);
+            }
+            if(typeOfLessonInt == 0 || typeOfLessonInt == -1) {
+                String teachTitle = "none";
+                if (lessonProcessed.contains("доц.")) teachTitle = "доц.";
+                if (lessonProcessed.contains("асс.")) teachTitle = "асс.";
+                if (lessonProcessed.contains("проф.")) teachTitle = "проф.";
+                if (lessonProcessed.contains("ст.пр.")) teachTitle = "ст.пр.";
+                if (lessonProcessed.contains("работодатель")) teachTitle = "работодатель";
+
+                if (!teachTitle.equals("none")) {
+                    int teachTitleInt = lessonProcessed.indexOf(teachTitle);
+                    if (!lessonProcessed.contains("нед.")) {
+                        if (weekDayOk) {
+                            lessonString = lesson.toLowerCase().replaceAll("\\s", "").substring(lesson.indexOf(weekDay) + weekDay.length() + 1, teachTitleInt);
+                        }
+                        else {
+                            lessonString = lesson.toLowerCase().replaceAll("\\s", "").substring(0, teachTitleInt);
+                        }
+
+                    } else {
+                        lessonString = lessonProcessed.substring(lessonProcessed.indexOf("нед.") + "нед.".length(), teachTitleInt);
+                    }
+                }
+            }
+            if (lessonProcessed.contains("повыбору")) {
+                lessonString = lessonProcessed.substring(lessonProcessed.indexOf("нед.") + "нед.".length(), lessonProcessed.indexOf("(повыбору"));
+            }
+        }
 
 
+        return lessonString;
 
+    }
 
 
     public ArrayList<Lesson> getLessonList(){

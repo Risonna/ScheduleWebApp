@@ -27,21 +27,16 @@
         <ui:define name="content">
 
             <h:form enctype="multipart/form-data" styleClass="file-upload">
-                <div style="margin-top: 10px">
-                    <h:form enctype="multipart/form-data" styleClass="file-upload">
+                <div style="margin-top: 10px; display: contents">
                         <p:fileUpload value="#{uploadedFileController.uploadedFile}" mode="simple"/>
                         <div style="margin-top: 10px">
-                            <h:commandButton value="#{msg.fileupload}" action="#{uploadedFileController.upload}" styleClass="button" />
-                            <h:commandButton value="#{msg.fileparse}" action="#{uploadedFileController.parse(uploadedFileController.filePath)}" styleClass="button" />
+                            <p:commandButton value="#{msg.fileupload}" action="#{uploadedFileController.upload}" styleClass="button" />
+                            <p:commandButton oncomplete="updateLessons()" value="#{msg.fileparse}" action="#{uploadedFileController.parse(uploadedFileController.filePath)}" styleClass="button"/>
 
                         </div>
-                    </h:form>
 
-                    <h:form>
-                        <h:commandButton value="#{msg.updateeverything}" action="#{scheduleController.updateEverythingFromSQL()}"/>
-                    </h:form>
 
-                    <h:dataTable value="#{scheduleController.lessonsOk}" var="lessonsList" styleClass="table">
+                    <h:dataTable id="dataTable" value="#{scheduleController.lessonsOk}" var="lessonsList" styleClass="table">
                         <h:column>
                             <h:outputText value="#{msg.subjectname} #{lessonsList.subjectName} "/>
                             <h:outputText value="#{msg.teachername} #{lessonsList.teacherName} "/>
@@ -52,6 +47,7 @@
                             <h:outputText value="#{msg.timeoflesson} #{lessonsList.lessonTime} "/>
                         </h:column>
                     </h:dataTable>
+                    <p:remoteCommand name="updateLessons" action="#{scheduleController.updateEverythingFromSQL()}" update="dataTable" />
 
                 </div>
             </h:form>

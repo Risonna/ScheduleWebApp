@@ -167,7 +167,7 @@ public class scheduleController implements Serializable {
     public List<String> getCabinetList() {
         List<String> listOfCabinets = new ArrayList<>();
         for (Cabinet cabinet:getCabinetsFromSQL()) {
-            if(cabinet.getCabinetName() != null){
+            if(cabinet.getCabinetName() != null && !cabinet.getCabinetName().replaceAll("\\s", "").equalsIgnoreCase("unknown")){
                 listOfCabinets.add(cabinet.getCabinetName());
             }
         }
@@ -196,6 +196,7 @@ public class scheduleController implements Serializable {
         List<String> names = new ArrayList<>();
         for (Teacher teacher : getTeachersFromSQL()) {
             String teacherName;
+            if(teacher.getTeacherName().replaceAll("\\s", "").equalsIgnoreCase("unknown"))continue;
             if(!teacher.getTeacherSurname().equalsIgnoreCase("unknown")){
                 teacherName = teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0) + ".";
             }
@@ -215,6 +216,7 @@ public class scheduleController implements Serializable {
         List<String> names = new ArrayList<>();
         names.add("Показать Всех");
         for (Teacher teacher:teachersFromSQL) {
+            if(teacher.getTeacherName().replaceAll("\\s", "").equalsIgnoreCase("unknown"))continue;
             if(teacher.getDepartment().equalsIgnoreCase(selectedDepartment)){
                 if(!teacher.getDepartment().equalsIgnoreCase("unknown"))
                 names.add(teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0) + ".");
@@ -256,7 +258,9 @@ public class scheduleController implements Serializable {
     public List<String> getGroupNames() {
         List<String> groupNames = new ArrayList<>();
         for(Group group:getGroupsFromSQL()){
-            groupNames.add(group.getGroupName());
+            if(!group.getGroupName().replaceAll("\\s", "").equalsIgnoreCase("unknown")) {
+                groupNames.add(group.getGroupName());
+            }
         }
         return groupNames;
     }
@@ -599,6 +603,7 @@ public class scheduleController implements Serializable {
 
             for (int j = i + 1; j < allLessons.size(); j++) { // Only check the remaining lessons in the list
                 Lesson lessonj = allLessons.get(j);
+                if(lesson.getCabinetName().replaceAll("\\s", "").equalsIgnoreCase("unknown"))continue;
                 if (lesson.getLessonWeek().replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonWeek().replaceAll("\\s", "")) &&
                         cabinetToCheck.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getCabinetName().replaceAll("\\s", "")) &&
                         cabinetTime.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonTime().replaceAll("\\s", "")) &&

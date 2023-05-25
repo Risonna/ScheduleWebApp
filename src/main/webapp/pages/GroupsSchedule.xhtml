@@ -186,7 +186,7 @@
                                                 <tr>
                                                     <ui:repeat value="#{listOfLessons}" var="singlelesson">
                                                         <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}" style="width: 25%; padding: 5px;">
-                                                            <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}" style="word-wrap: break-word;" />
+                                                            <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.fromWeekToWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}" style="word-wrap: break-word;" />
                                                         </td>
                                                     </ui:repeat>
                                                 </tr>
@@ -208,7 +208,7 @@
                                                         <tr>
                                                             <ui:repeat value="#{listOfLessons}" var="singlelesson">
                                                                 <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}" style="min-width: 150px; max-width: 150px" >
-                                                                    <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}"/>
+                                                                    <h:outputText value="#{singlelesson.lessonWeek} #{singlelesson.fromWeekToWeek} #{singlelesson.subjectName} #{singlelesson.teacherName} #{singlelesson.cabinetName}"/>
                                                                 </td>
                                                             </ui:repeat>
                                                         </tr>

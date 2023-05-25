@@ -21,6 +21,7 @@ public class Lesson implements Serializable {
     private String instituteName;
     private String lessonWeek;
     private String cellId;
+    private String fromWeekToWeek;
     private int rowFirst;
     private int rowLast;
     private int colFirst;
@@ -41,7 +42,7 @@ public class Lesson implements Serializable {
 
 
     public Lesson(){
-
+        fromWeekToWeek = "";
     }
 
 
@@ -243,5 +244,13 @@ public class Lesson implements Serializable {
 
     public void setGroupColLast(int groupColLast) {
         this.groupColLast = groupColLast;
+    }
+
+    public String getFromWeekToWeek() {
+        return fromWeekToWeek;
+    }
+
+    public void setFromWeekToWeek(String fromWeekToWeek) {
+        this.fromWeekToWeek = fromWeekToWeek;
     }
 }

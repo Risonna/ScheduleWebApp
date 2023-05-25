@@ -44,6 +44,7 @@ public class databaseProcessing implements Serializable {
                 boolean potochLesson = rs.getBoolean("lessonpotoch");
                 int groupColFirst = rs.getInt("groupcolfirst");
                 int groupColLast = rs.getInt("groupcollast");
+                String fromWeekToWeek = rs.getString("weekfromweekto");
                 Lesson lesson = new Lesson();
                 lesson.setTeacherId(teacherid);
                 lesson.setSubjectId(subjectid);
@@ -61,6 +62,7 @@ public class databaseProcessing implements Serializable {
                 lesson.setPotochLesson(potochLesson);
                 lesson.setGroupColFirst(groupColFirst);
                 lesson.setGroupColLast(groupColLast);
+                lesson.setFromWeekToWeek(fromWeekToWeek);
                 lessonsList.add(lesson);
             }
         } catch (SQLException e) {
@@ -431,8 +433,8 @@ public class databaseProcessing implements Serializable {
 
 
             prepStmt = conn.prepareStatement("INSERT INTO lessons (id, teacherid, subjectid, time, day, groupid, cabinetid, week, " +
-                    "rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons, lessonpotoch, groupcolfirst, groupcollast) VALUES" +
-                    " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
+                    "rowfirst, rowlast, colfirst, collast, forwholegroup, multiplelessons, lessonpotoch, groupcolfirst, groupcollast, weekfromweekto) VALUES" +
+                    " (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)");
             for (Lesson lesson: lessons) {
                 prepStmt.setInt(1, i);
                 prepStmt.setInt(2, lesson.getTeacherId());
@@ -451,6 +453,7 @@ public class databaseProcessing implements Serializable {
                 prepStmt.setBoolean(15, lesson.isPotochLesson());
                 prepStmt.setInt(16, lesson.getGroupColFirst());
                 prepStmt.setInt(17, lesson.getGroupColLast());
+                prepStmt.setString(18, lesson.getFromWeekToWeek());
                 prepStmt.addBatch();
                 i++;
 
