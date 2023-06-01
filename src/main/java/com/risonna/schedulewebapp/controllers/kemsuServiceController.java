@@ -58,21 +58,21 @@ public class kemsuServiceController implements Serializable {
 
                     String email = userinfo.getString("email");
                     userInfo.setEmail(email);
-
-                    String firstName = userinfo.getString("firstName");
-                    userInfo.setFirstName(firstName);
-
-                    String lastName = userinfo.getString("lastName");
-                    userInfo.setLastName(lastName);
-
-                    String middleName = userinfo.getString("middleName");
-                    userInfo.setMiddleName(middleName);
-
-                    String country = userinfo.getString("country");
-                    userInfo.setCountry(country);
-
-                    String town = userinfo.getString("town");
-                    userInfo.setTown(town);
+//
+//                    String firstName = userinfo.getString("firstName");
+//                    userInfo.setFirstName(firstName);
+//
+//                    String lastName = userinfo.getString("lastName");
+//                    userInfo.setLastName(lastName);
+//
+//                    String middleName = userinfo.getString("middleName");
+//                    userInfo.setMiddleName(middleName);
+//
+//                    String country = userinfo.getString("country");
+//                    userInfo.setCountry(country);
+//
+//                    String town = userinfo.getString("town");
+//                    userInfo.setTown(town);
                     System.out.println("all's okay in good method");
 
                     jsonReader.close();
