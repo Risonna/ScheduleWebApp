@@ -1,0 +1,48 @@
+.register-form {
+    margin: auto;
+    padding: 40px;
+    border-radius: 5px;
+    width: 400px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.register-form .form-group {
+    margin-bottom: 20px;
+}
+
+.register-form label {
+    font-size: 16px;
+    margin-bottom: 8px;
+}
+
+.register-form input[type="text"],
+.register-form input[type="password"] {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+    border: none;
+    border-bottom: 1px solid #ccc;
+    outline: none;
+    background-color: transparent;
+}
+
+.register-form .button-row {
+    display: flex;
+    justify-content: center;
+    margin-top: 20px;
+}
+
+.register-form .logbib-button {
+    background-color: cornflowerblue;
+    border: none;
+    text-align: center;
+    color: white;
+    font-size: 16px;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.register-form .logbib-button:hover {
+    background-color: #79bbff;
+}

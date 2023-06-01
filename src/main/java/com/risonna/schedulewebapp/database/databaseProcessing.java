@@ -255,15 +255,17 @@ public class databaseProcessing implements Serializable {
         try {
             conn = ScheduleDatabase.getConnection();
             stmt = conn.createStatement();
-            rs = stmt.executeQuery("SELECT * FROM webschedule.users");
+            rs = stmt.executeQuery("SELECT userid, email, creation_time, registered_via_kemsu FROM webschedule.users");
             while (rs.next()) {
                 String userid = rs.getString("userid");
                 String email = rs.getString("email");
                 String creation_time = rs.getString("creation_time");
+                boolean registered_via_kemsu = rs.getBoolean("registered_via_kemsu");
                 User user = new User();
                 user.setUsername(userid);
                 user.setEmail(email);
                 user.setRegistration_time(creation_time);
+                user.setRegistered_via_kemsu(registered_via_kemsu);
                 users.add(user);
             }
         } catch (SQLException e) {
@@ -581,5 +583,238 @@ public class databaseProcessing implements Serializable {
         }
         return false;
     }
+
+
+    public void addUsersGroups(String username, String group){
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = ScheduleDatabase.getConnection();
+
+            String sql = "INSERT INTO users_groups (userid, groupid) VALUES (?, ?)";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, group);
+            stmt.executeUpdate();
+
+            System.out.println("User added to group successfully!");
+        } catch (SQLException ex) {
+            // Handle any database errors
+            ex.printStackTrace();
+        } finally {
+            // Close resources in the reverse order of their creation
+            closeStmtCloseConn(conn, stmt);
+        }
+
+    }
+    public void removeUsersGroups(String username, String group){
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = ScheduleDatabase.getConnection();
+
+            // Prepare the DELETE statement
+            String sql = "DELETE FROM users_groups WHERE userid = ? AND groupid = ?";
+            stmt = conn.prepareStatement(sql);
+
+            // Set the parameter values
+            stmt.setString(1, username);
+            stmt.setString(2, group);
+
+            // Execute the statement
+            int rowsDeleted = stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            // Handle any errors that occur during the database operation
+            e.printStackTrace();
+        } finally {
+            // Close the resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+
+    }
+    public List<UsersGroups> getUsersGroups(){
+        Statement stmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        List<UsersGroups> usersGroups = new ArrayList<>();
+        try {
+            conn = ScheduleDatabase.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT groupid, userid FROM webschedule.users_groups");
+            while (rs.next()) {
+                    String groupId = rs.getString("groupid");
+                    String userId = rs.getString("userid");
+                    UsersGroups userGroup = new UsersGroups();
+                    userGroup.setGroup(groupId);
+                    userGroup.setUser(userId);
+                    usersGroups.add(userGroup);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+        }
+
+        return usersGroups;
+    }
+
+    private void closeStmtCloseConn(Connection conn, PreparedStatement stmt) {
+        if (stmt != null) {
+            try {
+                stmt.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+        if (conn != null) {
+            try {
+                conn.close();
+            } catch (SQLException ex) {
+                ex.printStackTrace();
+            }
+        }
+    }
+
+    public void addUser(String username, String password, String email, Boolean registered_via_kemsu) {
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = ScheduleDatabase.getConnection();
+
+            String sql = "INSERT INTO users (userid, password, email, registered_via_kemsu) VALUES (?, ?, ?, ?)";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, username);
+            stmt.setString(2, password);
+            stmt.setString(3, email);
+            stmt.setBoolean(4, registered_via_kemsu);
+            stmt.executeUpdate();
+
+            System.out.println("User added successfully!");
+        } catch (SQLException ex) {
+            // Handle any database errors
+            ex.printStackTrace();
+        } finally {
+            // Close resources in the reverse order of their creation
+            closeStmtCloseConn(conn, stmt);
+        }
+    }
+
+    public void addAdminTeacher(String teacherLogin){
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = ScheduleDatabase.getConnection();
+
+            String sql = "INSERT INTO admins_teachers (userid) VALUES (?)";
+            stmt = conn.prepareStatement(sql);
+            stmt.setString(1, teacherLogin);
+            stmt.executeUpdate();
+
+            System.out.println("User added successfully!");
+        } catch (SQLException ex) {
+            // Handle any database errors
+            ex.printStackTrace();
+        } finally {
+            // Close resources in the reverse order of their creation
+            closeStmtCloseConn(conn, stmt);
+        }
+    }
+    public List<String> getAdminsTeachers() {
+        List<String> adminsTeachers = new ArrayList<>();
+
+        Statement stmt = null;
+        ResultSet rs = null;
+        Connection conn = null;
+        try {
+            conn = ScheduleDatabase.getConnection();
+            stmt = conn.createStatement();
+            rs = stmt.executeQuery("SELECT userid FROM webschedule.admins_teachers");
+            while (rs.next()) {
+                String userid = rs.getString("userid");
+                adminsTeachers.add(userid);
+            }
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
+        } finally {
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (rs != null) {
+                    rs.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                throw new RuntimeException(e);
+            }
+
+        }
+        return adminsTeachers;
+    }
+    public void removeAdminsTeachers(String teacher){
+        Connection conn = null;
+        PreparedStatement stmt = null;
+
+        try {
+            conn = ScheduleDatabase.getConnection();
+
+            // Prepare the DELETE statement
+            String sql = "DELETE FROM admins_teachers WHERE userid = ?";
+            stmt = conn.prepareStatement(sql);
+
+            // Set the parameter values
+            stmt.setString(1, teacher);
+
+            // Execute the statement
+            int rowsDeleted = stmt.executeUpdate();
+
+        } catch (SQLException e) {
+            // Handle any errors that occur during the database operation
+            e.printStackTrace();
+        } finally {
+            // Close the resources
+            try {
+                if (stmt != null) {
+                    stmt.close();
+                }
+                if (conn != null) {
+                    conn.close();
+                }
+            } catch (SQLException e) {
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+
 
 }

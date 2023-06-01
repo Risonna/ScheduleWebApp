@@ -15,7 +15,7 @@ public class validatePasswordConfirmation implements Validator<String> {
 
     @Override
     public void validate(FacesContext context, UIComponent component, String value) throws ValidatorException {
-        UIInput passwordField = (UIInput) context.getViewRoot().findComponent("loginForm:password");
+        UIInput passwordField = (UIInput) context.getViewRoot().findComponent("registerForm:password");
         if (passwordField == null)
             throw new IllegalArgumentException(String.format("Unable to find component."));
         String password = (String) passwordField.getValue();

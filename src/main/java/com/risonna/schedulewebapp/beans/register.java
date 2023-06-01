@@ -1,7 +1,11 @@
 package com.risonna.schedulewebapp.beans;
 import com.risonna.schedulewebapp.database.ScheduleDatabase;
+import com.risonna.schedulewebapp.database.databaseProcessing;
 import jakarta.enterprise.context.RequestScoped;
+import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
 import org.apache.commons.codec.digest.DigestUtils;
 import javax.naming.InitialContext;
 import java.io.Serializable;
@@ -18,6 +22,7 @@ public class register implements Serializable {
     private String password;
     private String passwordConfirm;
     private String email;
+    private boolean registered_via_kemsu;
 
     public String getEmail() {
         return email;
@@ -50,7 +55,7 @@ public class register implements Serializable {
         this.username = username;
     }
 
-    public void registerUser() throws SQLException, NoSuchAlgorithmException {
+    public String registerUser() throws NoSuchAlgorithmException {
         MessageDigest md = MessageDigest.getInstance("SHA-256");
         byte[] hashedPassword = md.digest(password.getBytes());
         StringBuilder sb = new StringBuilder();
@@ -58,18 +63,22 @@ public class register implements Serializable {
             sb.append(String.format("%02x", b));
         }
         String hashedPasswordStr = sb.toString();
-        Connection conn = ScheduleDatabase.getConnection();
-        PreparedStatement prepStmt = conn.prepareStatement("INSERT INTO users (userid, password, email) VALUES (?, ?, ?)");
-        prepStmt.setString(1, username);
-        prepStmt.setString(2, hashedPasswordStr);
-        prepStmt.setString(3, email);
-        prepStmt.executeUpdate();
+        databaseProcessing database = new databaseProcessing();
 
-        prepStmt = conn.prepareStatement("INSERT INTO users_groups (groupid, userid) VALUES (?, ?)");
+        database.addUser(username, hashedPasswordStr, email, registered_via_kemsu);
 
-        prepStmt.setString(1, "user");
-        prepStmt.setString(2, username);
-        prepStmt.executeUpdate();
+        database.addUsersGroups(username, "user");
 
+
+        return "login";
+
+    }
+
+    public boolean isRegistered_via_kemsu() {
+        return registered_via_kemsu;
+    }
+
+    public void setRegistered_via_kemsu(boolean registered_via_kemsu) {
+        this.registered_via_kemsu = registered_via_kemsu;
     }
 }

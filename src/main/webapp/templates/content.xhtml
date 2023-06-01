@@ -28,7 +28,7 @@
                 <li><h:link outcome="pages/TeacherSchedule.xhtml" value="#{msg.byteachers}" /></li>
                 <li><h:link outcome="pages/CabinetsSchedule.xhtml" value="#{msg.bycabinets}" /></li>
                 <li><h:link outcome="pages/DepartmentSchedule.xhtml" value="#{msg.scheduledepartments}"/> </li>
-                <h:form rendered="#{request.isUserInRole('admin')}">
+                <h:form rendered="#{request.isUserInRole('admin') or request.isUserInRole('admin_teacher')}">
                     <li><h:link outcome="pages/editing/scheduleEdit.xhtml" value="#{msg.editschedule}"/></li>
                 </h:form>
 

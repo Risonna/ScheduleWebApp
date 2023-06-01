@@ -138,20 +138,6 @@ public class ExcelSearch {
         //workbook.close();
         this.closeStuff();
 
-        Set<String> cabinetsIndividual = new HashSet<>();
-
-        for (Lesson lesson: lessonArrayList) {
-            cabinetsIndividual.add(lesson.getCabinetName());
-        }
-
-        StringBuilder sb = new StringBuilder();
-        if(!cabinetsIndividual.isEmpty()){
-            for (String cabinetb : cabinetsIndividual) {
-                sb.append(cabinetb).append("\n");
-            }
-            String result = sb.toString();
-        }
-
     }
     private void closeStuff() throws IOException {
         inputStreamFile.close();
@@ -453,7 +439,7 @@ public class ExcelSearch {
         }
 
         String fromWeekToWeek;
-        fromWeekToWeek = getFromWeekToWeek(processedCellValue);
+        fromWeekToWeek = getFromWeekToWeek(cellValue);
 
         lesson.setFromWeekToWeek(fromWeekToWeek);
 

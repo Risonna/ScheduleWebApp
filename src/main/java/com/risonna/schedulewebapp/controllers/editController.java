@@ -26,4 +26,8 @@ public class editController implements Serializable {
     public String testing(){
         return "testing.xhtml?faces-redirect=true";
     }
+
+    public String addTeachersAdmins(){
+        return "addTeacherAdmin.xhtml?faces-redirect=true";
+    }
 }

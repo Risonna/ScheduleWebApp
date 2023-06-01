@@ -14,7 +14,7 @@
 <ui:composition template="/templates/schedule_template.xhtml">
 
     <ui:define name="page-specific-css">
-        <h:outputStylesheet name="css/stylelogin.css"/>
+        <h:outputStylesheet name="css/style_register.css"/>
     </ui:define>
 
     <ui:define name="page-specific-script">
@@ -23,43 +23,40 @@
 
 
     <ui:define name="content">
-
-        <h:form id="loginForm" class="login-form">
+        <h:form id="registerForm" class="register-form">
             <h:panelGroup id="messages" layout="block" />
 
-            <h:panelGroup>
-                <h:outputLabel for="username" value="#{msg.username}" style="align-self: center; font-size: large" />
-                <h:inputText id="username" value="#{register.username}" class="form-control" required="true" validator="validateUsername" requiredMessage="Username is required">
-                </h:inputText>
-                <h:message for="username" styleClass="error" />
-            </h:panelGroup>
+            <div class="form-group">
+                <h:outputLabel for="username" value="#{msg.username}" />
+                <h:inputText id="username" value="#{user.username}" class="form-control" required="true" validator="validateUsername" requiredMessage="#{msg.usernamerequired}" />
+                <h:message for="username" styleClass="error" style="color: red"/>
+            </div>
 
-            <h:panelGroup>
-                <h:outputLabel for="password" value="#{msg.password}" style="align-self: center; font-size: large" />
-                <h:inputSecret id="password" value="#{register.password}" validator="validatePassword" class="form-control" required="true" requiredMessage="Password is required">
+            <div class="form-group">
+                <h:outputLabel for="password" value="#{msg.password}" />
+                <h:inputSecret id="password" value="#{user.password}" validator="validatePassword" class="form-control" required="true" requiredMessage="#{msg.passwordrequired}" />
+                <h:message for="password" styleClass="error" style="color: red" />
+            </div>
+
+            <div class="form-group">
+                <h:outputLabel for="passwordConfirm" value="#{msg.confirmpassword}" />
+                <h:inputSecret id="passwordConfirm" value="#{user.passwordConfirm}" validator="validatePasswordConfirmation" class="form-control" required="true" requiredMessage="#{msg.password_confirmation_required}">
+                    <f:attribute name="password" value="#{user.password}" />
                 </h:inputSecret>
-                <h:message for="password" styleClass="error" />
-            </h:panelGroup>
+                <h:message for="passwordConfirm" styleClass="error" style="color: red" />
+            </div>
 
-            <h:panelGroup>
-                <h:outputLabel for="passwordConfirm" value="#{msg.confirmpassword}" style="align-self: center; font-size: large" />
-                <h:inputSecret id="passwordConfirm" value="#{register.passwordConfirm}" validator="validatePasswordConfirmation" class="form-control" required="true" requiredMessage="Password confirmation is required">
-                    <f:attribute name="password" value="#{register.password}" />
-                </h:inputSecret>
-                <h:message for="passwordConfirm" styleClass="error" />
-            </h:panelGroup>
+            <div class="form-group">
+                <h:outputLabel for="email" value="#{msg.email}" />
+                <h:inputText id="email" value="#{user.email}" class="form-control" />
+            </div>
 
-            <h:panelGroup>
-                <h:outputLabel for="Email" value="#{msg.email}" style="align-self: center; font-size: large" />
-                <h:inputText id="Email" value="#{register.email}" class="form-control"/>
-            </h:panelGroup>
-
-            <h:panelGroup class="button-row">
-                <h:commandButton id="RegisterButton" value="#{msg.register}" action="#{register.registerUser()}" styleClass="logbib-button" />
-            </h:panelGroup>
+            <div class="button-row">
+                <h:commandButton id="registerButton" value="#{msg.register}" action="#{user.registerUser()}" styleClass="logbib-button" />
+            </div>
         </h:form>
-
     </ui:define>
+
 
 
 </ui:composition>

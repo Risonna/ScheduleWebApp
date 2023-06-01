@@ -1,0 +1,113 @@
+.teacher-form {
+    margin: 20px auto;
+    padding: 20px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #f5f5f5;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.form-container {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+}
+
+.form-field {
+    display: flex;
+    align-items: center;
+}
+
+.form-label {
+    font-size: 16px;
+    font-weight: bold;
+    margin-right: 10px;
+}
+
+.form-input {
+    width: 200px;
+    padding: 10px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    background-color: #fff;
+}
+
+.input-message {
+    font-size: 12px;
+    color: #888;
+    margin-top: 5px;
+}
+
+.form-button {
+    background-color: #4caf50;
+    color: #fff;
+    padding: 10px 20px;
+    font-size: 14px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+.form-button:hover {
+    background-color: #45a049;
+}
+
+.form-message {
+    color: red;
+    font-size: 14px;
+}
+
+.teacher-table {
+    margin-top: 20px;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.teacher-table th,
+.teacher-table td {
+    padding: 10px;
+    border-bottom: 1px solid #ddd;
+    text-align: left;
+}
+
+.teacher-table th {
+    font-weight: bold;
+    background-color: #f2f2f2;
+}
+
+.teacher-table {
+    width: 100%;
+    margin-top: 10px;
+}
+
+.teacher-table th {
+    text-align: left;
+}
+
+.teacher-table td {
+    vertical-align: middle;
+}
+
+.actions-column {
+    text-align: center;
+}
+
+.delete-link {
+    display: inline-block;
+    text-decoration: none;
+}
+
+.delete-link:focus,
+.delete-link:hover,
+.delete-link:active {
+    text-decoration: none !important;
+    border-bottom: none !important;
+    outline: none !important;
+}
+
+.delete-icon {
+    color: red;
+    font-size: 20px;
+    cursor: pointer;
+}

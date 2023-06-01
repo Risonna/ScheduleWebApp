@@ -312,6 +312,7 @@ public class scheduleController implements Serializable {
         List<Integer> colPositions = new ArrayList<>();
         int rowAmount = 0;
         int colAmount = 0;
+        int currentRow = 0;
         for (Lesson lesson : listHuh) {
             if (!rowPositions.contains(lesson.getRowFirst())) {
                 rowPositions.add(lesson.getRowFirst());
@@ -325,8 +326,21 @@ public class scheduleController implements Serializable {
 
 
             if(lesson.isMultipleLessonsInOneCell()){
-                colPositions.add(lesson.getColLast()+1);
-                if(colAmount <2)colAmount++;
+//                colPositions.add(lesson.getColLast()+1);
+//                if(colAmount <2)colAmount++;
+                if(currentRow != 0 && (currentRow - lesson.getRowFirst() >= 1)) {
+                    lesson.setRowFirst(currentRow);
+                }
+                currentRow = lesson.getRowFirst()+1;
+//                if(!rowPositions.contains(lesson.getRowFirst())){
+//                    rowPositions.add(lesson.getRowFirst());
+//                    rowAmount++;
+//                }
+                if(lesson.getRowFirst() > rowAmount && !rowPositions.contains(lesson.getRowFirst())) {
+                    rowAmount++;
+                    rowPositions.add(lesson.getRowFirst());
+                }
+
             }
         }
 
@@ -335,6 +349,12 @@ public class scheduleController implements Serializable {
             int currentrownum = rowPositions.get(i);
             int rowFirst = rowPositions.get(0);
             int rowLast = rowPositions.get(rowAmount-1);
+            Collections.sort(listHuh, new Comparator<Lesson>() {
+                @Override
+                public int compare(Lesson lesson1, Lesson lesson2) {
+                    return lesson1.getColFirst() - lesson2.getColFirst();
+                }
+            });
             for (Lesson lesson : listHuh) {
                 int colFirst = lesson.getGroupColFirst();
                 int colLast = lesson.getGroupColLast();

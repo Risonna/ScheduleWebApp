@@ -1,9 +1,7 @@
 window.onload = function() {
     const inputPlaceholderMap = {
-        'registerForm:username': 'Введите имя пользователя',
-        'registerForm:password': 'Введите пароль',
-        'registerForm:passwordConfirm': 'Подтвердите пароль',
-        'registerForm:email': 'Укажите электронную почту'
+        'loginForm:username': 'Введите имя пользователя',
+        'loginForm:password': 'Введите пароль',
     };
 
     const inputs = document.querySelectorAll("input[type='text'], input[type='password']");

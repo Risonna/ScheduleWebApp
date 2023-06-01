@@ -47,6 +47,12 @@
                 <div class="option">
                     <p:commandButton value="#{msg.testing}" action="#{editController.testing()}" styleClass="option-button" />
                 </div>
+                <ui:fragment rendered="#{request.isUserInRole('admin')}">
+                <div class="option" >
+                    <p:commandButton value="#{msg.testing}" action="#{editController.addTeachersAdmins()}" styleClass="option-button"/>
+                </div>
+                </ui:fragment>
+
             </div>
         </h:form>
 

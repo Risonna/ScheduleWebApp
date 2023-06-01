@@ -9,6 +9,8 @@ import jakarta.json.Json;
 import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpSession;
 
 import java.io.StringReader;
 import java.net.URL;
@@ -59,9 +61,11 @@ public class kemsuDatabase {
         try {
             URL url = new URL("https://api-next.kemsu.ru/api/stud-sch/main/groupList");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            HttpServletRequest request =  ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest());
+            HttpSession session = request.getSession(false);
+            String accessToken = session.getAttribute("accessToken").toString();
             con.setRequestMethod("GET");
-            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVz" +
-                    "ZXJJZCI6MjI0NTMsImlhdCI6MTY4NDY5MTU5MSwiZXhwIjoxNjg0Nzc3OTkxfQ.xzZardZBDRthMeJ3qjTIASsT-KFTVpvtaPd4MkD3vIY");
+            con.setRequestProperty("x-access-token", accessToken);
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             StringBuffer content = new StringBuffer();
@@ -95,9 +99,11 @@ public class kemsuDatabase {
         try {
             URL url = new URL("https://api-next.kemsu.ru/api/stud-sch/main/disciplineList");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            HttpServletRequest request =  ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest());
+            HttpSession session = request.getSession(false);
+            String accessToken = session.getAttribute("accessToken").toString();
             con.setRequestMethod("GET");
-            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVz" +
-                    "ZXJJZCI6MjI0NTMsImlhdCI6MTY4NDY5MTU5MSwiZXhwIjoxNjg0Nzc3OTkxfQ.xzZardZBDRthMeJ3qjTIASsT-KFTVpvtaPd4MkD3vIY");
+            con.setRequestProperty("x-access-token", accessToken);
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             StringBuffer content = new StringBuffer();
@@ -132,9 +138,11 @@ public class kemsuDatabase {
         try {
             URL url = new URL("https://api-next.kemsu.ru/api/stud-sch/main/prepList");
             HttpURLConnection con = (HttpURLConnection) url.openConnection();
+            HttpServletRequest request =  ((HttpServletRequest) FacesContext.getCurrentInstance().getExternalContext().getRequest());
+            HttpSession session = request.getSession(false);
+            String accessToken = session.getAttribute("accessToken").toString();
             con.setRequestMethod("GET");
-            con.setRequestProperty("x-access-token", "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ0eXBlIjoiYWNjZXNzIiwiaXAiOiIxNzYuMTk2LjE0OC43OSIsInVz" +
-                    "ZXJJZCI6MjI0NTMsImlhdCI6MTY4NDY5MTU5MSwiZXhwIjoxNjg0Nzc3OTkxfQ.xzZardZBDRthMeJ3qjTIASsT-KFTVpvtaPd4MkD3vIY");
+            con.setRequestProperty("x-access-token", accessToken);
             BufferedReader in = new BufferedReader(new InputStreamReader(con.getInputStream(), StandardCharsets.UTF_8));
             String inputLine;
             StringBuffer content = new StringBuffer();

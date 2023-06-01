@@ -29,25 +29,33 @@
     <ui:define name="page-specific-css">
         <h:outputStylesheet name="css/stylelogin.css"/>
     </ui:define>
+    <ui:define name="page-specific-script">
+        <h:outputScript name="js/login.js"/>
+    </ui:define>
 
     <ui:define name="content">
         <h:form id="loginForm" class="login-form">
-            <h:panelGroup>
-                <h:outputLabel for="username" value="#{msg.username}" style="align-self: center; font-size: large" />
+            <div class="form-group">
+                <h:outputLabel for="username" value="#{msg.username}" />
                 <h:inputText id="username" value="#{user.username}" class="form-control" required="true" requiredMessage="#{msg.usernamerequired}" />
-            </h:panelGroup>
-            <h:panelGroup>
-                <h:outputLabel for="password" value="#{msg.password}" style="align-self: center; font-size: large" />
+                <h:message for="username" styleClass="error" style="color: red"/>
+            </div>
+            <div class="form-group">
+                <h:outputLabel for="password" value="#{msg.password}" />
                 <h:inputSecret id="password" value="#{user.password}" class="form-control" required="true" redisplay="true" requiredMessage="#{msg.passwordrequired}" />
-            </h:panelGroup>
-            <h:panelGroup>
-                <h:messages id="messages" for="loginForm" style="color: red"/>
-            </h:panelGroup>
-            <h:panelGroup class="button-row">
-                <h:commandButton id="loginButton" value="Login" action="#{user.login()}" styleClass="logbib-button" />
-            </h:panelGroup>
+                <h:message for="password" styleClass="error" style="color: red" />
+            </div>
+            <h:messages id="messages" for="loginForm" style="color: red"/>
+            <div class="checkbox-container">
+                <h:selectBooleanCheckbox id="checkbox" value="#{user.useAlternativeMethod}" styleClass="checkbox-custom" />
+                <h:outputLabel for="checkbox" value="#{msg.login_via_kemsu}" styleClass="checkbox-label" />
+            </div>
+            <div class="button-row">
+                <h:commandButton id="loginButton" value="Login" action="#{user.performLogin}" styleClass="logbib-button" />
+            </div>
         </h:form>
     </ui:define>
+
 
 
 
