@@ -182,7 +182,7 @@
                                     <div style="text-align: center; display: inline-block; height: inherit">
                                         <table style="width: 100%; table-layout: fixed; height: inherit">
                                             <tbody>
-                                            <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listOfLessons">
+                                            <ui:repeat value="#{scheduleController.getFilteredAndSortedLessonsForGroups(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, scheduleController.selectedDayOfWeek))}" var="listOfLessons">
                                                 <tr>
                                                     <ui:repeat value="#{listOfLessons}" var="singlelesson">
                                                         <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}" style="width: 25%; padding: 5px;">
@@ -204,7 +204,7 @@
                                                 <!--suppress CssInvalidPropertyValue -->
                                                 <table style="width: 100%" class="inner-table">
                                                     <tbody>
-                                                    <ui:repeat value="#{scheduleController.getListsStuff(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listOfLessons">
+                                                    <ui:repeat value="#{scheduleController.filteredAndSortedLessonsForGroups(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listOfLessons">
                                                         <tr>
                                                             <ui:repeat value="#{listOfLessons}" var="singlelesson">
                                                                 <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}" style="min-width: 150px; max-width: 150px" >

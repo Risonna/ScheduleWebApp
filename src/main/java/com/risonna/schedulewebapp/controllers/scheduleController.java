@@ -305,7 +305,7 @@ public class scheduleController implements Serializable {
         return lessonsByTimePeriod;
     }
 
-    public List<List<Lesson>> getListsStuff(List<Lesson> listHuh) {
+    public List<List<Lesson>> getFilteredAndSortedLessonsForGroups(List<Lesson> listHuh) {
         List<List<Lesson>> listOfListsOfLessons = new ArrayList<>();
 
         List<Integer> rowPositions = new ArrayList<>();
