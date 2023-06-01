@@ -89,29 +89,35 @@ public class User implements Serializable {
                 request.logout();
             }
 
-            request.login(username, password);
-            this.logged = true;
-            HttpSession session = request.getSession(false);
-            session.setAttribute("isLogged", isLogged());
-            session.setAttribute("username", username);
             boolean isAdminTeacher = false;
             databaseProcessing database = new databaseProcessing();
             for(UsersGroups userGroup: database.getUsersGroups()){
-                if(userGroup.getGroup().equals("admin_teacher")){
+                if(userGroup.getGroup().equals("admin_teacher") && userGroup.getUser().equals(username)){
                     isAdminTeacher = true;
                     break;
                 }
             }
             if(!isAdminTeacher){
-                if(database.getAdminsTeachers().contains(username)){
-                    database.addUsersGroups(username, "admin_teacher");
+                usernamesChecker usernamesChecker = new usernamesChecker();
+                if(usernamesChecker.getUsernames().contains(username)){
+                    if(database.getAdminsTeachers().contains(username)){
+                        database.addUsersGroups(username, "admin_teacher");
+                    }
                 }
             }
             else{
-                if(!database.getAdminsTeachers().contains(username)){
-                    database.removeUsersGroups(username, "admin_teacher");
+                usernamesChecker usernamesChecker = new usernamesChecker();
+                if(usernamesChecker.getUsernames().contains(username)) {
+                    if (!database.getAdminsTeachers().contains(username)) {
+                        database.removeUsersGroups(username, "admin_teacher");
+                    }
                 }
             }
+            request.login(username, password);
+            this.logged = true;
+            HttpSession session = request.getSession(false);
+            session.setAttribute("isLogged", isLogged());
+            session.setAttribute("username", username);
 
 
 
