@@ -19,23 +19,28 @@
 <h:body>
     <ui:composition template="/templates/schedule_template.xhtml">
     <ui:define name="page-specific-css">
-        <h:outputStylesheet library="css" name="schedule_edit_style.css" rendered="#{true}"/>
+        <h:outputStylesheet name="css/style_dataAutomatic.css" rendered="#{true}"/>
     </ui:define>
 
 
         <ui:define name="content">
-    <h:form enctype="multipart/form-data" styleClass="file-upload">
-        <div style="margin-top: 10px">
-            <h:commandButton value="#{msg.fillteachers}" action="#{databaseProcessing.fillTeachers(scheduleController.teacherList)}" styleClass="button" />
-            <h:commandButton value="#{msg.fillsubjects}" action="#{databaseProcessing.fillSubjects(scheduleController.subjects)}" styleClass="button" />
-            <h:commandButton value="#{msg.fillcabinets}" action="#{databaseProcessing.fillCabinets(scheduleController.cabinets)}" styleClass="button" />
-            <h:commandButton value="#{msg.fillteachersapi}" action="#{databaseProcessing.fillTeachers(kemsuDatabase.teacherList)}" styleClass="button"/>
-            <h:commandButton value="#{msg.fillsubjectsapi}" action="#{databaseProcessing.fillSubjects(kemsuDatabase.subjectList)}" styleClass="button"/>
-            <h:commandButton value="#{msg.fillgroupsapi}" action="#{databaseProcessing.fillGroups(kemsuDatabase.groupList)}" styleClass="button"/>
-
-        </div>
-    </h:form>
+            <h:form enctype="multipart/form-data" styleClass="file-upload">
+                <div class="button-container">
+                    <div class="button-group">
+                        <h:commandButton value="#{msg.fillteachers}" action="#{databaseProcessing.fillTeachers(scheduleController.teacherList)}" styleClass="button button-primary" />
+                        <h:commandButton value="#{msg.fillsubjects}" action="#{databaseProcessing.fillSubjects(scheduleController.subjects)}" styleClass="button button-primary" />
+                        <h:commandButton value="#{msg.fillcabinets}" action="#{databaseProcessing.fillCabinets(scheduleController.cabinets)}" styleClass="button button-primary" />
+                    </div>
+                    <div class="button-group">
+                        <h:commandButton value="#{msg.fillteachersapi}" action="#{databaseProcessing.fillTeachers(kemsuDatabase.teacherList)}" styleClass="button button-secondary"/>
+                        <h:commandButton value="#{msg.fillsubjectsapi}" action="#{databaseProcessing.fillSubjects(kemsuDatabase.subjectList)}" styleClass="button button-secondary"/>
+                        <h:commandButton value="#{msg.fillgroupsapi}" action="#{databaseProcessing.fillGroups(kemsuDatabase.groupList)}" styleClass="button button-secondary"/>
+                    </div>
+                </div>
+            </h:form>
         </ui:define>
+
+
 
 
 

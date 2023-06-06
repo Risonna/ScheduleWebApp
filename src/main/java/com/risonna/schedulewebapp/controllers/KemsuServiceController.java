@@ -4,7 +4,6 @@ import com.risonna.schedulewebapp.beans.UserInfo;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.inject.Named;
 import jakarta.json.Json;
-import jakarta.json.JsonArray;
 import jakarta.json.JsonObject;
 import jakarta.json.JsonReader;
 
@@ -15,10 +14,10 @@ import java.nio.charset.StandardCharsets;
 
 @Named
 @RequestScoped
-public class kemsuServiceController implements Serializable {
+public class KemsuServiceController implements Serializable {
     private UserInfo userInfo;
 
-    public kemsuServiceController(){
+    public KemsuServiceController(){
 
     }
 

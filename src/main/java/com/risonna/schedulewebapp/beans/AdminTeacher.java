@@ -1,6 +1,6 @@
 package com.risonna.schedulewebapp.beans;
 
-import com.risonna.schedulewebapp.database.databaseProcessing;
+import com.risonna.schedulewebapp.database.DatabaseProcessing;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
 
@@ -9,11 +9,11 @@ import java.util.List;
 
 @Named
 @ViewScoped
-public class admin_teacher implements Serializable {
+public class AdminTeacher implements Serializable {
     private String teacherLogin;
     private List<String> adminTeacherList;
 
-    public admin_teacher(){
+    public AdminTeacher(){
         updateAdminsTeachers();
     }
 
@@ -26,7 +26,7 @@ public class admin_teacher implements Serializable {
     }
 
     public void addTeacher(){
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         database.addAdminTeacher(teacherLogin);
         updateAdminsTeachers();
     }
@@ -40,14 +40,14 @@ public class admin_teacher implements Serializable {
     }
 
     public void updateAdminsTeachers(){
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         setAdminTeacherList(database.getAdminsTeachers());
     }
 
     public void deleteTeacher(String teacher) {
         // Delete the teacher from the database using teacher login
         // ...
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         database.removeAdminsTeachers(teacher);
         updateAdminsTeachers();
 

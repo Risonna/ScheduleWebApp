@@ -204,7 +204,7 @@
                                                 <!--suppress CssInvalidPropertyValue -->
                                                 <table style="width: 100%" class="inner-table">
                                                     <tbody>
-                                                    <ui:repeat value="#{scheduleController.filteredAndSortedLessonsForGroups(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listOfLessons">
+                                                    <ui:repeat value="#{scheduleController.getFilteredAndSortedLessonsForGroups(scheduleController.getLessonsByTimePeriodAndGroupAndDay(timePeriod, day))}" var="listOfLessons">
                                                         <tr>
                                                             <ui:repeat value="#{listOfLessons}" var="singlelesson">
                                                                 <td colspan="#{singlelesson.colSpan}" rowspan="#{singlelesson.rowSpan}" style="min-width: 150px; max-width: 150px" >

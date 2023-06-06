@@ -1,23 +1,15 @@
 package com.risonna.schedulewebapp.beans;
-import com.risonna.schedulewebapp.database.ScheduleDatabase;
-import com.risonna.schedulewebapp.database.databaseProcessing;
+import com.risonna.schedulewebapp.database.DatabaseProcessing;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
-import jakarta.servlet.ServletException;
-import jakarta.servlet.http.HttpServletRequest;
-import org.apache.commons.codec.digest.DigestUtils;
-import javax.naming.InitialContext;
+
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
 
 @Named
 @RequestScoped
-public class register implements Serializable {
+public class Register implements Serializable {
     private String username;
     private String password;
     private String passwordConfirm;
@@ -63,7 +55,7 @@ public class register implements Serializable {
             sb.append(String.format("%02x", b));
         }
         String hashedPasswordStr = sb.toString();
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
 
         database.addUser(username, hashedPasswordStr, email, registered_via_kemsu);
 

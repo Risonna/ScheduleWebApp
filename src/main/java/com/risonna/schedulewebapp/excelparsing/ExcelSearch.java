@@ -441,7 +441,30 @@ public class ExcelSearch {
         String fromWeekToWeek;
         fromWeekToWeek = getFromWeekToWeek(cellValue);
 
-        lesson.setFromWeekToWeek(fromWeekToWeek);
+        //unjoin the c n-m нед
+        if(!fromWeekToWeek.equals("")){
+            String regexweeknums = "\\d+(?:-\\d+)?";
+            Pattern patternnums = Pattern.compile(regexweeknums);
+            Matcher matchernums = patternnums.matcher(fromWeekToWeek);
+            String firstLetterRegex = "^(со?)\\s*\\d+(?:-\\d+)?\\s*нед\\.?";
+            String lastLetterRegex = "со?\\s*\\d+(?:-\\d+)?\\s*(нед\\.?)?$";
+            Pattern firstLetterPattern = Pattern.compile(firstLetterRegex);
+            Matcher firstLetterMatcher = firstLetterPattern.matcher(fromWeekToWeek);
+            Pattern lastLetterPattern = Pattern.compile(lastLetterRegex);
+            Matcher lastLetterMatcher = lastLetterPattern.matcher(fromWeekToWeek);
+            if (matchernums.find() && firstLetterMatcher.find() && lastLetterMatcher.find()) {
+                String numbers = matchernums.group();
+                String firstLetter = firstLetterMatcher.group(1);
+                String lastLetter = lastLetterMatcher.group(1);
+                lesson.setFromWeekToWeek(firstLetter + " " + numbers + " " + lastLetter);
+            } else {
+                System.out.println("No match found.");
+                lesson.setFromWeekToWeek("nomatch");
+            }
+        }
+        else{
+            lesson.setFromWeekToWeek("");
+        }
 
 
         String cellTime;
@@ -707,7 +730,7 @@ public class ExcelSearch {
     }
 
     private String getFromWeekToWeek(String cellValue) {
-        String regex = "с\\s*(\\d+)(?:-(\\d+))?\\s*нед\\.?";
+        String regex = "со?\\s*(\\d+)(?:-(\\d+))?\\s*нед\\.?";
         Pattern pattern = Pattern.compile(regex);
         Matcher matcher = pattern.matcher(cellValue);
 

@@ -11,9 +11,9 @@ import java.util.List;
 
 @Named
 @RequestScoped
-public class databaseProcessing implements Serializable {
+public class DatabaseProcessing implements Serializable {
 
-    public databaseProcessing(){
+    public DatabaseProcessing(){
 
     }
 

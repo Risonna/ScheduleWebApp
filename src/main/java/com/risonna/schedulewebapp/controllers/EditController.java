@@ -7,8 +7,8 @@ import java.io.Serializable;
 
 @Named
 @RequestScoped
-public class editController implements Serializable {
-    public editController(){
+public class EditController implements Serializable {
+    public EditController(){
 
     }
 

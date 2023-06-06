@@ -2,7 +2,6 @@ package com.risonna.schedulewebapp.database;
 
 import com.risonna.schedulewebapp.beans.Teacher;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.faces.context.ExternalContext;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
 import jakarta.json.Json;
@@ -23,7 +22,7 @@ import java.util.List;
 
 @Named
 @RequestScoped
-public class kemsuDatabase {
+public class KemsuDatabase {
 
     private List<Teacher> teacherList;
     private List<String> subjectList;

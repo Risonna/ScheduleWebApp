@@ -11,7 +11,7 @@ import jakarta.faces.validator.ValidatorException;
 import java.util.ResourceBundle;
 
 @FacesValidator("validatePasswordConfirmation")
-public class validatePasswordConfirmation implements Validator<String> {
+public class ValidatePasswordConfirmation implements Validator<String> {
 
     @Override
     public void validate(FacesContext context, UIComponent component, String value) throws ValidatorException {

@@ -29,27 +29,27 @@
                 <div class="form-container">
                     <div class="form-field">
                         <h:outputText value="#{msg.teacher_login}:" styleClass="form-label" />
-                        <p:inputText id="teacherLogin" value="#{admin_teacher.teacherLogin}" styleClass="form-input" />
+                        <p:inputText id="teacherLogin" value="#{adminTeacher.teacherLogin}" styleClass="form-input" />
                         <p:message for="teacherLogin" styleClass="form-message" />
                         <div class="input-message">#{msg.add_teacher_admin_guide}</div>
                     </div>
 
-                    <p:commandButton value="#{msg.add_teacher}" action="#{admin_teacher.addTeacher}" update="teacherTable" styleClass="form-button" />
+                    <p:commandButton value="#{msg.add_teacher}" action="#{adminTeacher.addTeacher}" update="teacherTable" styleClass="form-button" />
                 </div>
 
-                <h:dataTable id="teacherTable" value="#{admin_teacher.adminTeacherList}" var="adminTeacher" emptyMessage="No teachers added yet" styleClass="teacher-table">
+                <h:dataTable id="teacherTable" value="#{adminTeacher.adminTeacherList}" var="admin_teacher" emptyMessage="No teachers added yet" styleClass="teacher-table">
                     <h:column>
                         <f:facet name="header">#{msg.teachers_logins}</f:facet>
-                        <h:outputText value="#{adminTeacher}" />
+                        <h:outputText value="#{admin_teacher}" />
                     </h:column>
                     <h:column styleClass="actions-column">
                         <f:facet name="header"/>
-                        <p:commandLink styleClass="delete-link" action="#{admin_teacher.deleteTeacher(adminTeacher)}" oncomplete="updateLessons()">
+                        <p:commandLink styleClass="delete-link" action="#{adminTeacher.deleteTeacher(admin_teacher)}" oncomplete="updateLessons()">
                             <i class="pi pi-minus-circle delete-icon"></i>
                         </p:commandLink>
                     </h:column>
                 </h:dataTable>
-                <p:remoteCommand name="updateLessons" action="#{admin_teacher.updateAdminsTeachers()}" update="teacherTable" />
+                <p:remoteCommand name="updateLessons" action="#{adminTeacher.updateAdminsTeachers()}" update="teacherTable" />
             </h:form>
         </ui:define>
 

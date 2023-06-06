@@ -44,6 +44,36 @@ public class Lesson implements Serializable {
     public Lesson(){
         fromWeekToWeek = "";
     }
+    public Lesson(Lesson other) {
+        this.teacherName = other.teacherName;
+        this.subjectName = other.subjectName;
+        this.cabinetName = other.cabinetName;
+        this.lessonDay = other.lessonDay;
+        this.lessonTime = other.lessonTime;
+        this.groupName = other.groupName;
+        this.groupNameFull = other.groupNameFull;
+        this.instituteName = other.instituteName;
+        this.lessonWeek = other.lessonWeek;
+        this.cellId = other.cellId;
+        this.fromWeekToWeek = other.fromWeekToWeek;
+        this.rowFirst = other.rowFirst;
+        this.rowLast = other.rowLast;
+        this.colFirst = other.colFirst;
+        this.colLast = other.colLast;
+        this.forWholeGroup = other.forWholeGroup;
+        this.colSpan = other.colSpan;
+        this.multipleLessonsInOneCell = other.multipleLessonsInOneCell;
+        this.rowSpan = other.rowSpan;
+        this.teacherId = other.teacherId;
+        this.subjectId = other.subjectId;
+        this.cabinetId = other.cabinetId;
+        this.groupId = other.groupId;
+        this.groupColFirst = other.groupColFirst;
+        this.groupColLast = other.groupColLast;
+        this.potochLesson = other.potochLesson;
+        this.lessonCell = other.lessonCell;
+        this.groupsForLesson = other.groupsForLesson;
+    }
 
 
     //setters

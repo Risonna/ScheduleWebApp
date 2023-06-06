@@ -23,8 +23,8 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Named
 @RequestScoped
-public class htmlToPdfConverter implements Serializable {
-    public htmlToPdfConverter() {
+public class HtmlToPdfConverter implements Serializable {
+    public HtmlToPdfConverter() {
 
     }
 

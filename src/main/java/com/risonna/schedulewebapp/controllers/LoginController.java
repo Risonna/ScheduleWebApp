@@ -7,8 +7,8 @@ import jakarta.inject.Named;
 
 @Named
 @RequestScoped
-public class loginController {
-    public loginController(){
+public class LoginController {
+    public LoginController(){
 
     }
 

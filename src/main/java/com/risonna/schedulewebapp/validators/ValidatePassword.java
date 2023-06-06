@@ -10,7 +10,7 @@ import jakarta.faces.validator.ValidatorException;
 import java.util.ResourceBundle;
 
 @FacesValidator("validatePassword")
-public class validatePassword implements Validator<String> {
+public class ValidatePassword implements Validator<String> {
     private static final int MINIMUM_LENGTH = 7;
     private static final int MAXIMUM_LENGTH = 25;
     private static final String PATTERN = "[a-zA-Z0-9]*";

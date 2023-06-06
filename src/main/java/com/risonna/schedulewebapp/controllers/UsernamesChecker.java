@@ -1,21 +1,21 @@
 package com.risonna.schedulewebapp.controllers;
 
 import com.risonna.schedulewebapp.beans.User;
-import com.risonna.schedulewebapp.database.databaseProcessing;
+import com.risonna.schedulewebapp.database.DatabaseProcessing;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class usernamesChecker {
+public class UsernamesChecker {
     private List<String> usernames;
 
     public List<String> getUsernames() {
         return usernames;
     }
 
-    public usernamesChecker(){
+    public UsernamesChecker(){
         usernames = new ArrayList<>();
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         List<User> users = new ArrayList<>();
         users = database.getUsersFromSQL();
         for(User user: users){

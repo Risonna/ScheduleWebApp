@@ -1,7 +1,7 @@
 package com.risonna.schedulewebapp.controllers;
 
 import com.risonna.schedulewebapp.beans.*;
-import com.risonna.schedulewebapp.database.databaseProcessing;
+import com.risonna.schedulewebapp.database.DatabaseProcessing;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
@@ -14,7 +14,7 @@ import java.util.*;
 
 @Named
 @ViewScoped
-public class scheduleController implements Serializable {
+public class ScheduleController implements Serializable {
     private List<Teacher> teacherList = specifyTheTeachers();
 
     public void setTeacherList(List<Teacher> teacherList) {
@@ -148,6 +148,7 @@ public class scheduleController implements Serializable {
     private List<Lesson> lessonsByTimePeriodAndTeacherAndDay;
     private List<Lesson> filteredLessonsByDayAndCabinet;
     private List<Lesson> lessonsByTimePeriodAndCabinetAndDay;
+    private List<List<Lesson>> filteredAndSortedLessonsForGroups;
 
 
     private List<Lesson> listOfStuff;
@@ -312,36 +313,52 @@ public class scheduleController implements Serializable {
         List<Integer> colPositions = new ArrayList<>();
         int rowAmount = 0;
         int colAmount = 0;
-        int currentRow = 0;
+        int currentMultipleLesson = 0;
+        int colForCopiedCheck = -20;
+        List<Lesson> copiedlistHuh = new ArrayList<>();
         for (Lesson lesson : listHuh) {
-            if (!rowPositions.contains(lesson.getRowFirst())) {
-                rowPositions.add(lesson.getRowFirst());
+            Lesson copiedLesson = new Lesson(lesson);
+            if(!copiedLesson.isMultipleLessonsInOneCell() || (copiedLesson.getColFirst() != colForCopiedCheck && colForCopiedCheck !=-20))currentMultipleLesson=0;
+            if(copiedLesson.isMultipleLessonsInOneCell()) {
+                colForCopiedCheck = lesson.getColFirst();
+                currentMultipleLesson++;
+                if (currentMultipleLesson>1){
+                    int rowFirst = copiedLesson.getRowFirst();
+                    copiedLesson.setRowFirst(rowFirst+currentMultipleLesson-1);
+                    copiedLesson.setRowLast(copiedLesson.getRowLast()+currentMultipleLesson-1);
+
+                }
+            }
+            if (!rowPositions.contains(copiedLesson.getRowFirst())) {
+                rowPositions.add(copiedLesson.getRowFirst());
                 rowAmount++;
             }
-            if(lesson.getGroupColLast()-lesson.getGroupColFirst()>0)colAmount=lesson.getGroupColLast()-lesson.getGroupColFirst()+1;
+            if(copiedLesson.getGroupColLast()-copiedLesson.getGroupColFirst()>0)colAmount=copiedLesson.getGroupColLast()-copiedLesson.getGroupColFirst()+1;
 //            if(!colPositions.contains(lesson.getColFirst()) && !colPositions.contains(lesson.getColLast())){
 //                    colPositions.add(lesson.getColFirst());
 //                    colAmount++;
 //            }
 
 
-            if(lesson.isMultipleLessonsInOneCell()){
-//                colPositions.add(lesson.getColLast()+1);
-//                if(colAmount <2)colAmount++;
-                if(currentRow != 0 && (currentRow - lesson.getRowFirst() >= 1)) {
-                    lesson.setRowFirst(currentRow);
-                }
-                currentRow = lesson.getRowFirst()+1;
-//                if(!rowPositions.contains(lesson.getRowFirst())){
-//                    rowPositions.add(lesson.getRowFirst());
-//                    rowAmount++;
-//                }
-                if(lesson.getRowFirst() > rowAmount && !rowPositions.contains(lesson.getRowFirst())) {
-                    rowAmount++;
-                    rowPositions.add(lesson.getRowFirst());
-                }
+//            if(lesson.isMultipleLessonsInOneCell()){
 
-            }
+////                colPositions.add(lesson.getColLast()+1);
+////                if(colAmount <2)colAmount++;
+//                if(currentRow != 0 && (currentRow - lesson.getRowFirst() >= 1)) {
+//                    lesson.setRowFirst(currentRow);
+//                }
+//                currentRow = lesson.getRowFirst()+1;
+////                if(!rowPositions.contains(lesson.getRowFirst())){
+////                    rowPositions.add(lesson.getRowFirst());
+////                    rowAmount++;
+////                }
+//                if(!rowPositions.contains(lesson.getRowFirst())) {
+//                    rowAmount++;
+//                    rowPositions.add(lesson.getRowFirst());
+//                }
+//
+//            }
+            copiedlistHuh.add(copiedLesson);
         }
 
         for (int i = 0; i < rowAmount; i++) {
@@ -349,64 +366,65 @@ public class scheduleController implements Serializable {
             int currentrownum = rowPositions.get(i);
             int rowFirst = rowPositions.get(0);
             int rowLast = rowPositions.get(rowAmount-1);
-            Collections.sort(listHuh, new Comparator<Lesson>() {
+            Collections.sort(copiedlistHuh, new Comparator<Lesson>() {
                 @Override
                 public int compare(Lesson lesson1, Lesson lesson2) {
                     return lesson1.getColFirst() - lesson2.getColFirst();
                 }
             });
-            for (Lesson lesson : listHuh) {
+            for (Lesson lesson : copiedlistHuh) {
                 int colFirst = lesson.getGroupColFirst();
                 int colLast = lesson.getGroupColLast();
-                if (lesson.getRowFirst() == currentrownum) {
-                    if(lesson.getGroupName().equalsIgnoreCase("фит-204") && lesson.getLessonTime().equalsIgnoreCase("13.30-15.05")){
-                        System.out.println("Lesson cols: " + lesson.getColFirst() +"/" + lesson.getColLast() + "group cols and colamount: " +
-                                colFirst + "/" + colLast + "//" + colAmount);
-                    }
-
+                if (lesson.getRowFirst() == currentrownum || lesson.getRowLast() == currentrownum) {
 
                     if(!lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell() &&
                             (lesson.getRowLast() != currentrownum || lesson.getRowFirst() != currentrownum))lesson.setRowSpan(rowAmount);
                     else lesson.setRowSpan(1);
 
 
-                    if(lesson.isForWholeGroup() && !lesson.isMultipleLessonsInOneCell())lesson.setColSpan(colAmount);
+                    if(lesson.isForWholeGroup())lesson.setColSpan(colAmount);
                     else lesson.setColSpan(1);
 
                     boolean isThereLessonAfter = true;
 
-                    if(colAmount>1 && lesson.getColLast() == colLast && lesson.getColFirst() != colFirst){
+                    if(colAmount>1 && lesson.getColLast() == colLast && lesson.getColFirst() != colFirst && !lesson.isForWholeGroup()){
                         boolean isThereLessonBefore = false;
-                        for (Lesson lesson1:listHuh) {
+                        for (Lesson lesson1:copiedlistHuh) {
                             if ((lesson1.getRowFirst() == currentrownum || lesson1.getRowLast() == currentrownum)
-                                    && lesson1.getColLast() != lesson.getColLast()) {
+                                    && lesson1.getColLast() != lesson.getColLast() && lesson1.getColFirst() != lesson.getColFirst()) {
                                 isThereLessonBefore = true;
                                 break;
                             }
 
                         }
 
-                        if(!isThereLessonBefore && lesson.getRowFirst() == currentrownum) {
+                        if(!isThereLessonBefore && (lesson.getRowFirst() == currentrownum) && lesson.getColFirst() != lesson.getGroupColFirst()) {
                             Lesson emptyLesson = new Lesson();
                             emptyLesson.setColSpan(1);
                             emptyLesson.setRowSpan(1);
+                            emptyLesson.setColFirst(lesson.getColFirst() + 1);
+                            emptyLesson.setColLast(lesson.getColLast() + 1);
+                            emptyLesson.setRowFirst(lesson.getRowFirst());
+                            emptyLesson.setRowLast(lesson.getRowLast());
+                            emptyLesson.setGroupColFirst(lesson.getGroupColFirst());
+                            emptyLesson.setGroupColLast(lesson.getGroupColLast());
                             listOfLessons.add(emptyLesson);
                             System.out.println("adding empty lesson for " + lesson.getGroupName());
                         }
                     }
 
-                    if(colAmount>1 && lesson.getColFirst() == colFirst && lesson.getColLast() != colLast){
+                    if(colAmount>1 && lesson.getColFirst() == colFirst && lesson.getColLast() != colLast && !lesson.isForWholeGroup()){
                         isThereLessonAfter = false;
-                        for (Lesson lesson1:listHuh) {
+                        for (Lesson lesson1:copiedlistHuh) {
                             if ((lesson1.getRowFirst() == currentrownum || lesson1.getRowLast() == currentrownum)
-                                    && lesson1.getColLast() != lesson.getColLast()) {
+                                    && lesson1.getColLast() != lesson.getColLast() && lesson1.getColFirst() != lesson.getColFirst()) {
                                 isThereLessonAfter = true;
                                 break;
                             }
 
                         }
 
-                        if(!isThereLessonAfter && lesson.getRowFirst() == currentrownum) {
+                        if(!isThereLessonAfter && (lesson.getRowFirst() == currentrownum) && lesson.getColLast() != lesson.getGroupColLast()) {
                             Lesson emptyLesson = new Lesson();
                             emptyLesson.setColSpan(1);
                             emptyLesson.setRowSpan(1);
@@ -416,7 +434,7 @@ public class scheduleController implements Serializable {
                         }
                     }
 
-                    if(isThereLessonAfter){listOfLessons.add(lesson);}
+                    if(isThereLessonAfter && !listOfLessons.contains(lesson) && lesson.getRowFirst() == currentrownum){listOfLessons.add(lesson);}
 
                 }
 //                rowFirst = lesson.getRowFirst();
@@ -424,6 +442,14 @@ public class scheduleController implements Serializable {
 //                colFirst = lesson.getColFirst();
 //                colLast = lesson.getColLast();
             }
+            System.out.println("size is " + listOfLessons.size());
+            for (Lesson lesson:listOfLessons){
+                System.out.println("Lesson is: " + lesson.getSubjectName() + "rows/cols: " + lesson.getRowFirst() + "/" + lesson.getColFirst() + " s " + lesson.getRowLast() + "/" + lesson.getColLast());
+            }
+            for (Lesson lesson: copiedlistHuh){
+                System.out.println("Lesson is: " + lesson.getSubjectName());
+            }
+
             listOfListsOfLessons.add(listOfLessons);
         }
 
@@ -545,7 +571,7 @@ public class scheduleController implements Serializable {
         this.subjects = subjects;
     }
 
-    public scheduleController() {
+    public ScheduleController() {
     updateEverythingFromSQL();
     if(getTeacherNameList().size() > 1 && getDepartmentList().size() >1 && getGroupNames().size() >1 &&
             getCabinetList().size() > 1 && getDaysOfWeek().size() >1){
@@ -687,27 +713,27 @@ public class scheduleController implements Serializable {
         getTeachersForDepartment();
     }
     private void updateTeachersFromSQL(){
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         setTeachersFromSQL(database.getTeacherListFromSQL());
         database = null;
     }
     private void updateCabinetsFromSQL(){
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         setCabinetsFromSQL(database.getCabinetListFromSQL());
         database = null;
     }
     private void updateSubjectsFromSQL(){
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         setSubjectsFromSQL(database.getSubjectListFromSQL());
         database = null;
     }
     private void updateGroupsFromSQL(){
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         setGroupsFromSQL(database.getGroupListFromSQL());
         database = null;
     }
     private void updateLessonsFromSQL(){
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
         setLessonsFromSQL(database.getLessonsListFromSQL());
         database = null;
     }

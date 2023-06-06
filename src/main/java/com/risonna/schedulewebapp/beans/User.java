@@ -1,10 +1,9 @@
 package com.risonna.schedulewebapp.beans;
 
-import com.risonna.schedulewebapp.controllers.kemsuServiceController;
-import com.risonna.schedulewebapp.controllers.usernamesChecker;
-import com.risonna.schedulewebapp.database.databaseProcessing;
+import com.risonna.schedulewebapp.controllers.KemsuServiceController;
+import com.risonna.schedulewebapp.controllers.UsernamesChecker;
+import com.risonna.schedulewebapp.database.DatabaseProcessing;
 import jakarta.enterprise.context.RequestScoped;
-import jakarta.enterprise.context.SessionScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
@@ -16,7 +15,6 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.sql.SQLException;
 import java.util.List;
 import java.util.ResourceBundle;
 import java.util.logging.Level;
@@ -90,7 +88,7 @@ public class User implements Serializable {
             }
 
             boolean isAdminTeacher = false;
-            databaseProcessing database = new databaseProcessing();
+            DatabaseProcessing database = new DatabaseProcessing();
             for(UsersGroups userGroup: database.getUsersGroups()){
                 if(userGroup.getGroup().equals("admin_teacher") && userGroup.getUser().equals(username)){
                     isAdminTeacher = true;
@@ -98,7 +96,7 @@ public class User implements Serializable {
                 }
             }
             if(!isAdminTeacher){
-                usernamesChecker usernamesChecker = new usernamesChecker();
+                UsernamesChecker usernamesChecker = new UsernamesChecker();
                 if(usernamesChecker.getUsernames().contains(username)){
                     if(database.getAdminsTeachers().contains(username)){
                         database.addUsersGroups(username, "admin_teacher");
@@ -106,7 +104,7 @@ public class User implements Serializable {
                 }
             }
             else{
-                usernamesChecker usernamesChecker = new usernamesChecker();
+                UsernamesChecker usernamesChecker = new UsernamesChecker();
                 if(usernamesChecker.getUsernames().contains(username)) {
                     if (!database.getAdminsTeachers().contains(username)) {
                         database.removeUsersGroups(username, "admin_teacher");
@@ -160,7 +158,7 @@ public class User implements Serializable {
 
     public String alternativeLogin() throws NoSuchAlgorithmException {
        String kemsuCode = connectToKemsu();
-        usernamesChecker usernamesChecker = new usernamesChecker();
+        UsernamesChecker usernamesChecker = new UsernamesChecker();
         if(usernamesChecker.getUsernames().contains(username)){
             if(kemsuCode.equals("connected")){
                 System.out.println("Connected to kemsu and found username");
@@ -244,7 +242,7 @@ public class User implements Serializable {
 
     private String connectToKemsu(){
         try {
-            kemsuServiceController kemsuApi = new kemsuServiceController();
+            KemsuServiceController kemsuApi = new KemsuServiceController();
             String isAllOkay = kemsuApi.authorizeKemsu(username, password);
             if(!isAllOkay.equals("somethingbad") && !isAllOkay.equals("not_authorized")) {
                 this.accessToken = kemsuApi.getUserInfo().getAccessToken();
@@ -268,7 +266,7 @@ public class User implements Serializable {
         if (useAlternativeMethod) {
             return alternativeLogin();
         } else {
-            databaseProcessing database = new databaseProcessing();
+            DatabaseProcessing database = new DatabaseProcessing();
             List<User> users = database.getUsersFromSQL();
             registered_via_kemsu = false;
             for(User user: users){
@@ -323,7 +321,7 @@ public class User implements Serializable {
             sb.append(String.format("%02x", b));
         }
         String hashedPasswordStr = sb.toString();
-        databaseProcessing database = new databaseProcessing();
+        DatabaseProcessing database = new DatabaseProcessing();
 
         database.addUser(username, hashedPasswordStr, email, registered_via_kemsu);
 
