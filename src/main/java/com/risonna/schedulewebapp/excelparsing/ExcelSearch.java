@@ -1,12 +1,14 @@
 package com.risonna.schedulewebapp.excelparsing;
 
 
-import com.risonna.schedulewebapp.beans.*;
-import org.apache.poi.hssf.usermodel.HSSFWorkbook;
+import com.risonna.schedulewebapp.hibernate.entity.Subject;
+import com.risonna.schedulewebapp.hibernate.entity.Group;
+import com.risonna.schedulewebapp.hibernate.entity.Teacher;
+import com.risonna.schedulewebapp.hibernate.entity.Cabinet;
+import com.risonna.schedulewebapp.hibernate.entity.Lesson;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.usermodel.Workbook;
 import org.apache.poi.ss.util.CellRangeAddress;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -360,7 +362,7 @@ public class ExcelSearch {
        String processedCellValue = cellValue.toLowerCase().replaceAll("\\s", "");
         Lesson lesson = new Lesson();
         lesson.setTeacherName("unknown");
-        lesson.setTeacherId(0);
+        lesson.setTeacherId(1);
         for (Teacher teacher : teacherNames) {
             String regex;
             String checking;
@@ -397,7 +399,7 @@ public class ExcelSearch {
 
 
         lesson.setCabinetName("unknown");
-        lesson.setCabinetId(0);
+        lesson.setCabinetId(1);
         for (Cabinet cabinet : cabinetList) {
             String processedCabinetName = cabinet.getCabinetName().trim().toLowerCase().replaceAll("\\s", "");
             if (processedCellValue.contains(processedCabinetName)) {
@@ -430,12 +432,12 @@ public class ExcelSearch {
             }
             if (!isSubjectThere) {
                 lesson.setSubjectName("Subject isn't specified or not found");
-                lesson.setSubjectId(0);
+                lesson.setSubjectId(1);
             }
         }
         else{
             lesson.setSubjectName("Couldn't parse the subjectName");
-            lesson.setSubjectId(0);
+            lesson.setSubjectId(1);
         }
 
         String fromWeekToWeek;
@@ -488,7 +490,7 @@ public class ExcelSearch {
         // Print institute name
         lesson.setInstituteName(instituteName);
 
-        lesson.setGroupId(0);
+        lesson.setGroupId(1);
 
 
         for (Group group : groupList) {
@@ -649,7 +651,7 @@ public class ExcelSearch {
 
                         }
                         if (!found) {
-                            lessonPotoch.setGroupId(0);
+                            lessonPotoch.setGroupId(1);
                         }
                         lessonArrayList.add(lessonPotoch);
 

@@ -236,10 +236,10 @@
 
                 <ui:repeat value="#{scheduleController.teachersForDepartment}" var="teacherToSee" rendered="#{scheduleController.selectedTeacher == 'Показать Всех'}">
 
-                <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod" rendered="#{teacherToSee != 'Показать Всех'}">
+                <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod" rendered="#{teacherToSee != 'Показать Всех' and scheduleController.isTeacherLessonsMoreThanOne(teacherToSee)}">
                     <tr>
                         <ui:fragment rendered="#{timePeriod=='8.00-9.35'}">
-                        <td class="first-teacher" rowspan="#{scheduleController.daysOfWeek.size()-1}">#{teacherToSee}</td>
+                        <td class="first-teacher" rowspan="#{scheduleController.TIME_PERIODS_length}">#{teacherToSee}</td>
                         </ui:fragment>
                         <td>
                             <h:outputText value="#{timePeriod}" />

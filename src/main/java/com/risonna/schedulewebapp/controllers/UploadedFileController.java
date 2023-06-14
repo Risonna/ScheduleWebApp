@@ -1,8 +1,12 @@
 package com.risonna.schedulewebapp.controllers;
 
-import com.risonna.schedulewebapp.beans.*;
-import com.risonna.schedulewebapp.database.DatabaseProcessing;
+import com.risonna.schedulewebapp.database.DataHelper;
 import com.risonna.schedulewebapp.excelparsing.ExcelSearch;
+import com.risonna.schedulewebapp.hibernate.entity.Cabinet;
+import com.risonna.schedulewebapp.hibernate.entity.Group;
+import com.risonna.schedulewebapp.hibernate.entity.Lesson;
+import com.risonna.schedulewebapp.hibernate.entity.Subject;
+import com.risonna.schedulewebapp.hibernate.entity.Teacher;
 import jakarta.enterprise.context.SessionScoped;
 import jakarta.inject.Named;
 import org.apache.commons.io.IOUtils;
@@ -56,21 +60,18 @@ public class UploadedFileController implements Serializable {
 
 
     public void parse(String filePath) throws IOException {
-        ScheduleController getLessonInfoFromSQL = new ScheduleController();
-        DatabaseProcessing database = new DatabaseProcessing();
-        List<Teacher> teachers = database.getTeacherListFromSQL();
-        List<Subject> subjects = database.getSubjectListFromSQL();
-        List<Cabinet> cabinets = database.getCabinetListFromSQL();
-        List<Group> groups = database.getGroupListFromSQL();
+        List<Teacher> teachers = DataHelper.getInstance().getAllTeachers();
+        List<Subject> subjects = DataHelper.getInstance().getAllSubjects();
+        List<Cabinet> cabinets = DataHelper.getInstance().getAllCabinets();
+        List<Group> groups = DataHelper.getInstance().getAllGroups();
 
         setExcelSearch(new ExcelSearch(filePath, teachers, subjects, cabinets, groups));
 
 
         excelSearch.parseStuff();
+        
 
-
-        database.fillLessons(excelSearch.getLessonList());
-        lessonsStatic = excelSearch.getLessonList();
+        DataHelper.getInstance().insertLessons(excelSearch.getLessonList());
 
 
 

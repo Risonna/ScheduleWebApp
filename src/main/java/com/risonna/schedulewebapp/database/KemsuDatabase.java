@@ -1,6 +1,8 @@
 package com.risonna.schedulewebapp.database;
 
-import com.risonna.schedulewebapp.beans.Teacher;
+import com.risonna.schedulewebapp.hibernate.entity.Group;
+import com.risonna.schedulewebapp.hibernate.entity.Subject;
+import com.risonna.schedulewebapp.hibernate.entity.Teacher;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.context.FacesContext;
 import jakarta.inject.Named;
@@ -25,14 +27,20 @@ import java.util.List;
 public class KemsuDatabase {
 
     private List<Teacher> teacherList;
-    private List<String> subjectList;
+    private List<String> subjectListString;
+    private List<Subject> subjectList = new ArrayList<>();
 
-    public List<String> getSubjectList() {
+    public List<Subject> getSubjectList() {
         getSubjectsFromAPI();
+        for(String subject:subjectListString){
+            Subject subject1 = new Subject();
+            subject1.setSubjectName(subject);
+            this.subjectList.add(subject1);
+        }
         return subjectList;
     }
 
-    public void setSubjectList(List<String> subjectList) {
+    public void setSubjectList(List<Subject> subjectList) {
         this.subjectList = subjectList;
     }
 
@@ -40,14 +48,22 @@ public class KemsuDatabase {
         getTeachersFromAPI();
         return teacherList;
     }
-    private List<String> groupList;
+    private List<String> groupListString;
+    private List<Group> groupList = new ArrayList<>();
 
-    public List<String> getGroupList() {
+    public List<Group> getGroupList() {
         getGroupsFromAPI();
+        for(String group:groupListString){
+            Group group1 = new Group();
+            group1.setGroupName(group);
+            group1.setFullGroupName("unknown");
+            group1.setInstitute("unknown");
+            this.groupList.add(group1);
+        }
         return groupList;
     }
 
-    public void setGroupList(List<String> groupList) {
+    public void setGroupList(List<Group> groupList) {
         this.groupList = groupList;
     }
 
@@ -91,7 +107,7 @@ public class KemsuDatabase {
         } catch (Exception e) {
             System.out.println(e);
         }
-        this.groupList = groupList;
+        this.groupListString = groupList;
     }
     public void getSubjectsFromAPI(){
         List<String> subjectList = new ArrayList<>();
@@ -115,7 +131,6 @@ public class KemsuDatabase {
             try (JsonReader jsonReader = Json.createReader(new StringReader(content.toString()))) {
                 JsonObject json = jsonReader.readObject();
                 JsonArray results = json.getJsonArray("result");
-                subjectList.add("unknown");
                 for (JsonObject result : results.getValuesAs(JsonObject.class)) {
                     String disciplineName = result.getString("disciplineName");
 
@@ -130,7 +145,7 @@ public class KemsuDatabase {
         } catch (Exception e) {
             System.out.println(e);
         }
-        this.subjectList = subjectList;
+        this.subjectListString = subjectList;
     }
     public void getTeachersFromAPI() {
         List<Teacher> teachersList = new ArrayList<>();

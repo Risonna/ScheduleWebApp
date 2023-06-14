@@ -27,14 +27,14 @@
             <h:form enctype="multipart/form-data" styleClass="file-upload">
                 <div class="button-container">
                     <div class="button-group">
-                        <h:commandButton value="#{msg.fillteachers}" action="#{databaseProcessing.fillTeachers(scheduleController.teacherList)}" styleClass="button button-primary" />
-                        <h:commandButton value="#{msg.fillsubjects}" action="#{databaseProcessing.fillSubjects(scheduleController.subjects)}" styleClass="button button-primary" />
-                        <h:commandButton value="#{msg.fillcabinets}" action="#{databaseProcessing.fillCabinets(scheduleController.cabinets)}" styleClass="button button-primary" />
+                        <h:commandButton value="#{msg.fillteachers}" action="#{dataHelper.insertTeachers(scheduleController.teacherList)}" styleClass="button button-primary" />
+                        <h:commandButton value="#{msg.fillsubjects}" action="#{dataHelper.insertSubjects(scheduleController.subjects)}" styleClass="button button-primary" />
+                        <h:commandButton value="#{msg.fillcabinets}" action="#{dataHelper.insertCabinets(scheduleController.cabinets)}" styleClass="button button-primary" />
                     </div>
                     <div class="button-group">
-                        <h:commandButton value="#{msg.fillteachersapi}" action="#{databaseProcessing.fillTeachers(kemsuDatabase.teacherList)}" styleClass="button button-secondary"/>
-                        <h:commandButton value="#{msg.fillsubjectsapi}" action="#{databaseProcessing.fillSubjects(kemsuDatabase.subjectList)}" styleClass="button button-secondary"/>
-                        <h:commandButton value="#{msg.fillgroupsapi}" action="#{databaseProcessing.fillGroups(kemsuDatabase.groupList)}" styleClass="button button-secondary"/>
+                        <h:commandButton value="#{msg.fillteachersapi}" action="#{dataHelper.insertTeachers(kemsuDatabase.teacherList)}" styleClass="button button-secondary"/>
+                        <h:commandButton value="#{msg.fillsubjectsapi}" action="#{dataHelper.insertSubjects(kemsuDatabase.subjectList)}" styleClass="button button-secondary"/>
+                        <h:commandButton value="#{msg.fillgroupsapi}" action="#{dataHelper.insertGroups(kemsuDatabase.groupList)}" styleClass="button button-secondary"/>
                     </div>
                 </div>
             </h:form>

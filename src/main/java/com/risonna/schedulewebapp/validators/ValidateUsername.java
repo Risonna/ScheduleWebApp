@@ -1,6 +1,7 @@
 package com.risonna.schedulewebapp.validators;
 
-import com.risonna.schedulewebapp.controllers.UsernamesChecker;
+import com.risonna.schedulewebapp.database.DataHelper;
+import com.risonna.schedulewebapp.hibernate.entity.Users;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.component.UIComponent;
 import jakarta.faces.context.FacesContext;
@@ -43,9 +44,12 @@ public class ValidateUsername implements Validator<String> {
     private boolean isUsernameAlreadyExists(String username) {
         // Implement your logic to check if the username already exists in the system
         // Return true if it exists, false otherwise
-        UsernamesChecker usernames = new UsernamesChecker();
-        List<String> users = usernames.getUsernames();
-        usernames = null;
-        return users.contains(username);// Replace this with your own implementation
+
+        List<Users> users = DataHelper.getInstance().getAllUsers();
+        boolean usernameExists = false;
+        for (Users user: users) {
+            if(user.getUserid().equals(username))return true;
+        }
+        return false;
     }
 }

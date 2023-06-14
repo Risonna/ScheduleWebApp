@@ -1,7 +1,11 @@
 package com.risonna.schedulewebapp.controllers;
 
-import com.risonna.schedulewebapp.beans.*;
-import com.risonna.schedulewebapp.database.DatabaseProcessing;
+import com.risonna.schedulewebapp.hibernate.entity.Teacher;
+import com.risonna.schedulewebapp.hibernate.entity.Subject;
+import com.risonna.schedulewebapp.hibernate.entity.Cabinet;
+import com.risonna.schedulewebapp.hibernate.entity.Group;
+import com.risonna.schedulewebapp.hibernate.entity.Lesson;
+import com.risonna.schedulewebapp.database.DataHelper;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.view.ViewScoped;
 import jakarta.inject.Named;
@@ -41,7 +45,8 @@ public class ScheduleController implements Serializable {
             "Системы хранения и обработки больших данных", "Разработка нативных мобильных приложений", "Администрирование ERP кластеров",
             "Компьютерное моделирование в современных задачах медицины и промышленн", "Информационная безопасность",
             "Коррупция: причины, проявления, продиводействие", "Разработка мобильных приложений");
-    private List<String> cabinets = Arrays.asList("1бл", "2бл", "2130а", "2130б", "2130в", "2131в", "2134", "2139",
+
+    private List<String> cabinetsString = Arrays.asList("1бл", "2бл", "2130а", "2130б", "2130в", "2131в", "2134", "2139",
             "2141", "2143", "2204", "2210", "2218", "2219", "2220", "2221", "2226бл", "2226", "2229", "5104", "5106", "5109",
             "5113", "5120", "5121", "5320", "5404", "1517", "1313", "1326", "1333", "1335", "4бл", "5бл", "лыжная база 1 корпус");
 
@@ -119,16 +124,29 @@ public class ScheduleController implements Serializable {
         this.lessonsOk = lessonsOk;
     }
 
-    public void setCabinets(List<String> cabinets) {
+    private List<Cabinet> cabinets = new ArrayList<>();
+    public void setCabinets(List<Cabinet> cabinets) {
         this.cabinets = cabinets;
     }
 
-    public List<String> getCabinets() {
+    public List<Cabinet> getCabinets() {
+        for (String cabinet:cabinetsString){
+            Cabinet cabinet1 = new Cabinet();
+            cabinet1.setType("unknown");
+            cabinet1.setSeats("unknown");
+            cabinet1.setCabinetName(cabinet);
+            this.cabinets.add(cabinet1);
+        }
         return cabinets;
     }
 
     private boolean isCabinetChecked = false;
     private final String[] TIME_PERIODS = {"8.00-9.35", "9.45-11.20", "11.45-13.20", "13.30-15.05", "15.30-17.05", "17.15-18.50", "19.00-20.35"};
+    private final int TIME_PERIODS_length = TIME_PERIODS.length;
+
+    public int getTIME_PERIODS_length() {
+        return TIME_PERIODS_length;
+    }
 
     public String[] getTIME_PERIODS() {
         return TIME_PERIODS;
@@ -220,7 +238,7 @@ public class ScheduleController implements Serializable {
             if(teacher.getTeacherName().replaceAll("\\s", "").equalsIgnoreCase("unknown"))continue;
             if(teacher.getDepartment().equalsIgnoreCase(selectedDepartment)){
                 if(!teacher.getDepartment().equalsIgnoreCase("unknown"))
-                names.add(teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0) + ".");
+                    names.add(teacher.getTeacherSurname()+" "+teacher.getTeacherName().charAt(0)+"."+teacher.getTeacherPatronymic().charAt(0) + ".");
                 else names.add(teacher.getTeacherName());
             }
 
@@ -572,15 +590,15 @@ public class ScheduleController implements Serializable {
     }
 
     public ScheduleController() {
-    updateEverythingFromSQL();
-    if(getTeacherNameList().size() > 1 && getDepartmentList().size() >1 && getGroupNames().size() >1 &&
-            getCabinetList().size() > 1 && getDaysOfWeek().size() >1){
-        this.selectedTeacher = getTeacherNameList().get(0);
-        this.selectedCabinet = getCabinetList().get(0);
-        this.selectedGroup = getGroupNames().get(0);
-        this.selectedDepartment = getDepartmentList().get(0);
-        this.selectedDayOfWeek = getDaysOfWeek().get(0);
-    }
+        updateEverythingFromSQL();
+        if(getTeacherNameList().size() > 1 && getDepartmentList().size() >1 && getGroupNames().size() >1 &&
+                getCabinetList().size() > 1 && getDaysOfWeek().size() >1){
+            this.selectedTeacher = getTeacherNameList().get(0);
+            this.selectedCabinet = getCabinetList().get(0);
+            this.selectedGroup = getGroupNames().get(0);
+            this.selectedDepartment = getDepartmentList().get(0);
+            this.selectedDayOfWeek = getDaysOfWeek().get(0);
+        }
 
     }
 
@@ -704,38 +722,37 @@ public class ScheduleController implements Serializable {
                 else{
                     lesson.setTeacherName(teacher.getTeacherName());
                 }
-                 break;
+                break;
             }
         }
+    }
+
+    public boolean isTeacherLessonsMoreThanOne(String teacherName){
+
+        for(Lesson lesson:lessonsOk){
+            if(lesson.getTeacherName().equals(teacherName))return true;
+        }
+
+        return false;
     }
 
     public void updateTeacherList(){
         getTeachersForDepartment();
     }
     private void updateTeachersFromSQL(){
-        DatabaseProcessing database = new DatabaseProcessing();
-        setTeachersFromSQL(database.getTeacherListFromSQL());
-        database = null;
+        setTeachersFromSQL(DataHelper.getInstance().getAllTeachers());
     }
     private void updateCabinetsFromSQL(){
-        DatabaseProcessing database = new DatabaseProcessing();
-        setCabinetsFromSQL(database.getCabinetListFromSQL());
-        database = null;
+        setCabinetsFromSQL(DataHelper.getInstance().getAllCabinets());
     }
     private void updateSubjectsFromSQL(){
-        DatabaseProcessing database = new DatabaseProcessing();
-        setSubjectsFromSQL(database.getSubjectListFromSQL());
-        database = null;
+        setSubjectsFromSQL(DataHelper.getInstance().getAllSubjects());
     }
     private void updateGroupsFromSQL(){
-        DatabaseProcessing database = new DatabaseProcessing();
-        setGroupsFromSQL(database.getGroupListFromSQL());
-        database = null;
+        setGroupsFromSQL(DataHelper.getInstance().getAllGroups());
     }
     private void updateLessonsFromSQL(){
-        DatabaseProcessing database = new DatabaseProcessing();
-        setLessonsFromSQL(database.getLessonsListFromSQL());
-        database = null;
+        setLessonsFromSQL(DataHelper.getInstance().getAllLessons());
     }
 
     public void updateEverythingFromSQL(){

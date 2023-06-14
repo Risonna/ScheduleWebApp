@@ -29,7 +29,7 @@
                 <div class="form-container">
                     <div class="form-field">
                         <h:outputText value="#{msg.teacher_login}:" styleClass="form-label" />
-                        <p:inputText id="teacherLogin" value="#{adminTeacher.teacherLogin}" styleClass="form-input" />
+                        <p:inputText id="teacherLogin" value="#{adminTeacher.userid}" styleClass="form-input" />
                         <p:message for="teacherLogin" styleClass="form-message" />
                         <div class="input-message">#{msg.add_teacher_admin_guide}</div>
                     </div>
@@ -45,7 +45,7 @@
                     <h:column styleClass="actions-column">
                         <f:facet name="header"/>
                         <p:commandLink styleClass="delete-link" action="#{adminTeacher.deleteTeacher(admin_teacher)}" oncomplete="updateLessons()">
-                            <i class="pi pi-minus-circle delete-icon"></i>
+                            <i class="pi pi-minus-circle delete-icon"/>
                         </p:commandLink>
                     </h:column>
                 </h:dataTable>

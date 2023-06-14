@@ -1,8 +1,8 @@
 package com.risonna.schedulewebapp.beans;
 
 import com.risonna.schedulewebapp.controllers.KemsuServiceController;
-import com.risonna.schedulewebapp.controllers.UsernamesChecker;
-import com.risonna.schedulewebapp.database.DatabaseProcessing;
+import com.risonna.schedulewebapp.database.DataHelper;
+import com.risonna.schedulewebapp.hibernate.entity.Users;
 import jakarta.enterprise.context.RequestScoped;
 import jakarta.faces.application.FacesMessage;
 import jakarta.faces.context.FacesContext;
@@ -87,30 +87,7 @@ public class User implements Serializable {
                 request.logout();
             }
 
-            boolean isAdminTeacher = false;
-            DatabaseProcessing database = new DatabaseProcessing();
-            for(UsersGroups userGroup: database.getUsersGroups()){
-                if(userGroup.getGroup().equals("admin_teacher") && userGroup.getUser().equals(username)){
-                    isAdminTeacher = true;
-                    break;
-                }
-            }
-            if(!isAdminTeacher){
-                UsernamesChecker usernamesChecker = new UsernamesChecker();
-                if(usernamesChecker.getUsernames().contains(username)){
-                    if(database.getAdminsTeachers().contains(username)){
-                        database.addUsersGroups(username, "admin_teacher");
-                    }
-                }
-            }
-            else{
-                UsernamesChecker usernamesChecker = new UsernamesChecker();
-                if(usernamesChecker.getUsernames().contains(username)) {
-                    if (!database.getAdminsTeachers().contains(username)) {
-                        database.removeUsersGroups(username, "admin_teacher");
-                    }
-                }
-            }
+
             request.login(username, password);
             this.logged = true;
             HttpSession session = request.getSession(false);
@@ -158,10 +135,23 @@ public class User implements Serializable {
 
     public String alternativeLogin() throws NoSuchAlgorithmException {
        String kemsuCode = connectToKemsu();
-        UsernamesChecker usernamesChecker = new UsernamesChecker();
-        if(usernamesChecker.getUsernames().contains(username)){
+        if(isUserThere()){
             if(kemsuCode.equals("connected")){
                 System.out.println("Connected to kemsu and found username");
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hashedPassword = md.digest(password.getBytes());
+                StringBuilder sb = new StringBuilder();
+                for (byte b : hashedPassword) {
+                    sb.append(String.format("%02x", b));
+                }
+                String hashedPasswordStr = sb.toString();
+                for(Users user:DataHelper.getInstance().getAllUsers()){
+                    if(user.getUserid().equals(username)){
+                        if(!user.getPassword().equals(hashedPasswordStr)){
+                            DataHelper.getInstance().updateUsersPassword(username, hashedPasswordStr);
+                        }
+                    }
+                }
 
                 login();
 
@@ -266,12 +256,11 @@ public class User implements Serializable {
         if (useAlternativeMethod) {
             return alternativeLogin();
         } else {
-            DatabaseProcessing database = new DatabaseProcessing();
-            List<User> users = database.getUsersFromSQL();
+            List<Users> users = DataHelper.getInstance().getAllUsers();
             registered_via_kemsu = false;
-            for(User user: users){
-                if(user.getUsername().equals(username)){
-                    registered_via_kemsu = user.isRegistered_via_kemsu();
+            for(Users user: users){
+                if(user.getUserid().equals(username)){
+                    registered_via_kemsu = user.getRegisteredViaKemsu();
                     break;
                 }
             }
@@ -288,6 +277,14 @@ public class User implements Serializable {
         }
     }
 
+    public boolean isUserThere(){
+        for(Users user:DataHelper.getInstance().getAllUsers()){
+            if(user.getUserid().equals(username)){
+                return true;
+            }
+        }
+        return false;
+    }
 
     public boolean isUseAlternativeMethod() {
         return useAlternativeMethod;
@@ -321,11 +318,10 @@ public class User implements Serializable {
             sb.append(String.format("%02x", b));
         }
         String hashedPasswordStr = sb.toString();
-        DatabaseProcessing database = new DatabaseProcessing();
 
-        database.addUser(username, hashedPasswordStr, email, registered_via_kemsu);
+        DataHelper.getInstance().insertUsers(username, hashedPasswordStr, email, registered_via_kemsu);
 
-        database.addUsersGroups(username, "user");
+        DataHelper.getInstance().insertUsersGroups(username, "user");
         this.passwordConfirm = null;
         login();
         hashedPasswordStr = null;
