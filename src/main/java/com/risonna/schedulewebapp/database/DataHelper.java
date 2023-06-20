@@ -9,6 +9,7 @@ import org.hibernate.SessionFactory;
 import jakarta.persistence.criteria.CriteriaBuilder;
 import jakarta.persistence.criteria.CriteriaQuery;
 import jakarta.persistence.criteria.Root;
+import org.hibernate.Transaction;
 
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
@@ -132,101 +133,225 @@ public class DataHelper {
         session.createQuery(criteriaDelete).executeUpdate();
     }
 
-    public List<UsersGroups> getAllUsersGroups(){
-        Session session = getSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<UsersGroups> query = builder.createQuery(UsersGroups.class);
-        Root<UsersGroups> root = query.from(UsersGroups.class);
-        query.select(root);
-        return session.createQuery(query).getResultList();
+    public List<UsersGroups> getAllUsersGroups() {
+        Session session = null;
+        List<UsersGroups> usersGroupsList = new ArrayList<>();
+
+        try {
+            session = sessionFactory.openSession();
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<UsersGroups> query = builder.createQuery(UsersGroups.class);
+            Root<UsersGroups> root = query.from(UsersGroups.class);
+            query.select(root);
+            usersGroupsList = session.createQuery(query).getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        return usersGroupsList;
     }
+
 
     public void insertUsersGroups(String login, String group) {
-        List<UsersGroups> listOfUsersGroups = getAllUsersGroups();
+        Session session = null;
+        Transaction transaction = null;
 
-        Session session = getSession();
-        boolean isUserGroupThere = false;
-        for (UsersGroups usersGroups : listOfUsersGroups) {
-            String userid = usersGroups.getUserid();
-            String groupid = usersGroups.getGroupid();
-            if (userid.equals(login) && groupid.equals(group)) {
-                isUserGroupThere = true;
-                break;
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            List<UsersGroups> listOfUsersGroups = getAllUsersGroups();
+            boolean isUserGroupThere = false;
+            for (UsersGroups usersGroups : listOfUsersGroups) {
+                String userid = usersGroups.getUserid();
+                String groupid = usersGroups.getGroupid();
+                if (userid.equals(login) && groupid.equals(group)) {
+                    isUserGroupThere = true;
+                    break;
+                }
+            }
+            if (!isUserGroupThere) {
+                UsersGroups usersGroups = new UsersGroups();
+                usersGroups.setGroupid(group);
+                usersGroups.setUserid(login);
+                session.persist(usersGroups);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
             }
         }
-        if (!isUserGroupThere) {
-            UsersGroups usersGroups = new UsersGroups();
-            usersGroups.setGroupid(group);
-            usersGroups.setUserid(login);
-            session.persist(usersGroups);
+    }
+
+
+    public void deleteUsersGroups(String groupid, String userid) {
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaDelete<UsersGroups> criteriaDelete = builder.createCriteriaDelete(UsersGroups.class);
+            Root<UsersGroups> root = criteriaDelete.from(UsersGroups.class);
+            criteriaDelete.where(builder.and(builder.equal(root.get("userid"), userid), builder.equal(root.get("groupid"), groupid)));
+            session.createQuery(criteriaDelete).executeUpdate();
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
         }
     }
 
-    public void deleteUsersGroups(String groupid, String userid){
-        Session session = getSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaDelete<UsersGroups> criteriaDelete = builder.createCriteriaDelete(UsersGroups.class);
-        Root<UsersGroups> root = criteriaDelete.from(UsersGroups.class);
-        criteriaDelete.where(builder.and(builder.equal(root.get("userid"), userid), builder.equal(root.get("groupid"), groupid)));
-        session.createQuery(criteriaDelete).executeUpdate();
+
+    public List<Users> getAllUsers() {
+        Session session = null;
+        Transaction transaction = null;
+        List<Users> users = null;
+
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Users> query = builder.createQuery(Users.class);
+            Root<Users> root = query.from(Users.class);
+            query.select(root);
+
+            users = session.createQuery(query).getResultList();
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+
+        return users;
     }
 
-    public List<Users> getAllUsers(){
-        Session session = getSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Users> query = builder.createQuery(Users.class);
-        Root<Users> root = query.from(Users.class);
-        query.select(root);
-        return session.createQuery(query).getResultList();
-    }
 
     public void insertUsers(String userid, String password, String email, boolean registered_via_kemsu) {
-        List<Users> listOfUsers = getAllUsers();
+        Session session = null;
+        Transaction transaction = null;
 
-        Session session = getSession();
-        boolean isUserThere = false;
-        for (Users users : listOfUsers) {
-            String useridt = users.getUserid();
-            if (useridt.equals(userid)) {
-                isUserThere = true;
-                break;
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            List<Users> listOfUsers = getAllUsers();
+            boolean isUserThere = false;
+            for (Users users : listOfUsers) {
+                String useridt = users.getUserid();
+                if (useridt.equals(userid)) {
+                    isUserThere = true;
+                    break;
+                }
+            }
+            if (!isUserThere) {
+                Users user = new Users();
+                user.setUserid(userid);
+                user.setPassword(password);
+                user.setEmail(email);
+                user.setRegisteredViaKemsu(registered_via_kemsu);
+                session.persist(user);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
             }
         }
-        if (!isUserThere) {
-            Users user = new Users();
-            user.setUserid(userid);
-            user.setPassword(password);
-            user.setEmail(email);
-            user.setRegisteredViaKemsu(registered_via_kemsu);
-            session.persist(user);
-        }
     }
+
 
     public Users getUserById(String userid) {
-        Session session = getSession();
-        CriteriaBuilder builder = session.getCriteriaBuilder();
-        CriteriaQuery<Users> query = builder.createQuery(Users.class);
-        Root<Users> root = query.from(Users.class);
-        query.select(root).where(builder.equal(root.get("userid"), userid));
-        return session.createQuery(query).uniqueResult();
-    }
+        Session session = null;
+        Users user = null;
 
-    public void updateUsersPassword(String userid, String password) throws NoSuchAlgorithmException {
-        Session session = getSession();
-        Users user = getUserById(userid);
-        if (user != null) {
-            MessageDigest md = MessageDigest.getInstance("SHA-256");
-            byte[] hashedPassword = md.digest(password.getBytes());
-            StringBuilder sb = new StringBuilder();
-            for (byte b : hashedPassword) {
-                sb.append(String.format("%02x", b));
+        try {
+            session = sessionFactory.openSession();
+            CriteriaBuilder builder = session.getCriteriaBuilder();
+            CriteriaQuery<Users> query = builder.createQuery(Users.class);
+            Root<Users> root = query.from(Users.class);
+            query.select(root).where(builder.equal(root.get("userid"), userid));
+            user = session.createQuery(query).uniqueResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
             }
-            String hashedPasswordStr = sb.toString();
-            user.setPassword(hashedPasswordStr);
-            session.merge(user);
         }
 
+        return user;
     }
+
+
+    public void updateUsersPassword(String userid, String password) throws NoSuchAlgorithmException {
+        Session session = null;
+        Transaction transaction = null;
+
+        try {
+            session = sessionFactory.openSession();
+            transaction = session.beginTransaction();
+
+            Users user = getUserById(userid);
+            if (user != null) {
+                MessageDigest md = MessageDigest.getInstance("SHA-256");
+                byte[] hashedPassword = md.digest(password.getBytes());
+                StringBuilder sb = new StringBuilder();
+                for (byte b : hashedPassword) {
+                    sb.append(String.format("%02x", b));
+                }
+                String hashedPasswordStr = sb.toString();
+                user.setPassword(hashedPasswordStr);
+                session.merge(user);
+            }
+
+            transaction.commit();
+        } catch (Exception e) {
+            if (transaction != null) {
+                transaction.rollback();
+            }
+            e.printStackTrace();
+        } finally {
+            if (session != null) {
+                session.close();
+            }
+        }
+    }
+
 
 
     public void insertTeachers(List<Teacher> teachers) {

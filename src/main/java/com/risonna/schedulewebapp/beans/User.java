@@ -147,8 +147,8 @@ public class User implements Serializable {
                 String hashedPasswordStr = sb.toString();
                 for(Users user:DataHelper.getInstance().getAllUsers()){
                     if(user.getUserid().equals(username)){
-                        if(!user.getPassword().equals(hashedPasswordStr)){
-                            DataHelper.getInstance().updateUsersPassword(username, hashedPasswordStr);
+                        if(!user.getPassword().equals(password)){
+                            DataHelper.getInstance().updateUsersPassword(username, password);
                         }
                     }
                 }
