@@ -291,7 +291,6 @@ public class ScheduleController implements Serializable {
             for (Lesson lesson : getLessonsOk()) {
                 if (lesson.getLessonDay().equalsIgnoreCase(day) && lesson.getTeacherName().equalsIgnoreCase(teacherName)) {
                     filteredLessons.add(lesson);
-                    System.out.println("getFilteredLessonsByTeacherAndDay " + lesson.getTeacherName());
                 }
             }
         }
@@ -316,10 +315,8 @@ public class ScheduleController implements Serializable {
                 if(!hasLessonWithDayTime){
                     lessonsByTimePeriod.add(lesson);
                 }
-                System.out.println("getLessonsByTimePeriodAndTeacherAndDay: " + lesson.getSubjectName() + lesson.getGroupName() + lesson.getLessonDay() + lesson.getLessonTime());
             }
         }
-        System.out.println("Lessons by time period getLessonsByTimePeriodAndTeacherAndDay: " + lessonsByTimePeriod);
 
         return lessonsByTimePeriod;
     }
@@ -427,7 +424,6 @@ public class ScheduleController implements Serializable {
                             emptyLesson.setGroupColFirst(lesson.getGroupColFirst());
                             emptyLesson.setGroupColLast(lesson.getGroupColLast());
                             listOfLessons.add(emptyLesson);
-                            System.out.println("adding empty lesson for " + lesson.getGroupName());
                         }
                     }
 
@@ -448,7 +444,6 @@ public class ScheduleController implements Serializable {
                             emptyLesson.setRowSpan(1);
                             listOfLessons.add(lesson);
                             listOfLessons.add(emptyLesson);
-                            System.out.println("adding empty lesson for " + lesson.getGroupName());
                         }
                     }
 
@@ -460,14 +455,6 @@ public class ScheduleController implements Serializable {
 //                colFirst = lesson.getColFirst();
 //                colLast = lesson.getColLast();
             }
-            System.out.println("size is " + listOfLessons.size());
-            for (Lesson lesson:listOfLessons){
-                System.out.println("Lesson is: " + lesson.getSubjectName() + "rows/cols: " + lesson.getRowFirst() + "/" + lesson.getColFirst() + " s " + lesson.getRowLast() + "/" + lesson.getColLast());
-            }
-            for (Lesson lesson: copiedlistHuh){
-                System.out.println("Lesson is: " + lesson.getSubjectName());
-            }
-
             listOfListsOfLessons.add(listOfLessons);
         }
 
@@ -516,15 +503,12 @@ public class ScheduleController implements Serializable {
                         "")) && lesson.getCabinetName().replaceAll("\\s", "").equalsIgnoreCase(cabinetName.replaceAll("\\s",
                         ""))) {
                     filteredLessons.add(lesson);
-                    System.out.println("getFilteredLessonsByDayAndCabinet " + lesson.getCabinetName());
                 }
                 else{
-                    System.out.println("the statement in if() in for() in getFilteredLessonsByDayAndCabinet isn't true");
                 }
             }
         }
         else{
-            System.out.println("cabinetName is null in getFilteredLessonsByDayAndCabinet");
         }
         return filteredLessons;
     }
@@ -551,10 +535,8 @@ public class ScheduleController implements Serializable {
                 if(!hasLessonWithDayTime){
                     lessonsByTimePeriod.add(lesson);
                 }
-                System.out.println("getLessonsByTimePeriodAndDayAndCabinet: " + lesson.getSubjectName() + lesson.getGroupName() + lesson.getLessonDay() + lesson.getLessonTime());
             }
         }
-        System.out.println("Lessons by time period getLessonsByTimePeriodAndCabinetAndDay: " + lessonsByTimePeriod);
 
         return lessonsByTimePeriod;
     }

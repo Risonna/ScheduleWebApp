@@ -158,16 +158,16 @@
         <h1>#{msg.scheduledepartments}</h1>
         <h:form>
             <div class="selection-menu-wrapper">
-                <p:selectOneMenu value="#{scheduleController.selectedDepartment}" filter="true" filterMatchMode="startsWith">
-                    <f:selectItems value="#{scheduleController.departmentList}" />
-                    <p:ajax listener="#{scheduleController.updateTeacherList}" update="@form" />
+                <p:selectOneMenu value="#{scheduleDepartmentController.selectedDepartment}" filter="true" filterMatchMode="startsWith">
+                    <f:selectItems value="#{scheduleDepartmentController.departmentList}" />
+                    <p:ajax listener="#{scheduleDepartmentController.updateTeacherList}" update="@form"/>
                 </p:selectOneMenu>
-                <p:selectOneMenu value="#{scheduleController.selectedTeacher}" filter="true" filterMatchMode="startsWith">
-                    <f:selectItems value="#{scheduleController.teachersForDepartment}" />
+                <p:selectOneMenu value="#{scheduleDepartmentController.selectedTeacher}" filter="true" filterMatchMode="startsWith">
+                    <f:selectItems value="#{scheduleDepartmentController.teachersForDepartment}" />
                     <p:ajax update="@form" />
                 </p:selectOneMenu>
-                <p:selectOneMenu value="#{scheduleController.selectedDayOfWeek}">
-                    <f:selectItems value="#{scheduleController.daysOfWeek}" />
+                <p:selectOneMenu value="#{scheduleDepartmentController.selectedDayOfWeek}">
+                    <f:selectItems value="#{scheduleDepartmentController.daysOfWeek}" />
                     <p:ajax update="@form" />
                 </p:selectOneMenu>
 
@@ -177,30 +177,30 @@
 
             <table class="lesson-table" id="lessonTable">
                 <tr>
-                    <ui:fragment rendered="#{scheduleController.selectedTeacher == 'Показать Всех'}">
+                    <ui:fragment rendered="#{scheduleDepartmentController.selectedTeacher == 'Показать Всех'}">
                         <th>Преподаватель</th>
                     </ui:fragment>
                     <th>Время</th>
-                    <ui:fragment rendered="#{scheduleController.selectedDayOfWeek!='ВСЯ НЕДЕЛЯ'}">
-                        <th>#{scheduleController.selectedDayOfWeek}</th>
+                    <ui:fragment rendered="#{scheduleDepartmentController.selectedDayOfWeek!='ВСЯ НЕДЕЛЯ'}">
+                        <th>#{scheduleDepartmentController.selectedDayOfWeek}</th>
                     </ui:fragment>
-                    <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
-                        <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
+                    <ui:fragment rendered="#{scheduleDepartmentController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
+                        <ui:repeat value="#{scheduleDepartmentController.daysOfWeek}" var="day">
                             <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
                                 <th>#{day}</th>
                             </ui:fragment>
                         </ui:repeat>
                     </ui:fragment>
                 </tr>
-                <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod" rendered="#{scheduleController.selectedTeacher != 'Показать Всех'}">
+                <ui:repeat value="#{scheduleDepartmentController.TIME_PERIODS}" var="timePeriod" rendered="#{scheduleDepartmentController.selectedTeacher != 'Показать Всех'}">
                     <tr>
                         <td>
                             <h:outputText value="#{timePeriod}" />
                         </td>
-                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
+                        <ui:fragment rendered="#{scheduleDepartmentController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
                             <td>
                                 <div style="text-align: center">
-                                    <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, scheduleController.selectedDayOfWeek, scheduleController.selectedTeacher)}" var="filteredLessonsByDayAndTeacher"
+                                    <h:dataTable value="#{scheduleDepartmentController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, scheduleDepartmentController.selectedDayOfWeek, scheduleDepartmentController.selectedTeacher)}" var="filteredLessonsByDayAndTeacher"
                                                  style="display: inline-block">
                                         <h:column>
                                             <div>
@@ -211,12 +211,12 @@
                                 </div>
                             </td>
                         </ui:fragment>
-                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
-                            <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
+                        <ui:fragment rendered="#{scheduleDepartmentController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
+                            <ui:repeat value="#{scheduleDepartmentController.daysOfWeek}" var="day">
                                 <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
                                     <td>
                                         <div style="text-align: center">
-                                            <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, day, scheduleController.selectedTeacher)}" var="filteredLessonsByDayAndTeacher"
+                                            <h:dataTable value="#{scheduleDepartmentController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, day, scheduleDepartmentController.selectedTeacher)}" var="filteredLessonsByDayAndTeacher"
                                                          style="display: inline-block">
                                                 <h:column>
                                                     <div>
@@ -234,20 +234,20 @@
 
 
 
-                <ui:repeat value="#{scheduleController.teachersForDepartment}" var="teacherToSee" rendered="#{scheduleController.selectedTeacher == 'Показать Всех'}">
+                <ui:repeat value="#{scheduleDepartmentController.teachersForDepartment}" var="teacherToSee" rendered="#{scheduleDepartmentController.selectedTeacher == 'Показать Всех'}">
 
-                <ui:repeat value="#{scheduleController.TIME_PERIODS}" var="timePeriod" rendered="#{teacherToSee != 'Показать Всех' and scheduleController.isTeacherLessonsMoreThanOne(teacherToSee)}">
+                <ui:repeat value="#{scheduleDepartmentController.TIME_PERIODS}" var="timePeriod" rendered="#{teacherToSee != 'Показать Всех' and scheduleDepartmentController.isTeacherLessonsMoreThanOne(teacherToSee)}">
                     <tr>
                         <ui:fragment rendered="#{timePeriod=='8.00-9.35'}">
-                        <td class="first-teacher" rowspan="#{scheduleController.TIME_PERIODS_length}">#{teacherToSee}</td>
+                        <td class="first-teacher" rowspan="#{scheduleDepartmentController.TIME_PERIODS_length}">#{teacherToSee}</td>
                         </ui:fragment>
                         <td>
                             <h:outputText value="#{timePeriod}" />
                         </td>
-                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
+                        <ui:fragment rendered="#{scheduleDepartmentController.selectedDayOfWeek != 'ВСЯ НЕДЕЛЯ'}">
                             <td>
                                 <div style="text-align: center">
-                                    <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, scheduleController.selectedDayOfWeek, teacherToSee)}" var="filteredLessonsByDayAndTeacher"
+                                    <h:dataTable value="#{scheduleDepartmentController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, scheduleDepartmentController.selectedDayOfWeek, teacherToSee)}" var="filteredLessonsByDayAndTeacher"
                                                  style="display: inline-block">
                                         <h:column>
                                             <div>
@@ -258,12 +258,12 @@
                                 </div>
                             </td>
                         </ui:fragment>
-                        <ui:fragment rendered="#{scheduleController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
-                            <ui:repeat value="#{scheduleController.daysOfWeek}" var="day">
+                        <ui:fragment rendered="#{scheduleDepartmentController.selectedDayOfWeek == 'ВСЯ НЕДЕЛЯ'}">
+                            <ui:repeat value="#{scheduleDepartmentController.daysOfWeek}" var="day">
                                 <ui:fragment rendered="#{day != 'ВСЯ НЕДЕЛЯ'}">
                                     <td>
                                         <div style="text-align: center">
-                                            <h:dataTable value="#{scheduleController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, day, teacherToSee)}" var="filteredLessonsByDayAndTeacher"
+                                            <h:dataTable value="#{scheduleDepartmentController.getLessonsByTimePeriodAndTeacherAndDay(timePeriod, day, teacherToSee)}" var="filteredLessonsByDayAndTeacher"
                                                          style="display: inline-block">
                                                 <h:column>
                                                     <div>
