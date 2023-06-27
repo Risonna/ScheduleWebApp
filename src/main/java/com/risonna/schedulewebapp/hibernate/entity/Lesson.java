@@ -65,6 +65,13 @@ public class Lesson {
     @Column(name = "weekfromweekto", nullable = true, length = 150)
     private String fromWeekToWeek;
 
+    @Basic
+    @Column(name = "lesson_type", nullable = true, length = 10)
+    private String lessonType;
+
+    @Basic
+    @Column(name = "by_choice", nullable = true, length = 15)
+    private String byChoice;
 
     private transient String teacherName;
     private transient String subjectName;
@@ -355,5 +362,23 @@ public class Lesson {
         this.potochLesson = other.potochLesson;
         this.lessonCell = other.lessonCell;
         this.groupsForLesson = other.groupsForLesson;
+        this.lessonType = other.lessonType;
+        this.byChoice = other.byChoice;
+    }
+
+    public String getLessonType() {
+        return lessonType;
+    }
+
+    public void setLessonType(String lessonType) {
+        this.lessonType = lessonType;
+    }
+
+    public String getByChoice() {
+        return byChoice;
+    }
+
+    public void setByChoice(String byChoice) {
+        this.byChoice = byChoice;
     }
 }

@@ -46,7 +46,6 @@ public class ValidateUsername implements Validator<String> {
         // Return true if it exists, false otherwise
 
         List<Users> users = DataHelper.getInstance().getAllUsers();
-        boolean usernameExists = false;
         for (Users user: users) {
             if(user.getUserid().equals(username))return true;
         }

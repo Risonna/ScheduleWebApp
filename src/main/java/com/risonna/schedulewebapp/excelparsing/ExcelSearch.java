@@ -397,6 +397,12 @@ public class ExcelSearch {
         }
         
 
+        lesson.setLessonType("");
+        if(processedCellValue.contains("(л)") || processedCellValue.contains("(пр)") || processedCellValue.contains("(лаб)")){
+            if(processedCellValue.contains("(л)"))lesson.setLessonType("(л)");
+            if(processedCellValue.contains("(пр)"))lesson.setLessonType("(пр)");
+            if(processedCellValue.contains("(лаб)"))lesson.setLessonType("(лаб)");
+        }
 
         lesson.setCabinetName("unknown");
         lesson.setCabinetId(1);
@@ -577,7 +583,8 @@ public class ExcelSearch {
 
 
 
-
+        if(isByChoice(processedCellValue))lesson.setByChoice("(по выбору)");
+        else lesson.setByChoice("");
 
         if (potochLesson) {
             lesson.setPotochLesson(true);
@@ -615,6 +622,8 @@ public class ExcelSearch {
                         lessonPotoch.setGroupColFirst(firstCol);
                         lessonPotoch.setGroupColLast(lastCol);
                         lessonPotoch.setFromWeekToWeek(fromWeekToWeek);
+                        lessonPotoch.setLessonType(lesson.getLessonType());
+                        lessonPotoch.setByChoice(lesson.getByChoice());
 
                         if(lessonCell.getFirstColumn() <= firstCol) {
                             lessonPotoch.setColFirst(firstCol);
@@ -746,6 +755,9 @@ public class ExcelSearch {
         }
     }
 
+    private boolean isByChoice(String processedValue){
+        return processedValue.contains("повыбору");
+    }
     private String getSubjectName(String lesson) {
         String weekDay = checkWeek(lesson);
         boolean weekDayOk = weekDay.length() > 1;
