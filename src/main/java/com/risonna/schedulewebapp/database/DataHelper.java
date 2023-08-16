@@ -47,6 +47,29 @@ public class DataHelper {
         query.select(root);
         return session.createQuery(query).getResultList();
     }
+
+    public List<Lesson> getLessonsByTeacher(int teacherId) {
+        Session session = getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Lesson> query = builder.createQuery(Lesson.class);
+        Root<Lesson> root = query.from(Lesson.class);
+        query.select(root);
+        // Add a condition to the query to filter by teacherId
+        query.where(builder.equal(root.get("teacherId"), teacherId));
+        return session.createQuery(query).getResultList();
+    }
+
+    public List<Lesson> getLessonsByCabinet(int cabinetId) {
+        Session session = getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Lesson> query = builder.createQuery(Lesson.class);
+        Root<Lesson> root = query.from(Lesson.class);
+        query.select(root);
+        // Add a condition to the query to filter by teacherId
+        query.where(builder.equal(root.get("cabinetId"), cabinetId));
+        return session.createQuery(query).getResultList();
+    }
+
     public void insertLessons(List<Lesson> lessonsList) {
 
         List<Lesson> listOfLessons = getAllLessons();
@@ -69,6 +92,22 @@ public class DataHelper {
         query.select(root);
         return session.createQuery(query).getResultList();
     }
+
+    public List<Teacher> getTeachersByParameters(String department) {
+        Session session = getSession();
+        CriteriaBuilder builder = session.getCriteriaBuilder();
+        CriteriaQuery<Teacher> query = builder.createQuery(Teacher.class);
+        Root<Teacher> root = query.from(Teacher.class);
+        query.select(root);
+        // Add a condition to the query to filter by department
+        if (department != null && !department.isEmpty()) {
+            query.where(builder.equal(root.get("department"), department));
+        }
+        return session.createQuery(query).getResultList();
+    }
+
+
+
 
     public List<Subject> getAllSubjects(){
         Session session = getSession();

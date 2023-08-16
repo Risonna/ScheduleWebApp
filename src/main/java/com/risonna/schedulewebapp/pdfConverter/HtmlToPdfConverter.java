@@ -40,7 +40,7 @@ public class HtmlToPdfConverter implements Serializable {
 
             // Configure CSS styling
             ConverterProperties converterProperties = new ConverterProperties();
-            converterProperties.setMediaDeviceDescription(new MediaDeviceDescription(MediaType.SCREEN));
+            converterProperties.setMediaDeviceDescription(new MediaDeviceDescription(MediaType.ALL));
 
             // Save the current HTML page to an InputStream
             ByteArrayOutputStream baosd = new ByteArrayOutputStream();
