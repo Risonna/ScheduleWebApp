@@ -30,7 +30,7 @@ import org.hibernate.SessionFactory;
 
 @WebFilter(filterName = "HibernateSession",
         urlPatterns = {"/pages/GroupsSchedule.xhtml", "/pages/TeacherSchedule.xhtml", "/pages/CabinetsSchedule.xhtml", "/pages/DepartmentSchedule.xhtml",
-        "/pages/editing/parsing.xhtml", "/pages/editing/testing.xhtml", "/pages/editing/addTeacherAdmin.xhtml", "/pages/editing/dataAutomatic.xhtml", "/api/get-all-info/*", "/api/auth/*"})
+        "/pages/editing/parsing.xhtml", "/pages/editing/testing.xhtml", "/pages/editing/addTeacherAdmin.xhtml", "/pages/editing/dataAutomatic.xhtml", "/api/get-all-info/*", "/api/auth/*", "/websocket"}, asyncSupported = true)
 public class HibernateSession implements Filter {
 
     private SessionFactory sessionFactory;
