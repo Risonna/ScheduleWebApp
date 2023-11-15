@@ -2,31 +2,22 @@ package com.risonna.schedulewebapp.api.rs;
 
 import com.risonna.schedulewebapp.pdfConverter.HtmlToPdfConverterAsync;
 import jakarta.ws.rs.*;
-import jakarta.ws.rs.container.AsyncResponse;
-import jakarta.ws.rs.container.Suspended;
-import jakarta.ws.rs.core.MediaType;
 
-import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+import jakarta.ws.rs.core.MediaType;
+import jakarta.ws.rs.core.Response;
+
+import java.util.UUID;
+
 
 
 @Path("/pdf")
 public class PdfResource {
     @POST
     @Consumes(MediaType.TEXT_HTML)
-    @Produces("application/pdf")
-    public void generatePdf(String html, @Suspended final AsyncResponse asyncResponse) {
-        Future<byte[]> pdfDataFuture = new HtmlToPdfConverterAsync().convertPdfAsync(html);
+    public Response generatePdf(String html) {
+        String taskId = UUID.randomUUID().toString(); // Generate a unique task identifier
+        new HtmlToPdfConverterAsync().convertPdfAsync(html, taskId); // Start async PDF generation
         // Use a CompletableFuture to handle the asynchronous result
-        CompletableFuture.supplyAsync(() -> {
-            try {
-                byte[] pdfData = pdfDataFuture.get(); // Extract the result when it's ready
-                asyncResponse.resume(pdfData);
-            } catch (Exception e) {
-                // Handle any exceptions
-                asyncResponse.resume(e);
-            }
-            return null;
-        });
+        return Response.ok(taskId).build(); // Return the unique identifier to the client
     }
 }

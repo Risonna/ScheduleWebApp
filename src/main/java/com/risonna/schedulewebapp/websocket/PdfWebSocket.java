@@ -9,12 +9,13 @@ import jakarta.websocket.server.ServerEndpoint;
 
 import java.io.IOException;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@ServerEndpoint("/websocket")
+@ServerEndpoint("/websocket/pdf")
 public class PdfWebSocket {
     private static Set<Session> sessions = new CopyOnWriteArraySet<>();
-    private Session session;
+    private static final ConcurrentHashMap<String, Session> taskSessionMap = new ConcurrentHashMap<>();
 
     // Define WebSocket event methods: OnOpen, OnMessage, OnClose, OnError
     @OnOpen
@@ -26,11 +27,14 @@ public class PdfWebSocket {
     @OnMessage
     public void onMessage(String message, Session session) {
         // Handle WebSocket messages from clients
+        taskSessionMap.put(message, session);
+        System.out.println("Message receiver, " + message);
     }
 
     @OnClose
     public void onClose(Session session) {
         sessions.remove(session);
+        taskSessionMap.values().removeIf(s -> s.equals(session));
         // Handle when a WebSocket connection is closed
     }
 
@@ -49,6 +53,22 @@ public class PdfWebSocket {
                     e.printStackTrace();
                 }
             }
+        }
+    }
+    public static void notifyClient(String taskId) {
+        Session session = taskSessionMap.get(taskId);
+        // ... (find the right session using taskId)
+        if (session != null && session.isOpen()) {
+            try {
+                session.getBasicRemote().sendText(taskId);
+                System.out.println("Message " + taskId + " sent to client");
+                // Optionally, store the pdfData somewhere the client can access it via HTTP
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+        else{
+            System.out.println("Either there is no session open whatsoever or the session wasn't registered yet");
         }
     }
 }
