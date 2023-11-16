@@ -87,9 +87,9 @@ public class HtmlToPdfConverterAsync {
     public void convertPdfAsync(String html, String taskId) {
         CompletableFuture<byte[]> pdfFuture = CompletableFuture.supplyAsync(() -> convertToPdf(html));
         pdfFuture.thenAccept(pdfData -> {
+            // Store the pdfData with the taskId as a reference for later retrieval
             savePdfToFileSystem(taskId, pdfData);
             PdfWebSocket.notifyClient(taskId); // Notify the client using WebSocket
-            // Store the pdfData with the taskId as a reference for later retrieval
         }).exceptionally(e -> {
             // Handle exceptions and possibly notify the client about the failure
             return null;

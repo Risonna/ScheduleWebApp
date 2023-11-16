@@ -43,25 +43,13 @@ public class PdfWebSocket {
         // Handle WebSocket errors
     }
 
-    public static void notifyClients() {
-        // Send a notification to all connected clients
-        for (Session session : sessions) {
-            if (session.isOpen()) {
-                try {
-                    session.getBasicRemote().sendText("pdf_ready");
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-            }
-        }
-    }
     public static void notifyClient(String taskId) {
         Session session = taskSessionMap.get(taskId);
         // ... (find the right session using taskId)
         if (session != null && session.isOpen()) {
             try {
                 session.getBasicRemote().sendText(taskId);
-                System.out.println("Message " + taskId + " sent to client");
+                System.out.println("Message " + taskId + " sent to the client");
                 // Optionally, store the pdfData somewhere the client can access it via HTTP
             } catch (IOException e) {
                 e.printStackTrace();

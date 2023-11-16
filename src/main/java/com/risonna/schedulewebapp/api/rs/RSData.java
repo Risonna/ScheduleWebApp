@@ -61,4 +61,11 @@ public class RSData {
     public List<Group> getAllGroups() {
         return DataHelper.getInstance().getAllGroups();
     }
+
+    @GET
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path("/get-all-admins-teachers")
+    public List<String> getAllAdminsTeachers(){
+        return DataHelper.getInstance().getAllAdminsTeachers();
+    }
 }

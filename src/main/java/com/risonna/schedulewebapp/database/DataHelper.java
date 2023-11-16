@@ -2,6 +2,7 @@ package com.risonna.schedulewebapp.database;
 
 import com.risonna.schedulewebapp.hibernate.HibernateUtil;
 import com.risonna.schedulewebapp.hibernate.entity.*;
+import com.risonna.schedulewebapp.websocket.EntityWebsocket;
 import jakarta.inject.Named;
 import jakarta.persistence.criteria.CriteriaDelete;
 import org.hibernate.Session;
@@ -82,6 +83,7 @@ public class DataHelper {
 //            lesson.setId(i);
             session.merge(lesson);
         }
+        EntityWebsocket.notifyClients("lessons");
     }
 
     public List<Teacher> getAllTeachers() {
@@ -161,6 +163,7 @@ public class DataHelper {
             adminTeacher.setUserid(teacherLogin);
             session.persist(adminTeacher);
         }
+        EntityWebsocket.notifyClients("adminsTeachers");
     }
 
     public void deleteAdminTeacher(String teacherId){
@@ -170,6 +173,7 @@ public class DataHelper {
         Root<AdminTeacher> root = criteriaDelete.from(AdminTeacher.class);
         criteriaDelete.where(builder.equal(root.get("userid"), teacherId));
         session.createQuery(criteriaDelete).executeUpdate();
+        EntityWebsocket.notifyClients("adminsTeachers");
     }
 
     public List<UsersGroups> getAllUsersGroups() {
@@ -425,6 +429,7 @@ public class DataHelper {
         for(Teacher teacher:listToInsert){
             session.merge(teacher);
         }
+        EntityWebsocket.notifyClients("teachers");
     }
     public void insertSubjects(List<Subject> subjects) {
         List<Subject> listOfSubjects = getAllSubjects();
@@ -451,6 +456,7 @@ public class DataHelper {
         for(Subject subject:listToInsert){
             session.merge(subject);
         }
+        EntityWebsocket.notifyClients("subjects");
     }
     public void insertGroups(List<Group> groups) {
         List<Group> listOfGroups = getAllGroups();
@@ -481,6 +487,7 @@ public class DataHelper {
         for(Group group:listToInsert){
             session.merge(group);
         }
+        EntityWebsocket.notifyClients("groups");
     }
     public void insertCabinets(List<Cabinet> cabinets) {
         List<Cabinet> listOfTeachers = getAllCabinets();
@@ -511,6 +518,7 @@ public class DataHelper {
         for(Cabinet cabinet:listToInsert){
             session.merge(cabinet);
         }
+        EntityWebsocket.notifyClients("cabinets");
     }
 
 
