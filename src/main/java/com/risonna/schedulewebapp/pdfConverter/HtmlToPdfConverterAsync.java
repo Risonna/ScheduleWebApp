@@ -11,24 +11,31 @@ import com.itextpdf.styledxmlparser.jsoup.Jsoup;
 import com.itextpdf.styledxmlparser.jsoup.nodes.Document;
 import com.itextpdf.styledxmlparser.jsoup.nodes.Element;
 import com.risonna.schedulewebapp.websocket.PdfWebSocket;
+import jakarta.annotation.Resource;
 import jakarta.ejb.Asynchronous;
 import jakarta.ejb.Stateless;
+import jakarta.enterprise.concurrent.ManagedScheduledExecutorService;
 import jakarta.faces.context.FacesContext;
 import jakarta.faces.context.ResponseWriter;
 import jakarta.inject.Named;
 import jakarta.servlet.http.HttpServletResponse;
 
+import javax.naming.InitialContext;
+import javax.naming.NamingException;
 import java.io.*;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Future;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
 
 @Named
 @Stateless
 public class HtmlToPdfConverterAsync {
+
     public HtmlToPdfConverterAsync() {
     }
     public void takeThePdf() throws IOException {
@@ -85,16 +92,35 @@ public class HtmlToPdfConverterAsync {
 
     @Asynchronous
     public void convertPdfAsync(String html, String taskId) {
-        CompletableFuture<byte[]> pdfFuture = CompletableFuture.supplyAsync(() -> convertToPdf(html));
-        pdfFuture.thenAccept(pdfData -> {
-            // Store the pdfData with the taskId as a reference for later retrieval
-            savePdfToFileSystem(taskId, pdfData);
-            PdfWebSocket.notifyClient(taskId); // Notify the client using WebSocket
-        }).exceptionally(e -> {
-            // Handle exceptions and possibly notify the client about the failure
-            return null;
-        });
+        try {
+            InitialContext context = new InitialContext();
+            ManagedScheduledExecutorService managedScheduledExecutorService =
+                    (ManagedScheduledExecutorService) context.lookup(
+                            "concurrent/ScheduledPdfExecutorService");
 
+
+            CompletableFuture<byte[]> pdfFuture = CompletableFuture.supplyAsync(() -> convertToPdf(html), managedScheduledExecutorService);
+            pdfFuture.thenAccept(pdfData -> {
+                // Store the pdfData with the taskId as a reference for later retrieval
+                savePdfToFileSystem(taskId, pdfData);
+
+
+                System.out.println("Before managedExecutorService");
+
+                managedScheduledExecutorService.schedule(() -> {
+                    PdfWebSocket.notifyClient(taskId); // Notify the client using WebSocket
+                    System.out.println("In managedExecutorService");
+                }, 5, TimeUnit.SECONDS);
+                System.out.println("outside managedExecutorService");
+
+
+            }).exceptionally(e -> {
+                // Handle exceptions and possibly notify the client about the failure
+                return null;
+            });
+        } catch (NamingException e) {
+            throw new RuntimeException(e);
+        }
     }
 
 
@@ -149,7 +175,7 @@ public class HtmlToPdfConverterAsync {
             Files.createDirectories(pdfPath.getParent()); // Ensure the directory exists
             Files.write(pdfPath, pdfData); // Write the PDF bytes to the file
         } catch (IOException e) {
-            // Handle exceptions (e.g., log them and notify an administrator)
+            // Handle exceptions
             e.printStackTrace();
         }
     }

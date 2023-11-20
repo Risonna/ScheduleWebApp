@@ -5,6 +5,7 @@ import jakarta.websocket.OnError;
 import jakarta.websocket.OnMessage;
 import jakarta.websocket.OnOpen;
 import jakarta.websocket.Session;
+import jakarta.websocket.server.PathParam;
 import jakarta.websocket.server.ServerEndpoint;
 
 import java.io.IOException;
@@ -12,15 +13,17 @@ import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CopyOnWriteArraySet;
 
-@ServerEndpoint("/websocket/pdf")
+@ServerEndpoint("/websocket/pdf/{taskId}")
 public class PdfWebSocket {
     private static Set<Session> sessions = new CopyOnWriteArraySet<>();
     private static final ConcurrentHashMap<String, Session> taskSessionMap = new ConcurrentHashMap<>();
 
     // Define WebSocket event methods: OnOpen, OnMessage, OnClose, OnError
     @OnOpen
-    public void onOpen(Session session) {
+    public void onOpen(Session session, @PathParam("taskId") String taskId) {
         sessions.add(session);
+        session.getUserProperties().put("taskId", taskId);
+        System.out.println("TASK ID IN ONOPEN WEBSOCKET IS " + taskId);
         // Handle when a new WebSocket connection is established
     }
 
@@ -44,19 +47,23 @@ public class PdfWebSocket {
     }
 
     public static void notifyClient(String taskId) {
-        Session session = taskSessionMap.get(taskId);
-        // ... (find the right session using taskId)
-        if (session != null && session.isOpen()) {
-            try {
-                session.getBasicRemote().sendText(taskId);
-                System.out.println("Message " + taskId + " sent to the client");
-                // Optionally, store the pdfData somewhere the client can access it via HTTP
-            } catch (IOException e) {
-                e.printStackTrace();
+        for (Session session : sessions) {
+            if (session.isOpen()) {
+                String taskIdFromUser = (String) session.getUserProperties().get("taskId");
+                System.out.println("TASK ID IN SESSION IS " + taskIdFromUser);
+                System.out.println("TASKID GIVEN TO METHOD IS " + taskId);
+
+                if (taskIdFromUser != null && taskId.equals(taskIdFromUser)) {
+                    try {
+                        session.getBasicRemote().sendText(taskIdFromUser);
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+                else{
+                    System.out.println("NotifyClientIf Doesnt Work!!!!");
+                }
             }
-        }
-        else{
-            System.out.println("Either there is no session open whatsoever or the session wasn't registered yet");
         }
     }
 }

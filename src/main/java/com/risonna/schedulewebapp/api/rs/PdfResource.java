@@ -14,10 +14,9 @@ import java.util.UUID;
 public class PdfResource {
     @POST
     @Consumes(MediaType.TEXT_HTML)
-    public Response generatePdf(String html) {
-        String taskId = UUID.randomUUID().toString(); // Generate a unique task identifier
+    public Response generatePdf(String html, @QueryParam("taskId") String taskId) {
         new HtmlToPdfConverterAsync().convertPdfAsync(html, taskId); // Start async PDF generation
         // Use a CompletableFuture to handle the asynchronous result
-        return Response.ok(taskId).build(); // Return the unique identifier to the client
+        return Response.ok().build(); // Return the unique identifier to the client
     }
 }

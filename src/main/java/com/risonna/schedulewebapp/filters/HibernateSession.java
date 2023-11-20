@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Set;
 
 import com.risonna.schedulewebapp.hibernate.HibernateUtil;
+import com.risonna.schedulewebapp.websocket.EntityWebsocket;
 import jakarta.servlet.Filter;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.FilterConfig;
@@ -33,6 +34,7 @@ import org.hibernate.SessionFactory;
         "/pages/editing/parsing.xhtml", "/pages/editing/testing.xhtml", "/pages/editing/addTeacherAdmin.xhtml", "/pages/editing/dataAutomatic.xhtml",
                 "/api/get-all-info/*", "/api/auth/*", "/websocket/*"}, asyncSupported = true)
 public class HibernateSession implements Filter {
+    private static final ThreadLocal<String> sendNotification = new ThreadLocal<>();
 
     private SessionFactory sessionFactory;
     private static final boolean debug = false;
@@ -85,7 +87,44 @@ public class HibernateSession implements Filter {
             if (sessionFactory.getCurrentSession().isOpen()) {
                 sessionFactory.getCurrentSession().close();
             }
+
+            // Check if a notification should be sent after the filter
+            if (sendNotification.get() != null) {
+                switch (sendNotification.get()){
+                    case("adminsTeachers"): {
+                    EntityWebsocket.notifyClients("adminsTeachers");
+                    sendNotification.remove();  // Clear the thread-local variable
+                    }
+                    case("lessons"):{
+                    EntityWebsocket.notifyClients("lessons");
+                    sendNotification.remove();  // Clear the thread-local variable
+                    }
+                    case("groups"):{
+                        EntityWebsocket.notifyClients("groups");
+                        sendNotification.remove();  // Clear the thread-local variable
+                    }
+                    case("teachers"):{
+                        EntityWebsocket.notifyClients("teachers");
+                        sendNotification.remove();  // Clear the thread-local variable
+                    }
+                    case("cabinets"):{
+                        EntityWebsocket.notifyClients("cabinets");
+                        sendNotification.remove();  // Clear the thread-local variable
+                    }
+                    case("subjects"):{
+                        EntityWebsocket.notifyClients("subjects");
+                        sendNotification.remove();  // Clear the thread-local variable
+                    }
+                    default:
+                        System.out.println("GOT WRONG CASE IN HIBERNATESESSION");
+                }
+            }
         }
+    }
+
+    // Helper method to set the thread-local variable
+    public static void setSendNotification(String whatToSend) {
+        sendNotification.set(whatToSend);
     }
 
 
