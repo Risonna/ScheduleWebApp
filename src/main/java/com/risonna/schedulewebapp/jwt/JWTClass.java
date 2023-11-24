@@ -36,7 +36,7 @@ public class JWTClass {
 
     }
 
-    public boolean verifyToken(String jwtToken){
+    public boolean verifyToken(String jwtToken, String systemRole){
         JWTVerifier verifier = JWT.require(algorithm)
                 .withIssuer("WebSchedule Server")
                 .build();
@@ -51,7 +51,10 @@ public class JWTClass {
             String subject = decodedJWT.getSubject();
             System.out.println(subject);
             System.out.println(role);
-            return true;
+            if(role.equals(systemRole)){
+                return true;
+            }
+            return false;
 
         } catch (JWTVerificationException e) {
             System.out.println(e.getMessage());

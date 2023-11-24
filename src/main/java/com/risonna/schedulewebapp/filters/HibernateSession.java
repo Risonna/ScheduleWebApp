@@ -32,7 +32,7 @@ import org.hibernate.SessionFactory;
 @WebFilter(filterName = "HibernateSession",
         urlPatterns = {"/pages/GroupsSchedule.xhtml", "/pages/TeacherSchedule.xhtml", "/pages/CabinetsSchedule.xhtml", "/pages/DepartmentSchedule.xhtml",
         "/pages/editing/parsing.xhtml", "/pages/editing/testing.xhtml", "/pages/editing/addTeacherAdmin.xhtml", "/pages/editing/dataAutomatic.xhtml",
-                "/api/get-all-info/*", "/api/auth/*", "/websocket/*"}, asyncSupported = true)
+                "/api/get-all-info/*", "/api/auth/*", "/websocket/*", "/api/adminTeacher/*"}, asyncSupported = true)
 public class HibernateSession implements Filter {
     private static final ThreadLocal<String> sendNotification = new ThreadLocal<>();
 
@@ -92,31 +92,38 @@ public class HibernateSession implements Filter {
             if (sendNotification.get() != null) {
                 switch (sendNotification.get()){
                     case("adminsTeachers"): {
-                    EntityWebsocket.notifyClients("adminsTeachers");
-                    sendNotification.remove();  // Clear the thread-local variable
+                        EntityWebsocket.notifyClients("adminsTeachers");
+                        sendNotification.remove();
+                        break;
                     }
                     case("lessons"):{
-                    EntityWebsocket.notifyClients("lessons");
-                    sendNotification.remove();  // Clear the thread-local variable
+                     EntityWebsocket.notifyClients("lessons");
+                        sendNotification.remove();
+                        break;
                     }
                     case("groups"):{
                         EntityWebsocket.notifyClients("groups");
-                        sendNotification.remove();  // Clear the thread-local variable
+                        sendNotification.remove();
+                        break;
                     }
                     case("teachers"):{
                         EntityWebsocket.notifyClients("teachers");
-                        sendNotification.remove();  // Clear the thread-local variable
+                        sendNotification.remove();
+                        break;
                     }
                     case("cabinets"):{
                         EntityWebsocket.notifyClients("cabinets");
-                        sendNotification.remove();  // Clear the thread-local variable
+                        sendNotification.remove();
+                        break;
                     }
                     case("subjects"):{
                         EntityWebsocket.notifyClients("subjects");
-                        sendNotification.remove();  // Clear the thread-local variable
+                        sendNotification.remove();
+                        break;
                     }
                     default:
-                        System.out.println("GOT WRONG CASE IN HIBERNATESESSION");
+                        System.out.println("GOT WRONG CASE IN HIBERNATESESSION, the notification from seesion is " + sendNotification.get());
+                        break;
                 }
             }
         }

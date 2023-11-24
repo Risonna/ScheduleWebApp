@@ -135,8 +135,6 @@ public class AuthorizationService {
         // Authenticate user credentials against the database
         boolean authenticationSuccess = isUsernameDataMatches(request.getUsername(), request.getPassword());
         if (authenticationSuccess) {
-            // Generate an access token (you can use JWT or any other token format)
-//            String accessToken = generateAccessToken(request.getEmail());
             String role = "";
             List<UsersGroups> usersGroups = DataHelper.getInstance().getAllUsersGroups();
             for (UsersGroups userGroup: usersGroups) {

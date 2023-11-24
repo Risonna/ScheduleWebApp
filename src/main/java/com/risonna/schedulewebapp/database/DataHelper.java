@@ -52,6 +52,7 @@ public class DataHelper {
 
     public List<Lesson> getLessonsByTeacher(int teacherId) {
         Session session = getSession();
+
         CriteriaBuilder builder = session.getCriteriaBuilder();
         CriteriaQuery<Lesson> query = builder.createQuery(Lesson.class);
         Root<Lesson> root = query.from(Lesson.class);

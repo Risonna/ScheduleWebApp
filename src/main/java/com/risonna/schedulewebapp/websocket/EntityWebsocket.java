@@ -50,6 +50,7 @@ public class EntityWebsocket {
                         }
                     }
                 }
+                break;
             }
             case("teachers"):{
                 for (Session session : sessions) {
@@ -61,6 +62,7 @@ public class EntityWebsocket {
                         }
                     }
                 }
+                break;
             }
             case("subjects"):{
                 for (Session session : sessions) {
@@ -72,6 +74,7 @@ public class EntityWebsocket {
                         }
                     }
                 }
+                break;
             }
             case("cabinets"):{
                 for (Session session : sessions) {
@@ -83,6 +86,7 @@ public class EntityWebsocket {
                         }
                     }
                 }
+                break;
             }
             case("groups"):{
                 for (Session session : sessions) {
@@ -94,6 +98,7 @@ public class EntityWebsocket {
                         }
                     }
                 }
+                break;
             }
             case("adminsTeachers"):{
                 for (Session session : sessions) {
@@ -105,9 +110,11 @@ public class EntityWebsocket {
                         }
                     }
                 }
+                break;
             }
             default:{
-                System.out.println("this was invoked with a wrong string argument(PdfWebSocket.notifyAllClients)");
+                System.out.println("this was invoked with a wrong string argument(PdfWebSocket.notifyAllClients), the entity is " + entity);
+                break;
             }
         }
 

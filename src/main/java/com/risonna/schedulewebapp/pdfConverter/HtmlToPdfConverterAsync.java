@@ -11,7 +11,6 @@ import com.itextpdf.styledxmlparser.jsoup.Jsoup;
 import com.itextpdf.styledxmlparser.jsoup.nodes.Document;
 import com.itextpdf.styledxmlparser.jsoup.nodes.Element;
 import com.risonna.schedulewebapp.websocket.PdfWebSocket;
-import jakarta.annotation.Resource;
 import jakarta.ejb.Asynchronous;
 import jakarta.ejb.Stateless;
 import jakarta.enterprise.concurrent.ManagedScheduledExecutorService;
@@ -28,8 +27,6 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Named
