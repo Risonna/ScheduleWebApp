@@ -1,11 +1,9 @@
 package com.risonna.schedulewebapp.api.rs;
 
 import com.risonna.schedulewebapp.database.DataHelper;
-import com.risonna.schedulewebapp.hibernate.HibernateUtil;
 import com.risonna.schedulewebapp.hibernate.entity.*;
 import jakarta.ws.rs.*;
 import jakarta.ws.rs.core.MediaType;
-import org.hibernate.SessionFactory;
 
 import java.util.List;
 

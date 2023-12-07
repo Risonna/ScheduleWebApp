@@ -628,7 +628,48 @@ public class ScheduleController implements Serializable {
         return teacherlist;
     }
 
+    public List<String> checkCabinetUsageNoFacesContext(List<Lesson> allLessons) {
+        String cabinet = "Кабинет";
+        String inuse = "используется";
+        String byteachers = "преподавателями";
+        String usedand = "и";
+        List<String> repeatedCabinetUse = new ArrayList<>();
+        Set<String> seenCabinetUses = new HashSet<>();
 
+        for (int i = 0; i < allLessons.size(); i++) {
+            Lesson lesson = allLessons.get(i);
+            String cabinetToCheck = lesson.getCabinetName();
+            String cabinetTime = lesson.getLessonTime();
+            String cabinetDay = lesson.getLessonDay();
+            String teacherToCheck = lesson.getTeacherName();
+
+            for (int j = i + 1; j < allLessons.size(); j++) {
+                Lesson lessonj = allLessons.get(j);
+                if (lesson.getCabinetName().replaceAll("\\s", "").equalsIgnoreCase("unknown")) continue;
+
+                if (lesson.getLessonWeek().replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonWeek().replaceAll("\\s", "")) &&
+                        cabinetToCheck.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getCabinetName().replaceAll("\\s", "")) &&
+                        cabinetTime.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonTime().replaceAll("\\s", "")) &&
+                        cabinetDay.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getLessonDay().replaceAll("\\s", "")) &&
+                        !teacherToCheck.replaceAll("\\s", "").equalsIgnoreCase(lessonj.getTeacherName().replaceAll("\\s", ""))) {
+
+                    String cabinetUse = cabinet + " " + cabinetToCheck + " " + inuse + " " +
+                            cabinetTime + " " + cabinetDay + " " + byteachers + " " + lessonj.getTeacherName() + " " +
+                            usedand + " " + teacherToCheck;
+
+                    if (!seenCabinetUses.contains(cabinetUse)) {
+                        repeatedCabinetUse.add(cabinetUse);
+                        seenCabinetUses.add(cabinetUse);
+                        System.out.println(cabinetUse);
+                    }
+                }
+            }
+        }
+
+        setCabinetChecked(true);
+        return repeatedCabinetUse;
+        // Do something with the repeatedCabinetUse list, or return it based on your needs
+    }
 
     public List<String> checkCabinetUsage(List<Lesson> allLessons) {
         String baseName = "nls.messages"; // Without the "resources" folder and file extension

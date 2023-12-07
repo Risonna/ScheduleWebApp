@@ -41,6 +41,7 @@ public class AdminTeacherService {
     @DELETE
     @Path("/deleteTeacher/{teacherId}")
     public Response deleteAdminTeacher(@PathParam("teacherId") String teacherId) {
+        System.out.println("TeacherId is " + teacherId);
         // Verify the JWT
         String jwtToken = headers.getHeaderString(HttpHeaders.AUTHORIZATION);
         if (verifyToken(jwtToken, "admin")) {

@@ -27,6 +27,8 @@ public class CORSFilter implements Filter {
         ((HttpServletResponse) response).setHeader("Access-Control-Allow-Methods", "POST, GET, OPTIONS, DELETE, PUT");
         ((HttpServletResponse) response).setHeader("Access-Control-Max-Age", "3600");
         ((HttpServletResponse) response).setHeader("Access-Control-Allow-Headers", "x-requested-with, content-type, Upgrade, Sec-WebSocket-Key, Sec-WebSocket-Version, Authorization");
+
+
         chain.doFilter(request, response);
     }
 }

@@ -45,7 +45,7 @@ public class AuthorizationService {
         // Create a new user account in the database
         boolean registrationSuccess = registerUserInDatabase(request);
         if (registrationSuccess) {
-            return Response.status(Response.Status.CREATED).build();
+            return Response.ok().build();
         } else {
             return Response.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
@@ -152,6 +152,7 @@ public class AuthorizationService {
 
             // Return the access token as a response
 //            return Response.ok(accessToken).build();
+            System.out.println("Authorized user successfully");
             return Response.ok(jsonResponse).build();
         } else {
             return Response.status(Response.Status.UNAUTHORIZED).build();
