@@ -6,7 +6,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
 
-@WebFilter(filterName = "CORSFilter", urlPatterns = {"/api/get-all-info/*", "/api/auth/*", "/api/pdf/*", "/websocket/*", "/api/adminTeacher/*"}, asyncSupported = true)
+@WebFilter(filterName = "CORSFilter", urlPatterns = {"/api/get-all-info/*", "/api/auth/*", "/api/pdf/*", "/websocket/*", "/api/adminTeacher/*", "/api/excel/*"}, asyncSupported = true)
 public class CORSFilter implements Filter {
     public void init(FilterConfig config) throws ServletException {
     }
